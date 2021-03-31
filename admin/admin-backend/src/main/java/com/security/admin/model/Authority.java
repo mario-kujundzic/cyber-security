@@ -9,8 +9,16 @@ import javax.persistence.Table;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 @Entity
 @Table(name = "authorities")
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class Authority implements GrantedAuthority {
 	/**
 	 * 
@@ -20,32 +28,9 @@ public class Authority implements GrantedAuthority {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "name", unique = true)
+	@NonNull
 	private String name;
 	
-	public Authority() {
-		
-	}
-	
-	public Authority(String name) {
-		this.name = name;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	@Override
 	public String getAuthority() {
 		return this.name;
