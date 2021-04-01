@@ -11,29 +11,25 @@ import org.springframework.stereotype.Component;
 import com.security.admin.pki.certificate.CertificateGenerator;
 import com.security.admin.pki.data.IssuerData;
 import com.security.admin.pki.data.SubjectData;
-import com.security.admin.pki.keystore.KeyStoreWriter;
+import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
 
 @Component
 public class FirstTimeSetup {
-	private static String keyStorePassword;
 	private static String keyStorePath;
-
+	
+	private static KeyStoreManager keyStoreManager;
+	
 	@Autowired
-	public FirstTimeSetup(@Value("${server.ssl.key-store-password}") String keyStorePassword,
-			@Value("${server.ssl.key-store}") String keyStorePath) {
-		FirstTimeSetup.keyStorePassword = keyStorePassword;
+	public FirstTimeSetup(@Value("${server.ssl.key-store}") String keyStorePath, KeyStoreManager ksm) {
 		FirstTimeSetup.keyStorePath = keyStorePath;
+		FirstTimeSetup.keyStoreManager = ksm;
 	}
 
 	public static void execute() {
 		File f = new File(keyStorePath);
-		KeyStoreWriter ksw = new KeyStoreWriter();
 		if (f.exists()) {
-			ksw.loadKeyStore(FirstTimeSetup.keyStorePath, FirstTimeSetup.keyStorePassword.toCharArray());
-
-		} else {
-			ksw.loadKeyStore(null, FirstTimeSetup.keyStorePassword.toCharArray());
+			keyStoreManager.loadKeyStore();
 
 			KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 
@@ -44,9 +40,10 @@ public class FirstTimeSetup {
 
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
 			
-			ksw.write("sslCertificate", kp.getPrivate(), keyStorePassword.toCharArray(), cert);
-			ksw.saveKeyStore(FirstTimeSetup.keyStorePath, FirstTimeSetup.keyStorePassword.toCharArray());
-		}
-
+			keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
+			keyStoreManager.saveKeyStore();
+		} else {
+			keyStoreManager.createKeyStore();
+		} 
 	}
 }
