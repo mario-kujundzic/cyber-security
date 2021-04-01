@@ -23,7 +23,7 @@ Vue.use(VueAxios, Axios);
 
 Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
 Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
-
+Vue.axios.defaults.baseURL = 'http://localhost:9002/';
 
 new Vue({
   vuetify,
