@@ -1,36 +1,44 @@
 <template>
   <v-content>
-    <v-container class="fill-height"
-     fluid>
-     <v-row align="center" justify="center">
-       <v-col cols="12" sm="8" md="4">
-          <v-card class="elevation-6">
-            <v-card-text >
-              <v-form v-model="valid" ref="form">
-                <v-text-field
-                  v-model="user.username"
-                  :rules="[rules.email, rules.required]"
-                  label="Username"
-                  prepend-icon="mdi-account"
-                  type="text" />
-                <v-text-field
-                  v-model="user.password"
-                  :rules="[rules.required]"
-                  label="Password"
-                  prepend-icon="mdi-lock"
-                  type="password" />
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-row>
-                <v-col>
-                  <v-btn color="success" @click="login()" block height=55>Login</v-btn>
-                </v-col>
-              </v-row>
-              </v-card-actions>
-          </v-card>
-       </v-col>
-     </v-row>
+    <v-container>
+        <v-row align="center" justify="center" class="mt-10">
+            <h1>Login to your account!</h1>
+        </v-row>
+        <v-row align="center" justify="center">
+            <v-col>
+                    <v-form v-model="valid" ref="form">
+                        <v-row class="pt-10">
+                            <v-text-field
+                                v-model="user.username"
+                                :rules="[rules.email, rules.required]"
+                                label="Username"
+                                prepend-icon="mdi-account"
+                                type="text" 
+                            />
+                        </v-row>
+                        <v-row>
+                        <v-text-field
+                            v-model="user.password"
+                            :rules="[rules.required]"
+                            label="Password"
+                            prepend-icon="mdi-lock"
+                            type="password" 
+                        />
+                        </v-row>
+                    </v-form>
+                    <v-row align="center" justify="center">
+                        <a>FORGOT PASSWORD?</a>
+                    </v-row>
+                    <v-row class="pt-15">
+                        <v-col>
+                            <v-btn color="#8C9EFF" @click="login()" block>Login</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row align="center" justify="center">
+                        <a>NOT REGISTERED YET? SIGN-UP!</a>
+                    </v-row>
+            </v-col>
+        </v-row>
     </v-container>
   </v-content>
 </template>
@@ -90,5 +98,7 @@ export default {
 </script>
 
 <style scoped>
-
+    a {
+        font-size: small;
+    }
 </style>
