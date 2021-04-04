@@ -1,7 +1,6 @@
 package com.security.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -63,6 +62,12 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	// Definisemo prava pristupa odredjenim URL-ovima
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		/*http.authorizeRequests().anyRequest().authenticated()
+			.and()
+			.x509()
+				.subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+				.userDetailsService(userDetailsService());*/
+		
 		http
 				// komunikacija izmedju klijenta i servera je stateless posto je u pitanju REST
 				// aplikacija
@@ -87,7 +92,9 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 						BasicAuthenticationFilter.class);
 		// zbog jednostavnosti primera
 		http.csrf().disable();
+		
 	}
+	
 
 	// Generalna bezbednost aplikacije
 	@Override
