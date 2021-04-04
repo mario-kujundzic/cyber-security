@@ -1,30 +1,48 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import Vue from "vue"
+import VueRouter from "vue-router"
 
 Vue.use(VueRouter);
 
+import Login from '../views/Login';
+import Home from '../views/Home';
+
 const routes = [
-  {
-    path: "/",
-    name: "Home",
-    component: Home,
-  },
-  {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
-  },
-];
+    {
+        component: Home,
+        name: 'Home',
+        path: '/',
+        beforeEnter : guardRouteLoggedIn,
+        
+    },
+    {
+        component: Login,
+        name: 'Login',
+        path: '/login',
+    },
+]
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
-  routes,
+//todo: token expired
+function guardRouteLoggedIn(to, from, next) {
+    let user = JSON.parse(localStorage.getItem('user'));
+    if(!user || user['token'] === undefined)
+        next('/login');
+    else
+        next(); // allow to enter the route
+}
+
+/*function guardRouteAdmin(to, from, next) {
+    let user = localStorage.getItem('user');
+    if(user['role'] === 'ADMIN')
+        next();
+}*/
+
+/*function guardRouteDoctor(to, from, next) {
+    let user = localStorage.getItem('user');
+    if(user['role'] === 'DOCTOR')
+        next();
+}*/
+
+export default new VueRouter({
+    mode: 'history',
+    routes: routes
 });
-
-export default router;

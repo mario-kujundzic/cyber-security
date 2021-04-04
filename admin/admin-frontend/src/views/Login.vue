@@ -7,7 +7,7 @@
                 cols="12"
                 md
             >
-                <img src="../assets/doctor.png">
+                <img src="../assets/logo.png">
             </v-col>
             <v-col 
                 no-gutters 
