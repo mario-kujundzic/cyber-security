@@ -8,7 +8,6 @@
             <v-text-field label="City/Locality" v-model="csr.cityLocality"></v-text-field>
             <v-text-field label="State/Province" v-model="csr.stateProvince"></v-text-field>
             <v-text-field label="Country/Region" v-model="csr.countryRegion"></v-text-field>
-            <v-textarea label="Public key" v-model="csr.publicKey"></v-textarea>
         </v-form>
 
         <v-btn color="primary" small @click="sendRequest">Request a certificate</v-btn>
@@ -26,15 +25,20 @@ export default {
                 organizationUnit: "",
                 cityLocality: "",
                 stateProvince: "",
-                countryRegion: "",
-                publicKey: ""
+                countryRegion: ""
             }
         }
     },
 
     methods: {
         sendRequest() {
-
+            this.axios.post("/api/admin/requestCertificate", this.csr)
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         }
     }
 }
