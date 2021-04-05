@@ -12,7 +12,6 @@ public class AdminApplication {
 	public static void main(String[] args) {
 		Security.addProvider(new BouncyCastleProvider());
 		SpringApplication.run(AdminApplication.class, args);
-//		FirstTimeSetup fts = new FirstTimeSetup();
 		FirstTimeSetup.execute();
 	}
 

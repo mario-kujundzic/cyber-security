@@ -28,22 +28,24 @@ public class FirstTimeSetup {
 
 	public static void execute() {
 		File f = new File(keyStorePath);
+
 		if (f.exists()) {
 			keyStoreManager.loadKeyStore();
+			return;
+		}
 
-			KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
+		keyStoreManager.createKeyStore();
 
-			SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("Mario", "Kujundzic",
-					"Cyber Security Administrative Center", "lotusclinic505@gmail.com", "2021-01-01", "2023-01-01");
+		KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 
-			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
+		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("Mario", "Kujundzic",
+				"Cyber Security Administrative Center", "lotusclinic505@gmail.com", "2021-01-01", "2023-01-01");
 
-			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
-			
-			keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
-			keyStoreManager.saveKeyStore();
-		} else {
-			keyStoreManager.createKeyStore();
-		} 
+		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
+
+		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
+
+		keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
+		keyStoreManager.saveKeyStore();
 	}
 }
