@@ -7,7 +7,7 @@
                 cols="12"
                 md
             >
-                <img src="../assets/logo.png">
+                <img src="../../assets/logo.png">
             </v-col>
             <v-col 
                 no-gutters 
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-    import LoginForm from '../components/auth/LoginForm.vue';
+    import LoginForm from '../../components/auth/LoginForm.vue';
     export default {
         name: 'Login',
         components: { LoginForm }

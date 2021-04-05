@@ -1,33 +1,44 @@
-import Vue from "vue"
-import VueRouter from "vue-router"
+import Vue from "vue";
+import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Login from '../views/Login';
-import Home from '../views/Home';
+import Login from "../views/auth/Login";
+import Home from "../views/home/Home";
+import AddCertificate from "../views/home/AddCertificate";
+import CertificateHomePage from "../views/home/CertificateHomePage";
 
 const routes = [
-    {
-        component: Home,
-        name: 'Home',
-        path: '/',
-        beforeEnter : guardRouteLoggedIn,
-        
-    },
-    {
-        component: Login,
-        name: 'Login',
-        path: '/login',
-    },
-]
+  {
+    component: Login,
+    name: "Login",
+    path: "/login",
+  },
+  {
+    component: Home,
+    name: "Home",
+    path: "/",
+    beforeEnter: guardRouteLoggedIn,
+    children: [
+      {
+        component: CertificateHomePage,
+        name: "CertificateHome",
+        path: "",
+      },
+      {
+        component: AddCertificate,
+        name: "AddCertificate",
+        path: "add-certificate",
+      },
+    ],
+  },
+];
 
 //todo: token expired
 function guardRouteLoggedIn(to, from, next) {
-    let user = JSON.parse(localStorage.getItem('user'));
-    if(!user || !user['token'])
-        next('/login');
-    else
-        next(); // allow to enter the route
+  let user = JSON.parse(localStorage.getItem("user"));
+  if (!user || !user["token"]) next("/login");
+  else next(); // allow to enter the route
 }
 
 /*function guardRouteAdmin(to, from, next) {
@@ -43,6 +54,6 @@ function guardRouteLoggedIn(to, from, next) {
 }*/
 
 export default new VueRouter({
-    mode: 'history',
-    routes: routes
+  mode: "history",
+  routes: routes,
 });

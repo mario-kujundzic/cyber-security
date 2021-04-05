@@ -2,8 +2,8 @@ package com.security.admin;
 
 import java.io.File;
 import java.security.KeyPair;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,7 @@ public class FirstTimeSetup {
 
 		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
 
-		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
+		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, new ArrayList<>(), "SHA256WithRSAEncryption");
 		
 		keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
 		keyStoreManager.saveKeyStore();

@@ -1,0 +1,31 @@
+<template>
+  <v-container fluid fill-height class="white">
+    <v-app-bar app class="indigo accent-1">
+      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+      <v-toolbar-title>Cyber Security Admin Application</v-toolbar-title>
+      <v-spacer />
+      <router-link :to="{ name: 'AddCertificate' }" v-slot="{navigate}">
+        <v-btn @click="navigate" class="ml-3">Add certificate</v-btn>
+      </router-link>
+      <router-link :to="{ name: 'CertificateHome' }" v-slot="{navigate}">
+        <v-btn @click="navigate" class="ml-3">View certificates</v-btn>
+      </router-link>
+    </v-app-bar>
+
+    <v-main>
+      <router-view></router-view>
+    </v-main>
+  </v-container>
+</template>
+
+<script>
+export default {
+  name: "Home",
+  components: {},
+  data: () => ({}),
+};
+</script>
+
+<style scoped>
+</style>

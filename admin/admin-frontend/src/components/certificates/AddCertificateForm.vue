@@ -115,6 +115,27 @@
           </v-menu>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-combobox
+            v-model="certificate.purpose"
+            :items="certPurposes"
+            :rules="[rules.required]"
+            label="Certificate purpose"
+            required
+            multiple
+          ></v-combobox>
+        </v-col>
+        <v-col>
+          <v-combobox
+            v-model="certificate.algorithm"
+            :items="cryptAlgorithms"
+            :rules="[rules.required]"
+            label="Crypting algorithm"
+            required
+          ></v-combobox>
+        </v-col>
+      </v-row>
       <v-row class="pt-15">
         <v-col>
           <v-btn color="#8C9EFF" @click="addCert()" block
@@ -144,7 +165,23 @@ export default {
       validFrom: "",
       validTo: "",
       purpose: [],
+      algorithm: "",
     },
+    certPurposes: [
+      { text: "Digital signature", value: "128" },
+      { text: "CRL sign", value: "2" },
+      { text: "Data encipherment", value: "16" },
+      { text: "Decipher only", value: "32768" },
+      { text: "Encipher only", value: "1" },
+      { text: "Key agreement", value: "8" },
+      { text: "Key certificate sign", value: "4" },
+      { text: "Key encipherment", value: "32" },
+      { text: "Non repudiation", value: "64" },
+    ],
+    cryptAlgorithms: [
+      { text: "SHA 256 with RSA", value: "SHA256WithRSAEncryption" },
+      { text: "SHA 512 with RSA", value: "SHA512WithRSAEncryption" },
+    ],
     rules: {
       required: (v) => !!v || "Field is required",
       uppercaseLetter: (v) =>
@@ -158,10 +195,16 @@ export default {
     addCert: function () {
       this.$refs.form.validate();
       if (!this.valid) return;
+      const purpose = Object.keys(this.certificate.purpose)
+        .map((key) => this.certificate.purpose[key])
+        .map((obj) => obj.value);
+      const algorithm = this.certificate.algorithm.value;
       const dto = {
         ...this.certificate,
         validFrom: Date.parse(this.certificate.validFrom),
         validTo: Date.parse(this.certificate.validTo),
+        purpose,
+        algorithm,
       };
       console.log("proslo validacije");
       console.log(dto);

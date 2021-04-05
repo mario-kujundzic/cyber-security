@@ -1,16 +1,12 @@
 package com.security.admin.pki.util;
 
-import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -40,7 +36,6 @@ public class KeyIssuerSubjectGenerator {
 			String locality, String state, String country, String email, long startDate, long endDate) {
 
 		KeyPair keyPairSubject = generateKeyPair();
-		// TODO proveriti sta sa ovim
 		String sn = RandomUtil.getRandomBigInteger().toString();
 
 		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
