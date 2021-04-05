@@ -6,37 +6,34 @@
         </v-row>
         <v-row align="center" justify="center">
             <v-col>
-                    <v-form v-model="valid" ref="form">
-                        <v-row class="pt-10">
-                            <v-text-field
-                                v-model="user.username"
-                                :rules="[rules.email, rules.required]"
-                                label="Username"
-                                prepend-icon="mdi-account"
-                                type="text" 
-                            />
-                        </v-row>
-                        <v-row>
+                <v-form v-model="valid" ref="form">
+                    <v-row class="pt-10">
                         <v-text-field
-                            v-model="user.password"
-                            :rules="[rules.required]"
-                            label="Password"
-                            prepend-icon="mdi-lock"
-                            type="password" 
+                            v-model="user.username"
+                            :rules="[rules.email, rules.required]"
+                            label="Username"
+                            prepend-icon="mdi-account"
+                            type="text" 
                         />
-                        </v-row>
-                    </v-form>
-                    <v-row align="center" justify="center">
-                        <a>FORGOT PASSWORD?</a>
                     </v-row>
-                    <v-row class="pt-15">
-                        <v-col>
-                            <v-btn color="#8C9EFF" @click="login()" block>Login</v-btn>
-                        </v-col>
+                    <v-row>
+                    <v-text-field
+                        v-model="user.password"
+                        :rules="[rules.required]"
+                        label="Password"
+                        prepend-icon="mdi-lock"
+                        type="password" 
+                    />
                     </v-row>
-                    <v-row align="center" justify="center">
-                        <a>NOT REGISTERED YET? SIGN-UP!</a>
-                    </v-row>
+                </v-form>
+                <v-row align="center" justify="center">
+                    <a>FORGOT PASSWORD?</a>
+                </v-row>
+                <v-row class="pt-15">
+                    <v-col>
+                        <v-btn color="#8C9EFF" @click="login()" block>Login</v-btn>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
     </v-container>

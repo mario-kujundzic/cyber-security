@@ -1,5 +1,8 @@
 package com.security.admin.model;
 
+import java.math.BigInteger;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,36 +22,21 @@ public class Certificate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+		
+	@Column(name = "serial_number")
+	private BigInteger serialNumber;
 	
-	@Column
-	private byte[] encodedPublicKey;
+	@Column(name = "valid_from")
+	private Date validFrom;
 	
-	@Column
-	private String serialNumber;
-
-	@Column
-	private String commonName;
-
-	@Column
-	private String locality;
-
-	@Column
-	private String state;
-
-	@Column
-	private String organizationName;
-
-	@Column
-	private String organizationUnitName;
-
-	@Column
+	@Column(name = "valid_to")
+	private Date validTo;
+	
+	@Column(name = "email")
 	private String email;
-
-	@Column(columnDefinition = "BOOLEAN DEFAULT false")
-	private boolean signed;
-
-	@Column(columnDefinition = "BOOLEAN DEFAULT false")
-	private boolean revocationStatus;
 	
+	@Column(name= "revocation_status", columnDefinition = "BOOLEAN DEFAULT false")
+	private boolean revocationStatus;
 
+	
 }

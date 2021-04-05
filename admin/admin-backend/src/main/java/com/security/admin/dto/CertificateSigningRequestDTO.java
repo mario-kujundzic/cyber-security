@@ -1,8 +1,5 @@
 package com.security.admin.dto;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -15,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class CertificateDTO {
-		
-	private BigInteger serialNumber;
-		
+public class CertificateSigningRequestDTO {
+	
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
 	private String commonName;
@@ -48,17 +43,7 @@ public class CertificateDTO {
 	private String email;
 	
 	@NonNull
-	@NotBlank(message = "Start date is required!")
-	private Long validFrom;
+	@NotBlank(message = "Public key is required!")
+	private byte[] publicKey;
 	
-	@NonNull
-	@NotBlank(message = "End date is required!")
-	private Long validTo;
-	
-	@NonNull
-	@NotBlank(message = "Purpose is required!")
-	private List<String> purpose;
-	
-	// TODO: ne mora uvek biti rootCA, moze biti hijerahija
-	// treba da moze da se menja issuer kasnije
 }
