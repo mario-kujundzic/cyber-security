@@ -24,7 +24,7 @@ const routes = [
 //todo: token expired
 function guardRouteLoggedIn(to, from, next) {
     let user = JSON.parse(localStorage.getItem('user'));
-    if(!user || user['token'] === undefined)
+    if(!user || !user['token'])
         next('/login');
     else
         next(); // allow to enter the route
