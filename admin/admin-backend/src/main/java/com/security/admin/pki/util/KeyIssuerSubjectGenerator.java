@@ -41,7 +41,7 @@ public class KeyIssuerSubjectGenerator {
 
 		KeyPair keyPairSubject = generateKeyPair();
 		// TODO proveriti sta sa ovim
-		String sn = "1";
+		String sn = RandomUtil.getRandomBigInteger().toString();
 
 		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
 		builder.addRDN(BCStyle.CN, commonName);
@@ -52,7 +52,7 @@ public class KeyIssuerSubjectGenerator {
 		builder.addRDN(BCStyle.C, country);
 		builder.addRDN(BCStyle.EmailAddress, email);
 
-		builder.addRDN(BCStyle.UID, RandomUtil.getRandomBigInteger().toString());
+		builder.addRDN(BCStyle.UID, sn);
 		return new SubjectData(keyPairSubject.getPublic(), builder.build(), sn, new Date(startDate), new Date(endDate));
 
 	}
