@@ -38,10 +38,10 @@ public class FirstTimeSetup {
 
 		KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 
-		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("Mario", "Kujundzic",
-				"Cyber Security Administrative Center", "lotusclinic505@gmail.com", "2021-01-01", "2023-01-01");
-
 		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
+
+		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("LotusClinic", "Lotus Clinic Organization",
+					"Cyber Security Administrative Center", "Serbia", "Locality", "RS", "lotusclinic505@gmail.com", 1620079200000L, 1651615200000L);
 
 		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
 

@@ -9,7 +9,6 @@ import com.security.admin.model.Authority;
 public interface AuthorityRepository extends JpaRepository<Authority, Long> {
 
 	Authority findByName(String name);
-
 	List<Authority> findAll();
 
 }
