@@ -8,6 +8,7 @@ import Home from "../views/home/Home";
 import AddCertificate from "../views/home/AddCertificate";
 import CertificateHomePage from "../views/home/CertificateHomePage";
 import Error404 from "../views/errors/Error404"
+import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
       {
         component: CertificateHomePage,
         name: "CertificateHome",
+        path: "",
+      },
+      {
+        component: ManageCertificateRequests,
+        name: "ManageCertificateRequests",
         path: "",
       },
       {
