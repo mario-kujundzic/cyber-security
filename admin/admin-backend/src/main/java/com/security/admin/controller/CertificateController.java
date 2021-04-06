@@ -34,7 +34,6 @@ public class CertificateController {
 		List<CertificateDTO> results = certService.getAll();
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
-	
 
 	@PostMapping()
 	@PreAuthorize("hasRole('ADMIN')")

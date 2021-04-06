@@ -2,7 +2,7 @@
   <v-content>
     <v-container>
         <v-row align="center" justify="center" class="mt-10">
-            <h1>Login to your account!</h1>
+            <h1>Log in to your account!</h1>
         </v-row>
         <v-row align="center" justify="center">
             <v-col>
@@ -31,11 +31,8 @@
                     </v-row>
                     <v-row class="pt-15">
                         <v-col>
-                            <v-btn color="#8C9EFF" @click="login()" block>Login</v-btn>
+                            <v-btn color="#c2e5cf" @click="login()" block>Login</v-btn>
                         </v-col>
-                    </v-row>
-                    <v-row align="center" justify="center">
-                        <a>NOT REGISTERED YET? SIGN-UP!</a>
                     </v-row>
             </v-col>
         </v-row>

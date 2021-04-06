@@ -7,6 +7,7 @@ import Login from "../views/auth/Login";
 import Home from "../views/home/Home";
 import AddCertificate from "../views/home/AddCertificate";
 import CertificateHomePage from "../views/home/CertificateHomePage";
+import Error404 from "../views/errors/Error404"
 
 const routes = [
   {
@@ -28,9 +29,14 @@ const routes = [
       {
         component: AddCertificate,
         name: "AddCertificate",
-        path: "add-certificate",
+        path: "add-certificate/:id",
       },
     ],
+  },
+  {
+    path: "/404",
+    alias: "*",
+    component: Error404
   },
 ];
 

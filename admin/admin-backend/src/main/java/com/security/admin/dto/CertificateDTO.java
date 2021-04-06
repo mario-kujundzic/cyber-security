@@ -63,6 +63,10 @@ public class CertificateDTO {
 	@NotBlank(message = "Algorithm is required!")
 	private String algorithm;
 	
+	@NonNull
+	@NotBlank(message = "Certificate request ID is required!")
+	private Long requestId;
+	
 	// TODO: ne mora uvek biti rootCA, moze biti hijerahija
 	// treba da moze da se menja issuer kasnije	
 	private String issuer;

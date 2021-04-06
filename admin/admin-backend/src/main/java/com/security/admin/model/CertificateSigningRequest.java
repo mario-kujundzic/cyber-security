@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.security.admin.dto.CertificateSigningRequestDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,11 +39,35 @@ public class CertificateSigningRequest {
 	@Column(name = "country")
 	private String country;
 	
-	@Column(name = "public_key")
-	private byte[] publicKey;
+	@Column(name = "public_key", columnDefinition = "TEXT")
+	private String publicKey;
 	
 	@Column(name = "status")
 	private CertificateSigningRequestStatus status;
-	
 
+	public CertificateSigningRequest(CertificateSigningRequestDTO dto) {
+		commonName = dto.getCommonName();
+		organization = dto.getOrganization();
+		organizationUnit = dto.getOrganizationUnit();
+		locality = dto.getLocality();
+		state = dto.getState();
+		country = dto.getCountry();
+		publicKey = dto.getPublicKey();
+		status = CertificateSigningRequestStatus.PENDING;
+	}
+
+	@Override
+	public String toString() {
+		return "CertificateSigningRequest{" +
+				"id=" + id +
+				", commonName='" + commonName + '\'' +
+				", organization='" + organization + '\'' +
+				", organizationUnit='" + organizationUnit + '\'' +
+				", locality='" + locality + '\'' +
+				", state='" + state + '\'' +
+				", country='" + country + '\'' +
+				", publicKey='" + publicKey + '\'' +
+				", status=" + status +
+				'}';
+	}
 }

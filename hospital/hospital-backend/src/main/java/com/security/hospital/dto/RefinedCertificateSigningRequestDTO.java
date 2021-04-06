@@ -1,18 +1,19 @@
-package com.security.admin.dto;
+package com.security.hospital.dto;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
+import com.security.hospital.certificates.CertificateRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class CertificateSigningRequestDTO {
+public class RefinedCertificateSigningRequestDTO {
 	
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
@@ -45,6 +46,15 @@ public class CertificateSigningRequestDTO {
 	@NonNull
 	@NotBlank(message = "Public key is required!")
 	private String publicKey;
+
+	public RefinedCertificateSigningRequestDTO(CertificateRequest request) {
+		commonName = request.getCommonName();
+		organization = request.getOrganization();
+		organizationUnit = request.getOrganizationUnit();
+		locality = request.getCityLocality();
+		state = request.getStateProvince();
+		country = request.getCountryRegion();
+	}
 
 	public String getCommonName() {
 		return commonName;
@@ -110,5 +120,16 @@ public class CertificateSigningRequestDTO {
 		this.publicKey = publicKey;
 	}
 
-
+	@Override
+	public String toString() {
+		return "CertificateSigningRequest " +
+				"commonName='" + commonName + '\'' +
+				", organization='" + organization + '\'' +
+				", organizationUnit='" + organizationUnit + '\'' +
+				", locality='" + locality + '\'' +
+				", state='" + state + '\'' +
+				", country='" + country + '\'' +
+				", email='" + email + '\'' +
+				", publicKey='" + publicKey;
+	}
 }
