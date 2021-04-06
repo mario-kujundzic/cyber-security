@@ -69,10 +69,10 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn icon small @click="approveCSR(item)" class="mr-4">
+              <v-btn icon small @click="approveCSR(item)" class="mr-4" :disabled="item.status != 'PENDING'">
                 <v-icon>mdi-check</v-icon>
               </v-btn>
-              <v-btn icon small @click="rejectCSR(item)">
+              <v-btn icon small @click="rejectCSR(item)" :disabled="item.status != 'PENDING'">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </template>
@@ -84,6 +84,8 @@
 </template>
 
 <script>
+const apiDeclineRequest = "/api/certificateRequests/decline";
+
 export default {
   name: "ManageCertificateRequests",
 
@@ -130,12 +132,19 @@ export default {
 
     approveCSR(item) {
       // TODO: Notify hospital admin
-      this.$router.push({name: 'AddCertificate', params: {id: item.id}});
+      this.$router.push({ name: "AddCertificate", params: { id: item.id } });
     },
 
     rejectCSR(item) {
       // TODO: Notify hospital admin
-      console.log(item);
+      this.axios
+        .get(apiDeclineRequest + "/" + item.id)
+        .then(() => {
+          item.status = "REJECTED";
+        })
+        .catch(() => {
+          alert("Cannot decline!");
+        });
     },
   },
 };

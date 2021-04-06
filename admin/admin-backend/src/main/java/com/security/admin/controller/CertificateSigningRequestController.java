@@ -47,4 +47,10 @@ public class CertificateSigningRequestController {
 
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
+    
+    @GetMapping("/decline/{id}")
+    public ResponseEntity<Object> declineCertificateRequest(@PathVariable long id) {
+    	certificateSigningRequestService.declineRequest(id);
+    	return new ResponseEntity<>("Successfully declined request", HttpStatus.OK);
+    }
 }

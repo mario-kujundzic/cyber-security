@@ -91,7 +91,7 @@ public class CertificateService {
 
 		return dto;
 	}
-
+	
 	public CertificateDTO createCertificate(CertificateDTO dto) {
 		try {
 			// TODO IMPORTANT: promeniti ove kljuceve da budu - privatni od servera, public

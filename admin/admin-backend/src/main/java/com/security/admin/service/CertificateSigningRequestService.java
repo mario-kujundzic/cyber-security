@@ -54,4 +54,10 @@ public class CertificateSigningRequestService {
 	public CertificateSigningRequest getOne(Long requestId) {
 		return repository.getOne(requestId);
 	}
+
+	public void declineRequest(long id) {
+		CertificateSigningRequest request = repository.getOne(id);
+		request.setStatus(CertificateSigningRequestStatus.REJECTED);
+		repository.save(request);
+	}
 }
