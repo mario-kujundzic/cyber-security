@@ -5,14 +5,11 @@
 
       <v-toolbar-title>Cyber Security Admin Application</v-toolbar-title>
       <v-spacer />
-      <router-link :to="{ name: 'AddCertificate' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Add certificate</v-btn>
-      </router-link>
       <router-link :to="{ name: 'ViewCertificates' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">View certificates</v-btn>
+        <v-btn @click="navigate" class="ml-3">Certificates</v-btn>
       </router-link>
       <router-link :to="{ name: 'ManageCertificateRequests' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Certificate Requests</v-btn>
+        <v-btn @click="navigate" class="ml-3">Requests</v-btn>
       </router-link>
     </v-app-bar>
 
