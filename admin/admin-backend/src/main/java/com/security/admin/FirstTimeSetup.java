@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.security.admin.dto.CertificateDTO;
 import com.security.admin.pki.certificate.CertificateGenerator;
 import com.security.admin.pki.data.IssuerData;
 import com.security.admin.pki.data.SubjectData;
 import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
+import com.security.admin.service.CertificateService;
 
 @Component
 public class FirstTimeSetup {
@@ -21,10 +23,13 @@ public class FirstTimeSetup {
 	
 	private static KeyStoreManager keyStoreManager;
 	
+	private static CertificateService certificateService;
+	
 	@Autowired
-	public FirstTimeSetup(@Value("${server.ssl.key-store}") String keyStorePath, KeyStoreManager ksm) {
+	public FirstTimeSetup(@Value("${server.ssl.key-store}") String keyStorePath, KeyStoreManager ksm, CertificateService certService) {
 		FirstTimeSetup.keyStorePath = keyStorePath;
 		FirstTimeSetup.keyStoreManager = ksm;
+		FirstTimeSetup.certificateService = certService;
 	}
 
 	public static void execute() {
@@ -51,6 +56,11 @@ public class FirstTimeSetup {
 		
 		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, purposes, "SHA256WithRSAEncryption");
 
+		CertificateDTO dto = new CertificateDTO("LotusClinic", "Lotus Clinic Organization",
+				"Cyber Security Administrative Center", "Serbia", "Locality", "RS", "lotusclinic505@gmail.com", 1620079200000L, 1651615200000L, purposes, "SHA256WithRSAEncryption", 0L);
+		
+		certificateService.createCertificateModel(dto, "139095100165847", true);
+		
 		keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
 		keyStoreManager.saveKeyStore();
 	}

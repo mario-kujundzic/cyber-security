@@ -1,11 +1,13 @@
 package com.security.admin.service;
 
+import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -24,6 +26,7 @@ import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.util.Base64Utility;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
 import com.security.admin.pki.util.RandomUtil;
+import com.security.admin.repository.CertificateRepository;
 
 @Service
 public class CertificateService {
@@ -33,6 +36,9 @@ public class CertificateService {
 	
 	@Autowired
 	private CertificateSigningRequestService certRequestService;
+	
+	@Autowired
+	private CertificateRepository certificateRepository;
 	
 	public List<CertificateDTO> getAll() {
 		List<CertificateDTO> list = new ArrayList<>();
@@ -107,6 +113,8 @@ public class CertificateService {
 			req.setStatus(CertificateSigningRequestStatus.SIGNED);
 			certRequestService.save(req);
 			
+			createCertificateModel(dto, serial, false);
+			
 			Base64Utility.writeCertToFilePEM(cert, subjectData.getSerialNumber());
 			
 			return toDTO(cert);			
@@ -141,5 +149,18 @@ public class CertificateService {
 			}
 		}
 		return purposeHumanReadable;
+	}
+	
+	public void createCertificateModel(CertificateDTO dto, String serial, boolean isRootAuthority) {
+		com.security.admin.model.Certificate modelCert = new com.security.admin.model.Certificate();
+		
+		modelCert.setEmail(dto.getEmail());
+		modelCert.setRevocationStatus(false);
+		modelCert.setRootAuthority(isRootAuthority);
+		modelCert.setSerialNumber(new BigInteger(serial));
+		modelCert.setValidFrom(new Date(dto.getValidFrom()));
+		modelCert.setValidTo(new Date(dto.getValidTo()));
+		
+		certificateRepository.save(modelCert);		
 	}
 }

@@ -35,8 +35,10 @@ public class Certificate {
 	@Column(name = "email")
 	private String email;
 	
-	@Column(name= "revocation_status", columnDefinition = "BOOLEAN DEFAULT false")
+	@Column(name= "revocation_status")
 	private boolean revocationStatus;
-
+	
+	@Column(name= "root_authority")
+	private boolean rootAuthority;
 	
 }
