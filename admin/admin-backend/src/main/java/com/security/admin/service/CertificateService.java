@@ -131,17 +131,19 @@ public class CertificateService {
 		}
 	}
 
-	public CertificateDTO revokeCertifikate(String serialNumber) {
+	public CertificateDTO revokeCertificate(String serialNumber) {
 		BigInteger sn = new BigInteger(serialNumber);
 		com.security.admin.model.Certificate crt = certificateRepository.findOneBySerialNumber(sn);
 		if (crt == null)
 			return null;
+		if (crt.isRootAuthority())
+			return null; //TODO: SREDITI SA EXCEPTION
+		
 		crt.setRevocationStatus(true);
 		certificateRepository.save(crt);
 
 		// obrisi iz keystora
 		CertificateDTO revokedCert = null;
-
 		try {
 			Certificate certificate = keyStoreManager.removeCertificate(serialNumber);
 			revokedCert = toDTO(certificate);
@@ -150,7 +152,6 @@ public class CertificateService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return revokedCert;
 	}
 
