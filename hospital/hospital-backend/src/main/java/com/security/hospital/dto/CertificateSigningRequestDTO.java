@@ -1,13 +1,14 @@
-package com.security.admin.dto;
+package com.security.hospital.dto;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-
+import com.security.hospital.certificates.CertificateRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Data
 @NoArgsConstructor
@@ -45,6 +46,15 @@ public class CertificateSigningRequestDTO {
 	@NonNull
 	@NotBlank(message = "Public key is required!")
 	private String publicKey;
+
+	public CertificateSigningRequestDTO(CertificateRequest request) {
+		commonName = request.getCommonName();
+		organization = request.getOrganization();
+		organizationUnit = request.getOrganizationUnit();
+		locality = request.getCityLocality();
+		state = request.getStateProvince();
+		country = request.getCountryRegion();
+	}
 
 	public String getCommonName() {
 		return commonName;

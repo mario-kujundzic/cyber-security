@@ -10,10 +10,10 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MessageResponseDTO {
+public class GenericMessageDTO {
     private String message;
 
-    public MessageResponseDTO(String message) {
+    public GenericMessageDTO(String message) {
         this.message = message;
     }
 }
