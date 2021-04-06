@@ -131,28 +131,37 @@ public class CertificateService {
 		}
 	}
 
-	public CertificateDTO revokeCertificate(String serialNumber) {
+	public CertificateDTO revokeCertificate(String serialNumber) throws Exception {
 		BigInteger sn = new BigInteger(serialNumber);
 		com.security.admin.model.Certificate crt = certificateRepository.findOneBySerialNumber(sn);
 		if (crt == null)
-			return null;
+			throw new Exception();
 		if (crt.isRootAuthority())
-			return null; //TODO: SREDITI SA EXCEPTION
+			throw new Exception();
 		
 		crt.setRevocationStatus(true);
 		certificateRepository.save(crt);
 
 		// obrisi iz keystora
-		CertificateDTO revokedCert = null;
-		try {
-			Certificate certificate = keyStoreManager.removeCertificate(serialNumber);
-			revokedCert = toDTO(certificate);
-			keyStoreManager.saveKeyStore();
+		Certificate certificate = keyStoreManager.removeCertificate(serialNumber);
+		CertificateDTO revokedCert = toDTO(certificate);
+		keyStoreManager.saveKeyStore();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		return revokedCert;
+	}
+	
+	public List<CertificateDTO> getRevokedCerts() {
+		List<com.security.admin.model.Certificate> crts = certificateRepository.findAllByRevocationStatus(true);
+		List<CertificateDTO> crtsDTO = new ArrayList<>();
+		for (com.security.admin.model.Certificate c : crts) {
+			CertificateDTO dto = new CertificateDTO();
+			dto.setSerialNumber(c.getSerialNumber());
+			dto.setValidFrom(c.getValidFrom().getTime());
+			dto.setValidTo(c.getValidTo().getTime());
+			dto.setEmail(c.getEmail());
+			crtsDTO.add(dto);
+		}
+		return crtsDTO;
 	}
 
 	// katastrofa
