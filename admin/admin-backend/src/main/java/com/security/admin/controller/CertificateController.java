@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,4 +42,12 @@ public class CertificateController {
 		CertificateDTO created = certService.createCertificate(dto);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
+	
+	@PostMapping("/:serialNumber")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber) {
+		CertificateDTO revoked = certService.revokeCertifikate(serialNumber);
+		return new ResponseEntity<>(revoked, HttpStatus.OK);
+	}
+	
 }

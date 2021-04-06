@@ -72,4 +72,6 @@ public class CertificateDTO {
 	private String issuer;
 	
 	private List<String> purposeReadable;
+	
+	private boolean revocationStatus;
 }

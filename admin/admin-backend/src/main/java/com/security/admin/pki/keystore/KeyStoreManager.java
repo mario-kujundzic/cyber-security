@@ -3,6 +3,7 @@ package com.security.admin.pki.keystore;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -135,5 +136,11 @@ public class KeyStoreManager {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public Certificate removeCertificate(String serialNumber) throws Exception {
+		Certificate cert = this.readCertificate(serialNumber);
+		keyStore.deleteEntry(serialNumber);
+		return cert;
 	}
 }
