@@ -39,7 +39,7 @@ public class CertificateSigningRequest {
 	@Column(name = "country")
 	private String country;
 	
-	@Column(name = "public_key")
+	@Column(name = "public_key", columnDefinition = "TEXT")
 	private String publicKey;
 	
 	@Column(name = "status")
@@ -53,7 +53,21 @@ public class CertificateSigningRequest {
 		state = dto.getState();
 		country = dto.getCountry();
 		publicKey = dto.getPublicKey();
+		status = CertificateSigningRequestStatus.PENDING;
 	}
-	
 
+	@Override
+	public String toString() {
+		return "CertificateSigningRequest{" +
+				"id=" + id +
+				", commonName='" + commonName + '\'' +
+				", organization='" + organization + '\'' +
+				", organizationUnit='" + organizationUnit + '\'' +
+				", locality='" + locality + '\'' +
+				", state='" + state + '\'' +
+				", country='" + country + '\'' +
+				", publicKey='" + publicKey + '\'' +
+				", status=" + status +
+				'}';
+	}
 }

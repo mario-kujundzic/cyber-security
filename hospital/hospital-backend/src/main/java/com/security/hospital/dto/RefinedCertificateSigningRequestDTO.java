@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
-public class CertificateSigningRequestDTO {
+public class RefinedCertificateSigningRequestDTO {
 	
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
@@ -47,7 +47,7 @@ public class CertificateSigningRequestDTO {
 	@NotBlank(message = "Public key is required!")
 	private String publicKey;
 
-	public CertificateSigningRequestDTO(CertificateRequest request) {
+	public RefinedCertificateSigningRequestDTO(CertificateRequest request) {
 		commonName = request.getCommonName();
 		organization = request.getOrganization();
 		organizationUnit = request.getOrganizationUnit();
@@ -118,5 +118,18 @@ public class CertificateSigningRequestDTO {
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	@Override
+	public String toString() {
+		return "CertificateSigningRequest " +
+				"commonName='" + commonName + '\'' +
+				", organization='" + organization + '\'' +
+				", organizationUnit='" + organizationUnit + '\'' +
+				", locality='" + locality + '\'' +
+				", state='" + state + '\'' +
+				", country='" + country + '\'' +
+				", email='" + email + '\'' +
+				", publicKey='" + publicKey;
 	}
 }

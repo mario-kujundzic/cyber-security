@@ -34,10 +34,10 @@ export default {
         sendRequest() {
             this.axios.post("/api/admin/requestCertificate", this.csr)
                 .then((response) => {
-                    console.log(response);
+                    alert(response.data.message);
                 })
                 .catch((error) => {
-                    console.log(error);
+                    alert("Oops, an error occurred!\n" + error);
                 });
         }
     }

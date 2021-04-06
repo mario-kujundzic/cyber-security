@@ -33,6 +33,7 @@ public class CertificateSigningRequestService {
 
 	public void addRequest(CertificateSigningRequestDTO dto) {
 		CertificateSigningRequest request = new CertificateSigningRequest(dto);
+
 		repository.save(request);
 	}
 }
