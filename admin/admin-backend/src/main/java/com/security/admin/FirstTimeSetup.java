@@ -41,10 +41,15 @@ public class FirstTimeSetup {
 
 		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "rootCA");
 
-		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(kp.getPublic(), "LotusClinic", "Lotus Clinic Organization",
+		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(kp.getPublic(), "139095100165847", "LotusClinic", "Lotus Clinic Organization",
 					"Cyber Security Administrative Center", "Serbia", "Locality", "RS", "lotusclinic505@gmail.com", 1620079200000L, 1651615200000L);
 
-		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, new ArrayList<>(), "SHA256WithRSAEncryption");
+		ArrayList<Integer> purposes = new ArrayList<>();
+		purposes.add(128);
+		purposes.add(4);
+		purposes.add(16);
+		
+		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, purposes, "SHA256WithRSAEncryption");
 
 		keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
 		keyStoreManager.saveKeyStore();

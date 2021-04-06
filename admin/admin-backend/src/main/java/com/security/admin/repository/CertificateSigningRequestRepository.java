@@ -11,4 +11,5 @@ public interface CertificateSigningRequestRepository extends JpaRepository<Certi
 	
 	List<CertificateSigningRequest> getAllByStatus(CertificateSigningRequestStatus status);
 	CertificateSigningRequest getOneByCommonName(String commonName);
+	CertificateSigningRequest getOneByIdAndStatus(long id, CertificateSigningRequestStatus status);
 }

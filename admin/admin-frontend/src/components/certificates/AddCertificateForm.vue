@@ -196,8 +196,7 @@ export default {
   }),
   mounted: function () {
     if (!this.$route.params.id) {
-      alert("Must contain an id");
-      this.$router.push({ name: "CertificateHome" });
+      this.$router.push({ name: "ViewCertificates" });
     }
     this.axios({
       url: apiReq + "/" + this.$route.params.id,
@@ -214,9 +213,8 @@ export default {
         this.certificate.country = this.request.country;
         this.certificate.email = this.request.email;
       })
-      .catch((e) => {
-        alert(e);
-        this.$router.push({ name: "CertificateHome" });
+      .catch(() => {
+        this.$router.push({ name: "ViewCertificates" });
       });
   },
   methods: {

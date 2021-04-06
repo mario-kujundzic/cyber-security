@@ -1,14 +1,11 @@
 package com.security.admin.service;
 
-import java.security.KeyFactory;
-import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -26,6 +23,7 @@ import com.security.admin.pki.data.SubjectData;
 import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.util.Base64Utility;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
+import com.security.admin.pki.util.RandomUtil;
 
 @Service
 public class CertificateService {
@@ -89,25 +87,28 @@ public class CertificateService {
 			// TODO IMPORTANT: promeniti ove kljuceve da budu - privatni od servera, public od onog ko je requestovao
 			CertificateSigningRequest req = certRequestService.getOne(dto.getRequestId());
 			
-			byte[] publicBytes = Base64Utility.decode(req.getPublicKey());
-			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
-			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-			PublicKey pubKey = keyFactory.generatePublic(keySpec);
+			PublicKey pubKey = Base64Utility.decodePublicKeyPEM(req.getPublicKey());
 			
-			KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
-						
-			SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(pubKey, dto.getCommonName(), dto.getOrganization(), dto.getOrganizationUnit(), 
+			PrivateKey privKey = keyStoreManager.readPrivateKey("sslCertificate");
+			
+			String serial = RandomUtil.getRandomBigInteger().toString();
+									
+			SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(pubKey, serial, dto.getCommonName(), dto.getOrganization(), dto.getOrganizationUnit(), 
 					dto.getLocality(), dto.getState(), dto.getCountry(), dto.getEmail(), dto.getValidFrom(), dto.getValidTo());
 			
 			// za sada samo jedan issuer
-			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "rootCA");
+			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(privKey, "rootCA");
 			
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(), dto.getAlgorithm());
 			
 			// da li je ok da alias bude serial number?
-			keyStoreManager.write(subjectData.getSerialNumber(), kp.getPrivate(), cert);
+			keyStoreManager.write(subjectData.getSerialNumber(), privKey, cert);
 			keyStoreManager.saveKeyStore();
 			req.setStatus(CertificateSigningRequestStatus.SIGNED);
+			certRequestService.save(req);
+			
+			Base64Utility.writeCertToFilePEM(cert, subjectData.getSerialNumber());
+			
 			return toDTO(cert);			
 		} catch (Exception e) {
 			e.printStackTrace();

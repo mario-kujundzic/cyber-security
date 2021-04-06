@@ -1,6 +1,6 @@
 <template>
   <v-content fill-height fluid>
-    <v-container class="fill-height"
+    <v-container class="fill-height blue-grey lighten-5"
      fluid>
      <v-row align="center" justify="center">
     <v-card class="mx-auto" max-width="20%">
@@ -9,7 +9,7 @@
       <v-card-text class="justify-center headline">
         Sorry, we couldn't find the page you were looking for.
         <br />
-        <router-link :to="{ name: 'CertificateHome' }"
+        <router-link :to="{ name: 'ViewCertificates' }"
           >Return to the home page.
         </router-link>
       </v-card-text>
