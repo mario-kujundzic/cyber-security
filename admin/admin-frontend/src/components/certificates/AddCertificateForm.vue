@@ -219,7 +219,6 @@ export default {
   },
   methods: {
     addCert: function () {
-      console.log(this.certificate.purpose)
       this.$refs.form.validate();
       if (!this.valid) return;
       const dto = {
@@ -227,15 +226,12 @@ export default {
         validFrom: Date.parse(this.certificate.validFrom),
         validTo: Date.parse(this.certificate.validTo),
       };
-      console.log("proslo validacije");
-      console.log(dto);
       this.axios({
         url: apiCert,
         method: "POST",
         data: dto,
-      }).then((response) => {
-        console.log(response);
-        //this.$router.push({ name: "Home" });
+      }).then(() => {
+        this.$router.push({ name: "ViewCertificates" });
       });
     },
   },
