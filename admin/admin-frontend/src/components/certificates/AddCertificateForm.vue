@@ -196,8 +196,7 @@ export default {
   }),
   mounted: function () {
     if (!this.$route.params.id) {
-      alert("Must contain an id");
-      this.$router.push({ name: "CertificateHome" });
+      this.$router.push({ name: "ViewCertificates" });
     }
     this.axios({
       url: apiReq + "/" + this.$route.params.id,
@@ -214,14 +213,12 @@ export default {
         this.certificate.country = this.request.country;
         this.certificate.email = this.request.email;
       })
-      .catch((e) => {
-        alert(e);
-        this.$router.push({ name: "CertificateHome" });
+      .catch(() => {
+        this.$router.push({ name: "ViewCertificates" });
       });
   },
   methods: {
     addCert: function () {
-      console.log(this.certificate.purpose)
       this.$refs.form.validate();
       if (!this.valid) return;
       const dto = {
@@ -229,15 +226,12 @@ export default {
         validFrom: Date.parse(this.certificate.validFrom),
         validTo: Date.parse(this.certificate.validTo),
       };
-      console.log("proslo validacije");
-      console.log(dto);
       this.axios({
         url: apiCert,
         method: "POST",
         data: dto,
-      }).then((response) => {
-        console.log(response);
-        //this.$router.push({ name: "Home" });
+      }).then(() => {
+        this.$router.push({ name: "ViewCertificates" });
       });
     },
   },

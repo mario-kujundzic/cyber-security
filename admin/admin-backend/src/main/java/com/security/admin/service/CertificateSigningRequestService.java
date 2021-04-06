@@ -2,6 +2,7 @@ package com.security.admin.service;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.model.CertificateSigningRequest;
+import com.security.admin.model.CertificateSigningRequestStatus;
 import com.security.admin.repository.CertificateSigningRequestRepository;
 
 import lombok.NonNull;
@@ -24,11 +25,15 @@ public class CertificateSigningRequestService {
 	public void addRequest(CertificateSigningRequestDTO dto) {
 		CertificateSigningRequest request = new CertificateSigningRequest(dto);
 
-		repository.save(request);
+		save(request);
+	}
+	
+	public void save(CertificateSigningRequest req) {
+		repository.save(req);
 	}
 
-	public CertificateSigningRequestDTO getRequestDTO(long id) {
-		return toDTO(repository.getOne(id));
+	public CertificateSigningRequestDTO getUnsignedRequestDTO(long id) {
+		return toDTO(repository.getOneByIdAndStatus(id, CertificateSigningRequestStatus.PENDING));
 	}
 
 	public List<CertificateSigningRequestDTO> getAllRequestsDTO() {

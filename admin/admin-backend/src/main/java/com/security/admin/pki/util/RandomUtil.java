@@ -7,7 +7,16 @@ public class RandomUtil {
 	
 	public static BigInteger getRandomBigInteger() {
         Random rand = new Random();
-        BigInteger result = new BigInteger(4, rand); // (2^4-1) = 15 is the maximum value
+        int len = 15;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i != len; i++) {
+        	sb.append(rand.nextInt(10));
+        }
+        String resultString = sb.toString();
+        if (resultString.charAt(0) == '0') {
+        	resultString = "1" + resultString.substring(1, len);
+        }
+        BigInteger result = new BigInteger(resultString);
         return result;
     }
 
