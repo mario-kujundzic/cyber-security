@@ -61,6 +61,8 @@ public class CertificateService {
 		
 		// TODO: razmisliti o purpose i Extensions
 		
+		//X500Name issuer = holder.getIssuer();
+		
         return dto;
 	}
 
