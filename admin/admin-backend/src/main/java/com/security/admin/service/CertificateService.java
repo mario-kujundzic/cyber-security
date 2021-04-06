@@ -142,7 +142,7 @@ public class CertificateService {
 			return null;
 		if (crt.isRootAuthority())
 			return null; //TODO: SREDITI SA EXCEPTION
-		
+		crt.setValidTo(new Date());
 		crt.setRevocationStatus(true);
 		certificateRepository.save(crt);
 

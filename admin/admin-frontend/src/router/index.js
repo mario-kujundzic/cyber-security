@@ -7,6 +7,7 @@ import Login from "../views/auth/Login";
 import Home from "../views/home/Home";
 import AddCertificate from "../views/home/AddCertificate";
 import ViewCertificates from "../views/home/ViewCertificates";
+import ViewRevokedCertificates from "../views/home/ViewRevokedCertificates";
 import Error404 from "../views/errors/Error404"
 import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 
@@ -26,6 +27,11 @@ const routes = [
         component: ViewCertificates,
         name: "ViewCertificates",
         path: "",
+      },
+      {
+        component: ViewRevokedCertificates,
+        name: "ViewRevokedCertificates",
+        path: "revoked",
       },
       {
         component: ManageCertificateRequests,
