@@ -46,6 +46,8 @@
 <script>
 const apiURL = "/api/certificates";
 export default {
+  name: "ViewCertificates",
+  
   data() {
     return {
       search: "",
