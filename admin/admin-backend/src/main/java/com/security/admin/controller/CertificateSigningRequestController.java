@@ -33,8 +33,8 @@ public class CertificateSigningRequestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CertificateSigningRequestDTO> getCertificate(@PathVariable int id) {
-    	CertificateSigningRequestDTO dto = certificateSigningRequestService.getRequest(id);
+    public ResponseEntity<CertificateSigningRequestDTO> getCertificate(@PathVariable long id) {
+    	CertificateSigningRequestDTO dto = certificateSigningRequestService.getRequestDTO(id);
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
