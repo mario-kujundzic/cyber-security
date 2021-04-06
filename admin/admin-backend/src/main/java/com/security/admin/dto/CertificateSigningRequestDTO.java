@@ -4,6 +4,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import com.security.admin.model.CertificateSigningRequest;
+import com.security.admin.model.CertificateSigningRequestStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -13,7 +15,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class CertificateSigningRequestDTO {
-	
+	private Long id;
+
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
 	private String commonName;
@@ -45,6 +48,21 @@ public class CertificateSigningRequestDTO {
 	@NonNull
 	@NotBlank(message = "Public key is required!")
 	private String publicKey;
+
+	private CertificateSigningRequestStatus status;
+
+	public CertificateSigningRequestDTO(CertificateSigningRequest csr) {
+		commonName = csr.getCommonName();
+		organization = csr.getOrganization();
+		organizationUnit = csr.getOrganizationUnit();
+		locality = csr.getLocality();
+		state = csr.getState();
+		country = csr.getCountry();
+		email = csr.getEmail();
+		publicKey = csr.getPublicKey();
+		status = csr.getStatus();
+		id = csr.getId();
+	}
 
 	public String getCommonName() {
 		return commonName;
@@ -110,5 +128,19 @@ public class CertificateSigningRequestDTO {
 		this.publicKey = publicKey;
 	}
 
+	public CertificateSigningRequestStatus getStatus() {
+		return status;
+	}
 
+	public void setStatus(CertificateSigningRequestStatus status) {
+		this.status = status;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 }

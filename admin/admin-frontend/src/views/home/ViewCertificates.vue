@@ -44,7 +44,7 @@
 </template>
 
 <script>
-const apiURL = "/api/certificates";
+const apiURL = "api/certificates";
 export default {
   name: "ViewCertificates",
   

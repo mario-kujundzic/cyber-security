@@ -9,6 +9,9 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class CertificateSigningRequestService {
 	private CertificateSigningRequestRepository repository;
@@ -28,10 +31,18 @@ public class CertificateSigningRequestService {
 		return toDTO(repository.getOne(id));
 	}
 
+	public List<CertificateSigningRequestDTO> getAllRequestsDTO() {
+		ArrayList<CertificateSigningRequestDTO> list = new ArrayList<>();
+
+		for (CertificateSigningRequest csr : repository.findAll()) {
+			list.add(new CertificateSigningRequestDTO(csr));
+		}
+
+		return list;
+	}
+
 	private CertificateSigningRequestDTO toDTO(CertificateSigningRequest req) {
-		CertificateSigningRequestDTO dto = new CertificateSigningRequestDTO(req.getCommonName(), req.getOrganization(),
-				req.getOrganizationUnit(), req.getLocality(), req.getState(), req.getCountry(), req.getCommonName(),
-				req.getPublicKey());
+		CertificateSigningRequestDTO dto = new CertificateSigningRequestDTO(req);
 		return dto;
 	}
 

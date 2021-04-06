@@ -15,6 +15,8 @@ import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.service.CertificateSigningRequestService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/certificateRequests", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CertificateSigningRequestController {
@@ -33,9 +35,16 @@ public class CertificateSigningRequestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CertificateSigningRequestDTO> getCertificate(@PathVariable long id) {
+    public ResponseEntity<CertificateSigningRequestDTO> getCertificateRequest(@PathVariable long id) {
     	CertificateSigningRequestDTO dto = certificateSigningRequestService.getRequestDTO(id);
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<CertificateSigningRequestDTO>> getAllCertificateRequests() {
+        List<CertificateSigningRequestDTO> dtos = certificateSigningRequestService.getAllRequestsDTO();
+
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 }

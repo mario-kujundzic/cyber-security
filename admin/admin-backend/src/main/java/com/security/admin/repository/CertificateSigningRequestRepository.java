@@ -8,7 +8,9 @@ import com.security.admin.model.CertificateSigningRequest;
 import com.security.admin.model.CertificateSigningRequestStatus;
 
 public interface CertificateSigningRequestRepository extends JpaRepository<CertificateSigningRequest, Long> {
-	
+
+	List<CertificateSigningRequest> findAll();
 	List<CertificateSigningRequest> getAllByStatus(CertificateSigningRequestStatus status);
 	CertificateSigningRequest getOneByCommonName(String commonName);
+
 }
