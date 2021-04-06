@@ -63,7 +63,9 @@ public class CertificateDTO {
 	@NotBlank(message = "Algorithm is required!")
 	private String algorithm;
 	
-	private String issuer;
 	// TODO: ne mora uvek biti rootCA, moze biti hijerahija
-	// treba da moze da se menja issuer kasnije
+	// treba da moze da se menja issuer kasnije	
+	private String issuer;
+	
+	private List<String> purposeReadable;
 }

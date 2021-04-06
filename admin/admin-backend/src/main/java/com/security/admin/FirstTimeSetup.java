@@ -39,7 +39,7 @@ public class FirstTimeSetup {
 
 		KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 
-		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
+		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "rootCA");
 
 		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("LotusClinic", "Lotus Clinic Organization",
 					"Cyber Security Administrative Center", "Serbia", "Locality", "RS", "lotusclinic505@gmail.com", 1620079200000L, 1651615200000L);

@@ -16,12 +16,10 @@ import com.security.admin.pki.data.SubjectData;
 
 public class KeyIssuerSubjectGenerator {
 
-	public static IssuerData generateIssuerData(PrivateKey issuerKey, String name, String lastName) {
+	public static IssuerData generateIssuerData(PrivateKey issuerKey, String commonName) {
 		// za sada imamo samo jednog issuera
 		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-		builder.addRDN(BCStyle.CN, name + " " + lastName);
-		builder.addRDN(BCStyle.SURNAME, name);
-		builder.addRDN(BCStyle.GIVENNAME, lastName);
+		builder.addRDN(BCStyle.CN, commonName);
 		builder.addRDN(BCStyle.O, "Cyber Security Hospital Center");
 		builder.addRDN(BCStyle.OU, "Cyber Security Administrative Center");
 		builder.addRDN(BCStyle.C, "RS");
