@@ -88,7 +88,11 @@ public class CertificateService {
 
 		X500Name issuer = holder.getIssuer();
 		dto.setIssuer(issuer.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString());
-
+		
+		com.security.admin.model.Certificate crt = certificateRepository.findOneBySerialNumber(holder.getSerialNumber());
+		
+		dto.setRootAuthority(crt.isRootAuthority());
+		
 		return dto;
 	}
 	

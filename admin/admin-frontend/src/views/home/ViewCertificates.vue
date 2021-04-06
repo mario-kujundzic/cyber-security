@@ -27,9 +27,15 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-							<v-dialog v-model="dialog">	
+              <v-dialog v-model="dialog">
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn icon small v-bind="attrs" v-on="on" @click="dialog = !dialog">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="dialog = !dialog"
+                  >
                     <v-icon dark>mdi-certificate-outline</v-icon>
                   </v-btn>
                 </template>
@@ -39,7 +45,7 @@
               </v-dialog>
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
-              <v-btn icon small @click="log(item)">
+              <v-btn icon small :disabled="item.rootAuthority" @click="revokeCert(item)">
                 <v-icon dark>mdi-close-thick</v-icon>
               </v-btn>
             </template>
@@ -95,9 +101,19 @@ export default {
       });
   },
   methods: {
-		log(item) {
-			console.log(item);
-		}
+    revokeCert(item) {
+      if (item.rootAuthority) {
+        return;
+      }
+      this.axios
+        .post(apiURL + "/" + item.serialNumber)
+        .then(() => {
+          this.certificates = this.certificates.filter(f => f.serialNumber != item.serialNumber)
+        })
+        .catch(() => {
+          alert("Something went wrong.");
+        });
+    },
   },
 };
 </script>
