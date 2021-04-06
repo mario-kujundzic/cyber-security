@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="indigo accent-1">
+  <v-container fluid fill-height class="custom-background">
     <v-container id="login-card" class="white" width="70%" height="70%">
         <v-row>
             <v-col 
@@ -7,7 +7,7 @@
                 cols="12"
                 md
             >
-                <img src="../../assets/logo.png">
+                <img src="../../assets/admin-login.png">
             </v-col>
             <v-col 
                 no-gutters 
@@ -34,6 +34,9 @@
     img {
         height: 100%;
         width: 100%;
+    }
+    .custom-background {
+        background-color: #c2e5cf;
     }
 
 </style>

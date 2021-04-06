@@ -148,7 +148,8 @@
 </template>
 
 <script>
-const apiURL = "/api/certificates";
+const apiCert = "/api/certificates";
+const apiReq = "/api/certificateRequests"
 export default {
   data: () => ({
     valid: false,
@@ -166,6 +167,7 @@ export default {
       validTo: "",
       purpose: [],
       algorithm: "",
+      requestId: 1
     },
     certPurposes: [
       { text: "Digital signature", value: "128" },
@@ -191,6 +193,17 @@ export default {
         v.length < 3 || "Country code must be exactly 2 characters",
     },
   }),
+  mounted: () => {
+    if (!this.$route.params.id) {
+      alert("Must contain an id")
+      this.$router.push({name: "CertificateHome"})
+    }
+    this.axios({
+      url: apiReq + "/" + this.$route.params.id,
+      method: "GET"
+    })
+    this.certificate.requestId = this.$route.params.id
+  },
   methods: {
     addCert: function () {
       this.$refs.form.validate();
@@ -209,7 +222,7 @@ export default {
       console.log("proslo validacije");
       console.log(dto);
       this.axios({
-        url: apiURL,
+        url: apiCert,
         method: "POST",
         data: dto,
       }).then((response) => {

@@ -2,7 +2,6 @@ package com.security.admin.controller;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.dto.GenericMessageDTO;
-import com.security.admin.model.CertificateSigningRequest;
 import com.security.admin.service.CertificateSigningRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
