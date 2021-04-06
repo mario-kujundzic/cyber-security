@@ -21,15 +21,22 @@
             :search="search"
           >
             <template v-slot:[`item.validFrom`]="{ item }">
-              {{ item.validFrom | formatDate }}
+              {{ item.validFrom.toDateString() }}
             </template>
             <template v-slot:[`item.validTo`]="{ item }">
-              {{ item.validTo | formatDate }}
+              {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-btn icon small @click="log(item)">
-                <v-icon dark>mdi-certificate-outline</v-icon>
-              </v-btn>
+							<v-dialog v-model="dialog">	
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon small v-bind="attrs" v-on="on" @click="dialog = !dialog">
+                    <v-icon dark>mdi-certificate-outline</v-icon>
+                  </v-btn>
+                </template>
+                <view-certificate-form
+                  v-bind:certificate="item"
+                ></view-certificate-form>
+              </v-dialog>
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
               <v-btn icon small @click="log(item)">
@@ -44,13 +51,16 @@
 </template>
 
 <script>
+import ViewCertificateForm from "../../components/certificates/ViewCertificateForm.vue";
 const apiURL = "/api/certificates";
+
 export default {
   name: "ViewCertificates",
-  
+  components: { ViewCertificateForm },
   data() {
     return {
       search: "",
+      dialog: false,
       headers: [
         { text: "Serial Number", value: "serialNumber" },
         { text: "Common Name", value: "commonName" },
@@ -85,9 +95,9 @@ export default {
       });
   },
   methods: {
-    log(item) {
-      console.log(item);
-    },
+		log(item) {
+			console.log(item);
+		}
   },
 };
 </script>
