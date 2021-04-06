@@ -34,7 +34,7 @@
 </template>
 
 <script>
-const apiURL = "/api/certificates"; ///revoked";
+const apiURL = "/api/certificates/revoked";
 
 export default {
   name: "ViewCertificates",
@@ -44,7 +44,7 @@ export default {
       dialog: false,
       headers: [
         { text: "Serial Number", value: "serialNumber" },
-        { text: "Common Name", value: "commonName" },
+        { text: "Common Name", value: "email" },
         { text: "Valid From", value: "validFrom" },
         { text: "Valid To", value: "validTo" },
       ],
