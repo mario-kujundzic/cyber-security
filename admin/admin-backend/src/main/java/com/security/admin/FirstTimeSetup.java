@@ -41,7 +41,7 @@ public class FirstTimeSetup {
 
 		IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "rootCA");
 
-		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData("LotusClinic", "Lotus Clinic Organization",
+		SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(kp.getPublic(), "LotusClinic", "Lotus Clinic Organization",
 					"Cyber Security Administrative Center", "Serbia", "Locality", "RS", "lotusclinic505@gmail.com", 1620079200000L, 1651615200000L);
 
 		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, new ArrayList<>(), "SHA256WithRSAEncryption");

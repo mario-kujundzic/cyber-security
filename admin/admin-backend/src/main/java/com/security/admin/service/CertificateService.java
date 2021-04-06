@@ -93,6 +93,8 @@ public class CertificateService {
 			X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
 			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 			PublicKey pubKey = keyFactory.generatePublic(keySpec);
+			
+			KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 						
 			SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(pubKey, dto.getCommonName(), dto.getOrganization(), dto.getOrganizationUnit(), 
 					dto.getLocality(), dto.getState(), dto.getCountry(), dto.getEmail(), dto.getValidFrom(), dto.getValidTo());
