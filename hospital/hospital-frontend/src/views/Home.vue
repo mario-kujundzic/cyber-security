@@ -1,13 +1,9 @@
 <template>
-    <div>
-        <v-row class="ml-5 mt-5">
-            <v-col cols="4">
-                <CSRForm></CSRForm>
-            </v-col>
-            <v-col cols="4">
-            </v-col>
+    <v-container fluid fill-height class="blue-grey lighten-5">
+        <v-row align="center" justify="center">
+        <CSRForm></CSRForm>
         </v-row>
-    </div>
+    </v-container>
 </template>
 
 <script>
