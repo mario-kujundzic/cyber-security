@@ -56,6 +56,9 @@ public class CertificateService {
 		dto.setValidFrom(holder.getNotBefore().getTime());
 		dto.setValidTo(holder.getNotAfter().getTime());
 		
+		// TODO: proveriti da li je ova linija za algoritam okej
+		dto.setAlgorithm(holder.getSignatureAlgorithm().toString());
+		
 		// TODO: razmisliti o purpose i Extensions
 		
         return dto;
@@ -63,6 +66,7 @@ public class CertificateService {
 
 	public CertificateDTO createCertificate(CertificateDTO dto) {
 		try {
+			// TODO IMPORTANT: promeniti ove kljuceve da budu - privatni od servera, public od onog ko je requestovao
 			KeyPair kp = KeyIssuerSubjectGenerator.generateKeyPair();
 						
 			SubjectData subjectData = KeyIssuerSubjectGenerator.generateSubjectData(dto.getCommonName(), dto.getOrganization(), dto.getOrganizationUnit(), 
@@ -71,7 +75,7 @@ public class CertificateService {
 			// za sada samo jedan issuer
 			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
 			
-			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData);
+			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(), dto.getAlgorithm());
 			
 			// da li je ok da alias bude serial number?
 			keyStoreManager.write(subjectData.getSerialNumber(), kp.getPrivate(), cert);

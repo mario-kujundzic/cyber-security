@@ -57,7 +57,11 @@ public class CertificateDTO {
 	
 	@NonNull
 	@NotBlank(message = "Purpose is required!")
-	private List<String> purpose;
+	private List<Integer> purpose;
+
+	@NonNull
+	@NotBlank(message = "Algorithm is required!")
+	private String algorithm;
 	
 	// TODO: ne mora uvek biti rootCA, moze biti hijerahija
 	// treba da moze da se menja issuer kasnije
