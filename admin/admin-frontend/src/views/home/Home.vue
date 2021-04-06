@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="white">
+  <v-container fluid fill-height class="blue-grey lighten-5">
     <v-app-bar app color="#c2e5cf">
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
 

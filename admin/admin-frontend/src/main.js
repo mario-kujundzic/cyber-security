@@ -4,6 +4,7 @@ import vuetify from './plugins/vuetify';
 import VueAxios  from 'vue-axios'
 import Axios from 'axios'
 import router from './router/index'
+import moment from 'moment'
 
 Vue.config.productionTip = false
 
@@ -15,6 +16,12 @@ Object.defineProperty(Vue.prototype, '$role', {
   },
   set (value) {
     role.role = value;
+  }
+})
+
+Vue.filter('formatDate', function(value) {
+  if (value) {
+    return moment(String(value)).format('DD-MM-YYYY ');
   }
 })
 

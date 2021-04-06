@@ -42,7 +42,6 @@ public class CertificateService {
 			try {
 				list.add(toDTO(c));
 			} catch (CertificateEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -66,10 +65,21 @@ public class CertificateService {
 		dto.setValidFrom(holder.getNotBefore().getTime());
 		dto.setValidTo(holder.getNotAfter().getTime());
 		
-		// TODO: proveriti da li je ova linija za algoritam okej
-		dto.setAlgorithm(holder.getSignatureAlgorithm().toString());
+		// TODO: jako fishy, videti sta sa ovim
+		if(holder.getSignatureAlgorithm().getAlgorithm().toString().equals("1.2.840.113549.1.1.11"))
+			dto.setAlgorithm("SHA 256 with RSA");
+		else
+			dto.setAlgorithm("SHA 512 with RSA");
 		
 		// TODO: razmisliti o purpose i Extensions
+		//dto.setPurposeReadable(getCertificatePurpose(holder.getExtensions());
+		// kako na osnovu necega kao "1.2.840.113549.1.1.11" doci do necega kao sto je Digital signature
+		List<String> purposes = new ArrayList<>();
+		purposes.add("Digital signature"); // za sad zapucano
+		dto.setPurposeReadable(purposes);
+		
+		X500Name issuer = holder.getIssuer();
+		dto.setIssuer(issuer.getRDNs(BCStyle.CN)[0].getFirst().getValue().toString());
 		
         return dto;
 	}
@@ -88,7 +98,7 @@ public class CertificateService {
 					dto.getLocality(), dto.getState(), dto.getCountry(), dto.getEmail(), dto.getValidFrom(), dto.getValidTo());
 			
 			// za sada samo jedan issuer
-			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "Mario", "Kujundzic");
+			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(kp.getPrivate(), "rootCA");
 			
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(), dto.getAlgorithm());
 			
@@ -101,5 +111,32 @@ public class CertificateService {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	// katastrofa
+	private List<String> getCertificatePurpose(List<Integer> purposes) {
+		List<String> purposeHumanReadable = new ArrayList<>();
+		for (Integer i : purposes) {
+			if (i == 128) {
+				purposeHumanReadable.add("Digital signature");
+			} else if (i == 2) {
+				purposeHumanReadable.add("CRL sign");
+			} else if (i == 16) {
+				purposeHumanReadable.add("Data encipherment");
+			} else if (i == 32768) {
+				purposeHumanReadable.add("Decipher only");
+			} else if (i == 1) {
+				purposeHumanReadable.add("Encipher only");
+			} else if (i == 8) {
+				purposeHumanReadable.add("Key agreement");
+			} else if (i == 4) {
+				purposeHumanReadable.add("Key certificate sign");
+			} else if (i == 32) {
+				purposeHumanReadable.add("Key encipherment");
+			} else if (i == 64) {
+				purposeHumanReadable.add("Non repudiation");
+			}
+		}
+		return purposeHumanReadable;
 	}
 }
