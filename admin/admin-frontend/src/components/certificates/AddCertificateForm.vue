@@ -57,8 +57,8 @@
         <v-col>
           <v-text-field
             v-model="certificate.email"
-            :rules="[rules.required]"
-            label="Locality"
+            :rules="[rules.required, rules.mail]"
+            label="Email"
             required
           ></v-text-field>
         </v-col>
@@ -117,23 +117,21 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-combobox
+          <v-autocomplete
             v-model="certificate.purpose"
             :items="certPurposes"
-            :rules="[rules.required]"
+            :rules="[rules.requiredArray]"
             label="Certificate purpose"
-            required
             multiple
-          ></v-combobox>
+          ></v-autocomplete>
         </v-col>
         <v-col>
-          <v-combobox
+          <v-autocomplete
             v-model="certificate.algorithm"
             :items="cryptAlgorithms"
             :rules="[rules.required]"
             label="Crypting algorithm"
-            required
-          ></v-combobox>
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row class="pt-15">
@@ -149,7 +147,7 @@
 
 <script>
 const apiCert = "/api/certificates";
-const apiReq = "/api/certificateRequests"
+const apiReq = "/api/certificateRequests";
 export default {
   data: () => ({
     valid: false,
@@ -167,8 +165,9 @@ export default {
       validTo: "",
       purpose: [],
       algorithm: "",
-      requestId: 1
+      requestId: 1,
     },
+    request: {},
     certPurposes: [
       { text: "Digital signature", value: "128" },
       { text: "CRL sign", value: "2" },
@@ -186,38 +185,49 @@ export default {
     ],
     rules: {
       required: (v) => !!v || "Field is required",
+      requiredArray: (v) => v.length || "Field is required",
       uppercaseLetter: (v) =>
         /[A-Z]{2}/.test(v) ||
         "Country code must be a two-letter uppercase word",
       maxLetter: (v) =>
         v.length < 3 || "Country code must be exactly 2 characters",
+      mail: (v) => /.+@.+\..+/.test(v) || "Email must be a valid email",
     },
   }),
-  mounted: () => {
+  mounted: function () {
     if (!this.$route.params.id) {
-      alert("Must contain an id")
-      this.$router.push({name: "CertificateHome"})
+      alert("Must contain an id");
+      this.$router.push({ name: "CertificateHome" });
     }
     this.axios({
       url: apiReq + "/" + this.$route.params.id,
-      method: "GET"
+      method: "GET",
     })
-    this.certificate.requestId = this.$route.params.id
+      .then((response) => {
+        this.request = response.data;
+        this.certificate.requestId = this.$route.params.id;
+        this.certificate.commonName = this.request.commonName;
+        this.certificate.organization = this.request.organization;
+        this.certificate.organizationUnit = this.request.organizationUnit;
+        this.certificate.locality = this.request.locality;
+        this.certificate.state = this.request.state;
+        this.certificate.country = this.request.country;
+        this.certificate.email = this.request.email;
+      })
+      .catch((e) => {
+        alert(e);
+        this.$router.push({ name: "CertificateHome" });
+      });
   },
   methods: {
     addCert: function () {
+      console.log(this.certificate.purpose)
       this.$refs.form.validate();
       if (!this.valid) return;
-      const purpose = Object.keys(this.certificate.purpose)
-        .map((key) => this.certificate.purpose[key])
-        .map((obj) => obj.value);
-      const algorithm = this.certificate.algorithm.value;
       const dto = {
         ...this.certificate,
         validFrom: Date.parse(this.certificate.validFrom),
         validTo: Date.parse(this.certificate.validTo),
-        purpose,
-        algorithm,
       };
       console.log("proslo validacije");
       console.log(dto);

@@ -55,6 +55,7 @@ import ViewCertificateForm from "../../components/certificates/ViewCertificateFo
 const apiURL = "/api/certificates";
 
 export default {
+  name: "ViewCertificates",
   components: { ViewCertificateForm },
   data() {
     return {

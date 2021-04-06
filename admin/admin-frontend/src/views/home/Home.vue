@@ -8,7 +8,7 @@
       <router-link :to="{ name: 'AddCertificate' }" v-slot="{navigate}">
         <v-btn @click="navigate" class="ml-3">Add certificate</v-btn>
       </router-link>
-      <router-link :to="{ name: 'CertificateHome' }" v-slot="{navigate}">
+      <router-link :to="{ name: 'ViewCertificates' }" v-slot="{navigate}">
         <v-btn @click="navigate" class="ml-3">View certificates</v-btn>
       </router-link>
     </v-app-bar>

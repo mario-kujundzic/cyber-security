@@ -5,6 +5,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Date;
 
@@ -30,10 +31,9 @@ public class KeyIssuerSubjectGenerator {
 		return new IssuerData(issuerKey, builder.build());
 	}
 
-	public static SubjectData generateSubjectData(String commonName, String organization, String organizationUnit,
+	public static SubjectData generateSubjectData(PublicKey publicKey, String commonName, String organization, String organizationUnit,
 			String locality, String state, String country, String email, long startDate, long endDate) {
 
-		KeyPair keyPairSubject = generateKeyPair();
 		String sn = RandomUtil.getRandomBigInteger().toString();
 
 		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
@@ -46,7 +46,7 @@ public class KeyIssuerSubjectGenerator {
 		builder.addRDN(BCStyle.EmailAddress, email);
 
 		builder.addRDN(BCStyle.UID, sn);
-		return new SubjectData(keyPairSubject.getPublic(), builder.build(), sn, new Date(startDate), new Date(endDate));
+		return new SubjectData(publicKey, builder.build(), sn, new Date(startDate), new Date(endDate));
 
 	}
 

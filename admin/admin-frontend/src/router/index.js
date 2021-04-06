@@ -6,8 +6,9 @@ Vue.use(VueRouter);
 import Login from "../views/auth/Login";
 import Home from "../views/home/Home";
 import AddCertificate from "../views/home/AddCertificate";
-import CertificateHomePage from "../views/home/CertificateHomePage";
+import ViewCertificates from "../views/home/ViewCertificates";
 import Error404 from "../views/errors/Error404"
+import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 
 const routes = [
   {
@@ -22,8 +23,13 @@ const routes = [
     beforeEnter: guardRouteLoggedIn,
     children: [
       {
-        component: CertificateHomePage,
-        name: "CertificateHome",
+        component: ViewCertificates,
+        name: "ViewCertificates",
+        path: "",
+      },
+      {
+        component: ManageCertificateRequests,
+        name: "ManageCertificateRequests",
         path: "",
       },
       {
