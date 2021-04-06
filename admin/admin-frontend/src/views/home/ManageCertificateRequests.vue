@@ -22,42 +22,58 @@
             show-expand
           >
             <template v-slot:[`item.statusChip`]="{ item }">
-              <v-chip text-color="white" :color="statusToColor(item.status)">{{ item.status }}</v-chip>
+              <v-chip text-color="white" :color="statusToColor(item.status)">{{
+                item.status
+              }}</v-chip>
             </template>
 
             <template v-slot:expanded-item="{ headers, item }">
-                <td :colspan="headers.length">
-
+              <td :colspan="headers.length">
                 <div class="ma-10">
-                    <v-row>
-                        <v-col>
-                            <v-text-field :value="item.state" label="State" readonly></v-text-field>
-                        </v-col>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        :value="item.state"
+                        label="State"
+                        readonly
+                      ></v-text-field>
+                    </v-col>
 
-                        <v-col>
-                            <v-text-field :value="item.country" label="Country" readonly></v-text-field>
-                        </v-col>
+                    <v-col>
+                      <v-text-field
+                        :value="item.country"
+                        label="Country"
+                        readonly
+                      ></v-text-field>
+                    </v-col>
 
-                        <v-col>
-                            <v-text-field :value="item.organizationUnit" label="Organization unit" readonly></v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col>
-                            <v-textarea readonly :value="item.publicKey" label="Public key"></v-textarea>
-                        </v-col>
-                    </v-row>
+                    <v-col>
+                      <v-text-field
+                        :value="item.organizationUnit"
+                        label="Organization unit"
+                        readonly
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col>
+                      <v-textarea
+                        readonly
+                        :value="item.publicKey"
+                        label="Public key"
+                      ></v-textarea>
+                    </v-col>
+                  </v-row>
                 </div>
-
-                </td>
+              </td>
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
               <v-btn icon small @click="approveCSR(item)" class="mr-4">
-                  <v-icon>mdi-check</v-icon>
+                <v-icon>mdi-check</v-icon>
               </v-btn>
               <v-btn icon small @click="rejectCSR(item)">
-                  <v-icon>mdi-close</v-icon>
+                <v-icon>mdi-close</v-icon>
               </v-btn>
             </template>
           </v-data-table>
@@ -69,25 +85,26 @@
 
 <script>
 export default {
-    name: "ManageCertificateRequests",
+  name: "ManageCertificateRequests",
 
-    data() {
-        return {
-            search: "",
-            headers: [
-                { text: "Common Name", value: "commonName" },
-                { text: "Email", value: "email" },
-                { text: "Locality", value: "locality" },
-                { text: "Organization", value: "organization" },
-                { text: "Status", value: "statusChip" },
-                { text: "Actions", value: "actions" },
-                { text: '', value: 'data-table-expand' },
-            ],
-            requests: [],
-        };
+  data() {
+    return {
+      search: "",
+      headers: [
+        { text: "Common Name", value: "commonName" },
+        { text: "Email", value: "email" },
+        { text: "Locality", value: "locality" },
+        { text: "Organization", value: "organization" },
+        { text: "Status", value: "statusChip" },
+        { text: "Actions", value: "actions" },
+        { text: "", value: "data-table-expand" },
+      ],
+      requests: [],
+    };
   },
   mounted() {
-    this.axios.get("api/certificateRequests")
+    this.axios
+      .get("api/certificateRequests")
       .then((response) => {
         this.requests = response.data;
       })
@@ -101,25 +118,25 @@ export default {
     },
 
     statusToColor(status) {
-        switch (status) {
-            case "PENDING":
-                return "orange";
-            case "SIGNED":
-                return "green";
-            case "REJECTED":
-                return "red";
-        }
+      switch (status) {
+        case "PENDING":
+          return "orange";
+        case "SIGNED":
+          return "green";
+        case "REJECTED":
+          return "red";
+      }
     },
 
     approveCSR(item) {
-        // TODO: Approve CSR and sign certificate and notify hospital admin
-        console.log(item);
+      // TODO: Notify hospital admin
+      this.$router.push({name: 'AddCertificate', params: {id: item.id}});
     },
 
     rejectCSR(item) {
-        // TODO: Reject CSR and notify hospital admin
-        console.log(item);
-    }
+      // TODO: Notify hospital admin
+      console.log(item);
+    },
   },
-}
+};
 </script>

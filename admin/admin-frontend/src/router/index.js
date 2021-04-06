@@ -30,7 +30,7 @@ const routes = [
       {
         component: ManageCertificateRequests,
         name: "ManageCertificateRequests",
-        path: "/requests",
+        path: "requests",
       },
       {
         component: AddCertificate,
