@@ -111,10 +111,10 @@ public class KeyStoreManager {
 		return null;
 	}
 
-	public PrivateKey readPrivateKey(String alias, String pass) {
+	public PrivateKey readPrivateKey(String alias) {
 		try {
 			if (keyStore.isKeyEntry(alias)) {
-				PrivateKey pk = (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
+				PrivateKey pk = (PrivateKey) keyStore.getKey(alias, this.password);
 				return pk;
 			}
 		} catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {

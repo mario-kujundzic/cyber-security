@@ -26,15 +26,13 @@ public class KeyIssuerSubjectGenerator {
 		builder.addRDN(BCStyle.C, "RS");
 		builder.addRDN(BCStyle.E, "lotusclinic505@gmail.com");
 
-		builder.addRDN(BCStyle.UID, RandomUtil.getRandomBigInteger().toString());
+		builder.addRDN(BCStyle.UID, "139095100165847");
 
 		return new IssuerData(issuerKey, builder.build());
 	}
 
-	public static SubjectData generateSubjectData(PublicKey publicKey, String commonName, String organization, String organizationUnit,
+	public static SubjectData generateSubjectData(PublicKey publicKey, String serialNumber, String commonName, String organization, String organizationUnit,
 			String locality, String state, String country, String email, long startDate, long endDate) {
-
-		String sn = RandomUtil.getRandomBigInteger().toString();
 
 		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
 		builder.addRDN(BCStyle.CN, commonName);
@@ -45,8 +43,8 @@ public class KeyIssuerSubjectGenerator {
 		builder.addRDN(BCStyle.C, country);
 		builder.addRDN(BCStyle.EmailAddress, email);
 
-		builder.addRDN(BCStyle.UID, sn);
-		return new SubjectData(publicKey, builder.build(), sn, new Date(startDate), new Date(endDate));
+		builder.addRDN(BCStyle.UID, serialNumber);
+		return new SubjectData(publicKey, builder.build(), serialNumber, new Date(startDate), new Date(endDate));
 
 	}
 

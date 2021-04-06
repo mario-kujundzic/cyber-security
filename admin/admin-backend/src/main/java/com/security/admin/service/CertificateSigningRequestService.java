@@ -2,12 +2,16 @@ package com.security.admin.service;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.model.CertificateSigningRequest;
+import com.security.admin.model.CertificateSigningRequestStatus;
 import com.security.admin.repository.CertificateSigningRequestRepository;
 
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CertificateSigningRequestService {
@@ -21,17 +25,29 @@ public class CertificateSigningRequestService {
 	public void addRequest(CertificateSigningRequestDTO dto) {
 		CertificateSigningRequest request = new CertificateSigningRequest(dto);
 
-		repository.save(request);
+		save(request);
+	}
+	
+	public void save(CertificateSigningRequest req) {
+		repository.save(req);
 	}
 
-	public CertificateSigningRequestDTO getRequestDTO(long id) {
-		return toDTO(repository.getOne(id));
+	public CertificateSigningRequestDTO getUnsignedRequestDTO(long id) {
+		return toDTO(repository.getOneByIdAndStatus(id, CertificateSigningRequestStatus.PENDING));
+	}
+
+	public List<CertificateSigningRequestDTO> getAllRequestsDTO() {
+		ArrayList<CertificateSigningRequestDTO> list = new ArrayList<>();
+
+		for (CertificateSigningRequest csr : repository.findAll()) {
+			list.add(new CertificateSigningRequestDTO(csr));
+		}
+
+		return list;
 	}
 
 	private CertificateSigningRequestDTO toDTO(CertificateSigningRequest req) {
-		CertificateSigningRequestDTO dto = new CertificateSigningRequestDTO(req.getCommonName(), req.getOrganization(),
-				req.getOrganizationUnit(), req.getLocality(), req.getState(), req.getCountry(), req.getCommonName(),
-				req.getPublicKey());
+		CertificateSigningRequestDTO dto = new CertificateSigningRequestDTO(req);
 		return dto;
 	}
 

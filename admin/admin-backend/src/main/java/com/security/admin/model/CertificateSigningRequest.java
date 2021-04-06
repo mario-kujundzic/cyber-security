@@ -6,10 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Entity
 @Table(name = "requests")
@@ -41,6 +43,9 @@ public class CertificateSigningRequest {
 	
 	@Column(name = "public_key", columnDefinition = "TEXT")
 	private String publicKey;
+
+	@Column(name = "email")
+	private String email;
 	
 	@Column(name = "status")
 	private CertificateSigningRequestStatus status;
@@ -53,6 +58,7 @@ public class CertificateSigningRequest {
 		state = dto.getState();
 		country = dto.getCountry();
 		publicKey = dto.getPublicKey();
+		email = dto.getEmail();
 		status = CertificateSigningRequestStatus.PENDING;
 	}
 
@@ -69,5 +75,85 @@ public class CertificateSigningRequest {
 				", publicKey='" + publicKey + '\'' +
 				", status=" + status +
 				'}';
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
+	}
+
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public String getOrganizationUnit() {
+		return organizationUnit;
+	}
+
+	public void setOrganizationUnit(String organizationUnit) {
+		this.organizationUnit = organizationUnit;
+	}
+
+	public String getLocality() {
+		return locality;
+	}
+
+	public void setLocality(String locality) {
+		this.locality = locality;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
+
+	public CertificateSigningRequestStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(CertificateSigningRequestStatus status) {
+		this.status = status;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }
