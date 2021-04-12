@@ -85,7 +85,7 @@ export default {
                     this.axios.defaults.headers['Authorization'] = 'Bearer ' + response.data.accessToken;
                     // alert('Logged in ' + localStorage.getItem('user'))
                     //alert('Logged in: ' + this.$user['role'] + this.$user['key']);
-                    this.$router.push({ name: "Home" })
+                    this.$router.push({ name: "ViewCertificates" })
                 }
                 
             )

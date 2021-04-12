@@ -53,7 +53,7 @@
           <v-col>
             <v-text-field
               :value="certificate.email"
-              label="Locality"
+              label="Email"
               readonly
             ></v-text-field>
           </v-col>
