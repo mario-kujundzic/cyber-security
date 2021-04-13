@@ -104,6 +104,7 @@ export default {
     sendRequest() {
       this.$refs.form.validate();
       if (!this.valid) return;
+
       this.axios
         .post("/api/admin/requestCertificate", this.csr)
         .then((response) => {
