@@ -21,6 +21,12 @@ public class HospitalService {
         return new HospitalDTO(hospital);
     }
 
+    public HospitalDTO getByCommonName(String commonName) {
+        Hospital hospital = hospitalRepository.getByCommonName(commonName);
+
+        return new HospitalDTO(hospital);
+    }
+
     public ArrayList<HospitalDTO> getAll() {
         ArrayList<HospitalDTO> list = new ArrayList<>();
 

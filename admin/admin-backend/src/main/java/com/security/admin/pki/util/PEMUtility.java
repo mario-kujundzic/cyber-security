@@ -1,4 +1,4 @@
-package com.security.hospital.pki.util;
+package com.security.admin.pki.util;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;

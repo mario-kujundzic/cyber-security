@@ -7,5 +7,5 @@ import java.math.BigInteger;
 import java.util.List;
 
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
-
+    public Hospital getByCommonName(String commonName);
 }

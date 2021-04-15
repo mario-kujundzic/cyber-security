@@ -1,31 +1,26 @@
 package com.security.hospital.service;
 
-import com.security.hospital.certificates.CertificateRequest;
+import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
-import com.security.hospital.dto.RefinedCertificateSigningRequestDTO;
-import com.security.hospital.dto.UserTokenStateDTO;
-import com.security.hospital.exceptions.UserException;
 import com.security.hospital.model.Admin;
-import com.security.hospital.model.User;
+import com.security.hospital.pki.util.CryptographicUtility;
+import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.repository.UserRepository;
 import com.security.hospital.security.CustomUserDetailsService;
 import com.security.hospital.security.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
+import java.security.PrivateKey;
+import java.util.Base64;
 
 @Service
 public class AdminService {
@@ -50,19 +45,26 @@ public class AdminService {
 		this.resourceFolderPath = resourceFolderPath;
 	}
 
-	public GenericMessageDTO makeCertificateRequest(CertificateRequest certificateRequest, String adminEndpointURI, Admin admin) throws IOException, RestClientException {
+	public GenericMessageDTO makeCertificateRequest(CertificateRequestDTO certificateRequest, String adminEndpointURI, Admin admin) throws IOException, RestClientException {
 		RestTemplate restTemplate = new RestTemplate();
 
 		// Add email and public key
-		RefinedCertificateSigningRequestDTO refinedDTO = new RefinedCertificateSigningRequestDTO(certificateRequest);
-		refinedDTO.setEmail(admin.getUsername());
+		certificateRequest.setEmail(admin.getUsername());
 
-		byte[] bytes = Files.readAllBytes(Paths.get(resourceFolderPath + "/key.pub"));
-		refinedDTO.setPublicKey(new String(bytes));
+		String publicKeyPEM = KeyPairUtility.readPEM(resourceFolderPath + "/key.pub");
+		certificateRequest.setPublicKey(publicKeyPEM);
+
+		// Add signature
+		byte[] csrBytes = certificateRequest.getCSRBytes();
+		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
+		String base64Signature = Base64.getEncoder().encodeToString(signature);
+		certificateRequest.setSignature(base64Signature);
 
 		GenericMessageDTO csrResponse;
 
-		csrResponse = restTemplate.postForObject(adminEndpointURI, refinedDTO, GenericMessageDTO.class);
+		csrResponse = restTemplate.postForObject(adminEndpointURI, certificateRequest, GenericMessageDTO.class);
+
 
 		return csrResponse;
 	}

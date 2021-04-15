@@ -28,6 +28,10 @@ public class HospitalDTO {
 	private String publicKey;
 
 	public HospitalDTO(Hospital hospital) {
+		if (hospital == null) {
+			return;
+		}
+
 		id = hospital.getId();
 		commonName = hospital.getCommonName();
 		publicKey = hospital.getPublicKey();

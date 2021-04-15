@@ -49,6 +49,8 @@ public class CertificateSigningRequestDTO {
 	@NotBlank(message = "Public key is required!")
 	private String publicKey;
 
+	private String signature;
+
 	private CertificateSigningRequestStatus status;
 
 	public CertificateSigningRequestDTO(CertificateSigningRequest csr) {
@@ -62,6 +64,19 @@ public class CertificateSigningRequestDTO {
 		publicKey = csr.getPublicKey();
 		status = csr.getStatus();
 		id = csr.getId();
+	}
+
+	public byte[] getCSRBytes() {
+		String everything = commonName + organization + organizationUnit + locality + state + country + email;
+		return everything.getBytes();
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
 	}
 
 	public String getCommonName() {
