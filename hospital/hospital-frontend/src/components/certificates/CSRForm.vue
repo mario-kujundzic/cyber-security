@@ -1,5 +1,5 @@
 <template>
-  <v-card width="40%" height="50%">
+  <v-card height="50%">
     <v-form v-model="valid" ref="form">
       <v-container fluid >
         <v-row>
