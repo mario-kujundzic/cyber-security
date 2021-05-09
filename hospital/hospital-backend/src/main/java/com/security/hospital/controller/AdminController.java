@@ -1,7 +1,8 @@
 package com.security.hospital.controller;
 
-import com.security.hospital.certificates.CertificateRequest;
-import com.security.hospital.dto.RefinedCertificateSigningRequestDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.Admin;
 import com.security.hospital.service.AdminService;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,19 +35,26 @@ public class AdminController {
 
     @PostMapping("/requestCertificate")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequest certificateRequest,
-                                                                HttpServletResponse response, @AuthenticationPrincipal Admin admin) throws DisabledException{
+    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO certificateRequest,
+                                                                HttpServletResponse response, @AuthenticationPrincipal Admin admin) throws JsonProcessingException {
+
         GenericMessageDTO csrResponse;
+
         try {
-            csrResponse = adminService.makeCertificateRequest(
-                    certificateRequest,
-                    "http://localhost:9001/api/certificateRequests",
-                    admin);
+            csrResponse = adminService.makeCertificateRequest(certificateRequest,
+                    "http://localhost:9001/api/certificateRequests", admin);
         } catch (IOException exception) {
             return new ResponseEntity<>(new GenericMessageDTO("Something went wrong while trying to read the public key."), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (RestClientException exception) {
-            return new ResponseEntity<>(new GenericMessageDTO("Something went wrong with the admin server, message: " + exception.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (HttpClientErrorException e) {
+            String responseString = e.getResponseBodyAsString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            GenericMessageDTO messageDTO = objectMapper.readValue(responseString, GenericMessageDTO.class);
+            return new ResponseEntity<>(messageDTO, HttpStatus.BAD_REQUEST);
+        } catch (RestClientException e) {
+            return new ResponseEntity<>(new GenericMessageDTO("Something went wrong with the admin server: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+
 
         return new ResponseEntity<>(csrResponse, HttpStatus.OK);
 

@@ -79,7 +79,7 @@ export default {
                         role : response.data.userRole
                     }
                     localStorage.setItem('user', JSON.stringify(loggedInUser));
-                    alert('Logged in ' + localStorage.getItem('user'))
+                    // alert('Logged in ' + localStorage.getItem('user'))
                     this.axios.defaults.headers['Authorization'] = `Bearer ${loggedInUser.token}`;
                     localStorage.setItem('authKey', `Bearer ${loggedInUser.token}`);
                     this.$router.push({ name: "Home" })

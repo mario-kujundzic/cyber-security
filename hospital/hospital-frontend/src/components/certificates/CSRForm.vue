@@ -1,5 +1,5 @@
 <template>
-  <v-card width="40%" height="50%">
+  <v-card height="50%">
     <v-form v-model="valid" ref="form">
       <v-container fluid >
         <v-row>
@@ -12,9 +12,9 @@
         <v-row>
           <v-col>
             <v-text-field
-              label="Common Name/Email"
+              label="Common Name"
               v-model="csr.commonName"
-              :rules="[rules.required, rules.mail]"
+              :rules="[rules.required]"
             required
             ></v-text-field>
           </v-col>
@@ -39,7 +39,7 @@
           <v-col>
             <v-text-field
               label="Locality"
-              v-model="csr.cityLocality"
+              v-model="csr.locality"
               :rules="[rules.required]"
             required
             ></v-text-field>
@@ -49,7 +49,7 @@
           <v-col>
             <v-text-field
               label="State"
-              v-model="csr.stateProvince"
+              v-model="csr.state"
               :rules="[rules.required]"
             required
             ></v-text-field>
@@ -57,7 +57,7 @@
           <v-col>
             <v-text-field
               label="Country code"
-              v-model="csr.countryRegion"
+              v-model="csr.country"
               :rules="[rules.required, rules.uppercaseLetter, rules.maxLetter]"
             required
             ></v-text-field> </v-col
@@ -93,9 +93,9 @@ export default {
         commonName: "",
         organization: "",
         organizationUnit: "",
-        cityLocality: "",
-        stateProvince: "",
-        countryRegion: "",
+        locality: "",
+        state: "",
+        country: "",
       },
     };
   },
@@ -104,13 +104,14 @@ export default {
     sendRequest() {
       this.$refs.form.validate();
       if (!this.valid) return;
+
       this.axios
         .post("/api/admin/requestCertificate", this.csr)
         .then((response) => {
           alert(response.data.message);
         })
         .catch((error) => {
-          alert("Oops, an error occurred!\n" + error);
+          alert(error.response.data.message);
         });
     },
   },

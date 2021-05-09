@@ -8,16 +8,16 @@ import Home from '../views/Home';
 
 const routes = [
     {
+        component: Login,
+        name: 'Login',
+        path: '/login',
+    },
+    {
         component: Home,
         name: 'Home',
         path: '/',
         beforeEnter : guardRouteLoggedIn,
         
-    },
-    {
-        component: Login,
-        name: 'Login',
-        path: '/login',
     },
 ]
 

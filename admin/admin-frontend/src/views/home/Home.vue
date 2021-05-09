@@ -8,6 +8,11 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>Admin Application</v-toolbar-title>
+      <v-spacer />
+
+      <router-link :to="{ name: 'ManageHospitals' }" v-slot="{navigate}">
+        <v-btn @click="navigate" class="ml-3">Hospitals</v-btn>
+      </router-link>
     </v-app-bar>
 
     <v-main class="blue-grey lighten-5">

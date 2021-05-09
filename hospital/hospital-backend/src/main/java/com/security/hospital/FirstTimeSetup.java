@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Base64;
 

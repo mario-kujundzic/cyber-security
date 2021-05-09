@@ -29,7 +29,11 @@ public class CertificateSigningRequestController {
 
     @PostMapping()
     public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody CertificateSigningRequestDTO dto) {
-        certificateSigningRequestService.addRequest(dto);
+        try {
+            certificateSigningRequestService.addRequest(dto);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(new GenericMessageDTO("Certificate request successfully created! Wait for the Super Admin to respond."), HttpStatus.OK);
     }
