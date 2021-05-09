@@ -81,6 +81,6 @@ public class UserService {
         String jwt = tokenUtils.generateToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
 
-        return new UserTokenStateDTO(user.getId(), jwt, expiresIn);
+        return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname());
     }
 }

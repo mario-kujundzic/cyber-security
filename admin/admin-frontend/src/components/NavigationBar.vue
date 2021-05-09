@@ -1,21 +1,23 @@
 <template>
-  <v-container style="width: 350px">
+  <v-container>
+    <v-layout justify-center align-center>
+      <v-flex shrink>
+        <v-img
+          src="../assets/cat.gif"
+          style="width: 100px; height: 100px"
+        ></v-img>
+      </v-flex>
+    </v-layout>
     <v-list>
-      <v-list-item>
-        <v-list-item-avatar>
-          <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
-        </v-list-item-avatar>
-      </v-list-item>
-
       <v-list-item link>
         <v-list-item-content>
-          <v-list-item-title class="title"> Admin Adminovic </v-list-item-title>
-          <v-list-item-subtitle>admin1@gmail.com</v-list-item-subtitle>
+          <v-list-item-title class="title d-flex justify-center">{{
+            user.name + " " + user.surname
+          }}</v-list-item-title>
+          <v-list-item-subtitle class="d-flex justify-center">{{
+            user.username
+          }}</v-list-item-subtitle>
         </v-list-item-content>
-
-        <v-list-item-action>
-          <v-icon>mdi-menu-down</v-icon>
-        </v-list-item-action>
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
@@ -77,10 +79,14 @@
 export default {
   data: () => ({
     selectedItem: null,
+    user: JSON.parse(localStorage["user"]),
   }),
 };
 </script>
 
 <style scoped>
-
+img {
+  height: 50%;
+  width: 100%;
+}
 </style>

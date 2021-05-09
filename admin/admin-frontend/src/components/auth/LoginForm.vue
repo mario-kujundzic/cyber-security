@@ -76,7 +76,10 @@ export default {
                         id : response.data.id,
                         token : response.data.accessToken,
                         expiresIn : response.data.expiresIn,
-                        role : response.data.userRole
+                        role : response.data.userRole,
+                        username : response.data.username,
+                        name : response.data.name,
+                        surname: response.data.surname
                     }
                     localStorage.setItem('role', response.data.userRole);
                     localStorage.setItem('authKey', 'Bearer ' + response.data.accessToken);
