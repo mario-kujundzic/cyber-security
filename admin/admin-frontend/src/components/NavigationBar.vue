@@ -70,6 +70,18 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+        <v-divider></v-divider>
+        <router-link :to="{ name: 'ManageHospitals' }" v-slot="{ navigate }">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-hospital-box-outline</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title @click="navigate">Hospitals</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
       </v-list-item-group>
     </v-list>
   </v-container>

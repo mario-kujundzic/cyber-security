@@ -9,10 +9,7 @@
 
       <v-toolbar-title>Admin Application</v-toolbar-title>
       <v-spacer />
-
-      <router-link :to="{ name: 'ManageHospitals' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Hospitals</v-btn>
-      </router-link>
+        <v-btn class="ml-3" icon @click="logout()"><v-icon>mdi-logout</v-icon></v-btn>
     </v-app-bar>
 
     <v-main class="blue-grey lighten-5">
@@ -27,7 +24,13 @@ import NavigationBar from "../../components/NavigationBar.vue";
 export default {
   name: "Home",
   components: { NavigationBar },
-  data: () => ({ drawer: false }),
+  data: () => ({ drawer: true }),
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$router.push({ name: "Login" })
+    }
+  }
 };
 </script>
 
