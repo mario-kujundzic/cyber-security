@@ -2,17 +2,15 @@
   <v-dialog
     :value="dialog"
     @input="$emit('update:dialog', false)"
-    @keydown.esc="closeDialog()"
     width="400"
   >
     <v-card height="550">
       <v-card-title class="headline">Revoke Certificate</v-card-title>
       <v-card-text class="text--primary">
-        Pick a reason for revoking a certificate.
+        Pick a reason for revoking this certificate.
         <div>
           <v-spacer></v-spacer>
           <v-radio-group v-model="reason" column>
-            
             <v-tooltip left>
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
@@ -30,7 +28,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
                   label="CA Compromise"
-                  value="CACompromise"
+                  value="CA Compromise"
                   class="black--text"
                   v-bind="attrs"
                   v-on="on"
@@ -43,7 +41,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
                   label="Affiliation Changed"
-                  value="AffiliationChanged"
+                  value="Affiliation Changed"
                   class="black--text"
                   v-bind="attrs"
                   v-on="on"
@@ -72,7 +70,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
                   label="Cessation Of Operation"
-                  value="CessationOfOperation"
+                  value="Cessation Of Operation"
                   class="black--text"
                   v-bind="attrs"
                   v-on="on"
@@ -85,7 +83,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
                   label="Certificate Hold"
-                  value="CertificateHold"
+                  value="Certificate Hold"
                   class="black--text"
                   v-bind="attrs"
                   v-on="on"
@@ -98,7 +96,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-radio
                   label="Remove From CRL"
-                  value="RemoveFromCRL"
+                  value="Remove From CRL"
                   class="black--text"
                   v-bind="attrs"
                   v-on="on"
@@ -121,9 +119,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="red darken-4" text @click="closeDialog()">
-          Revoke
-        </v-btn>
+        <v-btn color="red darken-4" text @click="revokeCertificate()"> Revoke </v-btn>
         <v-btn color="green darken-10" text @click="closeDialog()">
           Cancel
         </v-btn>
@@ -133,6 +129,8 @@
 </template>
 
 <script>
+// const apiURL = "/api/certificates";
+
 export default {
   name: "RevokeCertificateDialog",
   data: () => ({
@@ -140,9 +138,22 @@ export default {
   }),
   props: ["id", "dialog"],
   methods: {
-    closeDialog() {
-      this.$emit("closeDialog");
+    revokeCertificate() {
+      this.$emit("remove-certificate", this.id);
+      console.log(this.reason);
+      // this.axios
+      //   .post(apiURL + "/" + this.id)
+      //   .then(() => {
+      //     this.$emit("remove-certificate", this.id);
+      //     console.log(reason);
+      //   })
+      //   .catch(() => {
+      //     alert("Something went wrong.");
+      //   });
     },
+    closeDialog() {
+      this.$emit('update:dialog', false);
+    }
   },
 };
 </script>
@@ -159,5 +170,5 @@ export default {
 
 .dark-red {
   color: darkred;
-} 
+}
 </style>

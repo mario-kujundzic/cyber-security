@@ -45,10 +45,19 @@
               </v-dialog>
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
-              <v-btn icon small :disabled="item.rootAuthority" @click="revokeDialog=true">
+              <v-btn
+                icon
+                small
+                :disabled="item.rootAuthority"
+                @click="revokeDialog = true"
+              >
                 <v-icon dark>mdi-close-thick</v-icon>
               </v-btn>
-              <revoke-certificate-dialog :dialog.sync="revokeDialog" @closeDialog="closeRevokeDialog" id="item.id">
+              <revoke-certificate-dialog
+                :dialog.sync="revokeDialog"
+                v-on:remove-certificate="removeCertificate"
+                v-bind:id="item.serialNumber"
+              >
               </revoke-certificate-dialog>
             </template>
           </v-data-table>
@@ -60,7 +69,7 @@
 
 <script>
 import ViewCertificateForm from "../../components/certificates/ViewCertificateForm.vue";
-import RevokeCertificateDialog from '../dialogs/RevokeCertificateDialog.vue';
+import RevokeCertificateDialog from "../dialogs/RevokeCertificateDialog.vue";
 const apiURL = "/api/certificates";
 
 export default {
@@ -110,18 +119,13 @@ export default {
         return;
       }
       this.revokeDialog = true;
-      /*this.axios
-        .post(apiURL + "/" + item.serialNumber)
-        .then(() => {
-          this.certificates = this.certificates.filter(f => f.serialNumber != item.serialNumber)
-        })
-        .catch(() => {
-          alert("Something went wrong.");
-        });*/
     },
-    closeRevokeDialog() {
+    removeCertificate(serialNumber) {
+      this.certificates = this.certificates.filter(
+        (f) => f.serialNumber == serialNumber
+      );
       this.revokeDialog = false;
-    }
+    },
   },
 };
 </script>

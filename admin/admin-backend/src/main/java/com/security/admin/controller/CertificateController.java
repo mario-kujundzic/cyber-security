@@ -45,10 +45,11 @@ public class CertificateController {
 	
 	@PostMapping("/{serialNumber}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber) {
+	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber, @RequestBody String revocationReason) {
 		CertificateDTO revoked = null;
 		try {
-			revoked = certService.revokeCertificate(serialNumber);
+			revoked = certService.revokeCertificate(serialNumber, revocationReason);
+			// posalji potpisano da li je revoked ili ne
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}

@@ -135,7 +135,7 @@ public class CertificateService {
 		}
 	}
 
-	public CertificateDTO revokeCertificate(String serialNumber) throws Exception {
+	public CertificateDTO revokeCertificate(String serialNumber, String revocationReason) throws Exception {
 		BigInteger sn = new BigInteger(serialNumber);
 		com.security.admin.model.Certificate crt = certificateRepository.findOneBySerialNumber(sn);
 		if (crt == null)
@@ -145,13 +145,14 @@ public class CertificateService {
 		
 		crt.setValidTo(new Date());
 		crt.setRevocationStatus(true);
+		crt.setRevocationReason(revocationReason);
 		certificateRepository.save(crt);
 
 		// obrisi iz keystora
 		Certificate certificate = keyStoreManager.removeCertificate(serialNumber);
 		CertificateDTO revokedCert = toDTO(certificate);
 		keyStoreManager.saveKeyStore();
-
+		
 		return revokedCert;
 	}
 	
