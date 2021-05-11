@@ -49,7 +49,6 @@ public class CertificateController {
 		CertificateDTO revoked = null;
 		try {
 			revoked = certService.revokeCertificate(serialNumber, revocationReason);
-			// posalji potpisano da li je revoked ili ne
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}

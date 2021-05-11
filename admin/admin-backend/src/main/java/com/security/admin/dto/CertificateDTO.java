@@ -75,5 +75,7 @@ public class CertificateDTO {
 	
 	private boolean revocationStatus;
 	
+	private String revocationReason;
+	
 	private boolean rootAuthority;
 }

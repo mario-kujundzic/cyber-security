@@ -27,38 +27,48 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-dialog v-model="dialog">
+              <v-dialog v-model="detailsDialog" :retain-focus="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     icon
                     small
                     v-bind="attrs"
                     v-on="on"
-                    @click="dialog = !dialog"
+                    @click="showCertDetails(item)"
                   >
                     <v-icon dark>mdi-certificate-outline</v-icon>
                   </v-btn>
                 </template>
                 <view-certificate-form
-                  v-bind:certificate="item"
+                  v-bind:certificate="certDetails"
                 ></view-certificate-form>
               </v-dialog>
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
-              <v-btn
-                icon
-                small
-                :disabled="item.rootAuthority"
-                @click="revokeDialog = true"
+              <v-dialog
+                v-model="revokeDialog"
+                :retain-focus="false"
+                width="400"
               >
-                <v-icon dark>mdi-close-thick</v-icon>
-              </v-btn>
-              <revoke-certificate-dialog
-                :dialog.sync="revokeDialog"
-                v-on:remove-certificate="removeCertificate"
-                v-bind:id="item.serialNumber"
-              >
-              </revoke-certificate-dialog>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    small
+                    :disabled="item.rootAuthority"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="revokeCertificate(item)"
+                  >
+                    <v-icon dark>mdi-close-thick</v-icon>
+                  </v-btn>
+                </template>
+                <revoke-certificate
+                    v-on:remove-certificate="removeCertificate"
+                    v-on:close-revoke-dialog="revokeDialog = false"
+                    v-bind:serialNumber="serialNumber"
+                  >
+                  </revoke-certificate>
+              </v-dialog>
             </template>
           </v-data-table>
         </v-card>
@@ -69,16 +79,19 @@
 
 <script>
 import ViewCertificateForm from "../../components/certificates/ViewCertificateForm.vue";
-import RevokeCertificateDialog from "../dialogs/RevokeCertificateDialog.vue";
+import RevokeCertificate from "../../components/certificates/RevokeCertificateForm.vue";
 const apiURL = "/api/certificates";
 
 export default {
   name: "ViewCertificates",
-  components: { ViewCertificateForm, RevokeCertificateDialog },
+  components: { ViewCertificateForm, RevokeCertificate },
   data() {
     return {
       search: "",
-      dialog: false,
+      detailsDialog: false,
+      revokeDialog: false,
+      serialNumber: "",
+      certDetails: "",
       headers: [
         { text: "Serial Number", value: "serialNumber" },
         { text: "Common Name", value: "commonName" },
@@ -94,7 +107,6 @@ export default {
         { text: "Revoke", value: "revoke", filterable: false, sortable: false },
       ],
       certificates: [],
-      revokeDialog: false,
     };
   },
   mounted() {
@@ -114,17 +126,22 @@ export default {
       });
   },
   methods: {
-    revokeCert(item) {
+    revokeCertificate(item) {
       if (item.rootAuthority) {
         return;
       }
       this.revokeDialog = true;
+      this.serialNumber = item.serialNumber;
     },
     removeCertificate(serialNumber) {
       this.certificates = this.certificates.filter(
-        (f) => f.serialNumber == serialNumber
+        (f) => f.serialNumber != serialNumber
       );
       this.revokeDialog = false;
+    },
+    showCertDetails(item) {
+      this.certDetails = item;
+      this.detailsDialog = true;
     },
   },
 };

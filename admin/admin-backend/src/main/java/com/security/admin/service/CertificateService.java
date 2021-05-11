@@ -162,6 +162,7 @@ public class CertificateService {
 		for (com.security.admin.model.Certificate c : crts) {
 			CertificateDTO dto = new CertificateDTO();
 			dto.setSerialNumber(c.getSerialNumber());
+			dto.setRevocationReason(c.getRevocationReason());
 			dto.setValidFrom(c.getValidFrom().getTime());
 			dto.setValidTo(c.getValidTo().getTime());
 			dto.setEmail(c.getEmail());

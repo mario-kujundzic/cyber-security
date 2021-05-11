@@ -45,6 +45,7 @@ export default {
       headers: [
         { text: "Serial Number", value: "serialNumber" },
         { text: "Common Name", value: "email" },
+        { text: "Revocation Reason", value: "revocationReason"},
         { text: "Valid From", value: "validFrom" },
         { text: "Valid To", value: "validTo" },
       ],
