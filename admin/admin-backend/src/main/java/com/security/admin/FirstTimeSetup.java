@@ -52,7 +52,7 @@ public class FirstTimeSetup {
 		ArrayList<Integer> purposes = new ArrayList<>();
 		purposes.add(128);
 		purposes.add(4);
-		purposes.add(16);
+		purposes.add(2);
 		
 		Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, purposes, "SHA256WithRSAEncryption");
 

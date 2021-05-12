@@ -77,7 +77,7 @@
         <v-row>
           <v-col>
             <v-text-field
-              :value="certificate.purposeReadable[0]"
+              :value="certificate.purposeReadable.join(', ')"
               label="Certificate purpose"
               readonly
             >

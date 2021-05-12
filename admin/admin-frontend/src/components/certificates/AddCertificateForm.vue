@@ -3,6 +3,15 @@
     <v-container>
       <v-row>
         <v-col>
+          <v-autocomplete
+            v-model="chosenTemplate"
+            :items="templates"
+            label="Template"
+          ></v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <v-text-field
             v-model="certificate.commonName"
             :rules="[rules.required]"
@@ -85,6 +94,7 @@
             <v-date-picker
               v-model="certificate.validFrom"
               @input="menuFrom = false"
+              @change="setTemplateCustom"
             ></v-date-picker>
           </v-menu>
         </v-col>
@@ -111,6 +121,7 @@
             <v-date-picker
               v-model="certificate.validTo"
               @input="menuTo = false"
+              @change="setTemplateCustom"
             ></v-date-picker>
           </v-menu>
         </v-col>
@@ -123,6 +134,7 @@
             :rules="[rules.requiredArray]"
             label="Certificate purpose"
             multiple
+            @change="setTemplateCustom"
           ></v-autocomplete>
         </v-col>
         <v-col>
@@ -131,6 +143,7 @@
             :items="cryptAlgorithms"
             :rules="[rules.required]"
             label="Crypting algorithm"
+            @change="setTemplateCustom"
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -146,6 +159,8 @@
 </template>
 
 <script>
+import moment from "moment";
+
 const apiCert = "/api/certificates";
 const apiReq = "/api/certificateRequests";
 export default {
@@ -183,9 +198,34 @@ export default {
       { text: "SHA 256 with RSA", value: "SHA256WithRSAEncryption" },
       { text: "SHA 512 with RSA", value: "SHA512WithRSAEncryption" },
     ],
+    chosenTemplate: { text: "Custom", value: { custom: true } },
+    templates: [
+      {
+        text: "Custom",
+        value: { custom: true },
+      },
+      {
+        text: "Digital Signature and CRL Sign with SHA256, for 6 months",
+        value: {
+          time: "6 months",
+          purpose: ["128", "2"],
+          algorithm: "SHA256WithRSAEncryption",
+          custom: false,
+        },
+      },
+      {
+        text: "Digital Signature and Data encipherment with SHA512, for 1 year",
+        value: {
+          time: "1 year",
+          purpose: ["128", "16"],
+          algorithm: "SHA512WithRSAEncryption",
+          custom: false,
+        },
+      },
+    ],
     rules: {
       required: (v) => !!v || "Field is required",
-      requiredArray: (v) => v.length || "Field is required",
+      requiredArray: (v) => v.length != 0 || "Field is required",
       uppercaseLetter: (v) =>
         /[A-Z]{2}/.test(v) ||
         "Country code must be a two-letter uppercase word",
@@ -219,6 +259,7 @@ export default {
   },
   methods: {
     addCert: function () {
+      alert(this.certificate.validFrom);
       this.$refs.form.validate();
       if (!this.valid) return;
       const dto = {
@@ -233,6 +274,29 @@ export default {
       }).then(() => {
         this.$router.push({ name: "ViewCertificates" });
       });
+    },
+    setTemplateCustom: function () {
+      this.chosenTemplate = { custom: true };
+    },
+  },
+  watch: {
+    chosenTemplate: function (newTemplate) {
+      if (!newTemplate.custom) {
+        if (newTemplate.time == "1 year") {
+          this.certificate.validFrom = moment().format("YYYY-MM-DD");
+          this.certificate.validTo = moment()
+            .add(1, "years")
+            .format("YYYY-MM-DD");
+        }
+        if (newTemplate.time == "6 months") {
+          this.certificate.validFrom = moment().format("YYYY-MM-DD");
+          this.certificate.validTo = moment()
+            .add(6, "months")
+            .format("YYYY-MM-DD");
+        }
+        this.certificate.purpose = newTemplate.purpose;
+        this.certificate.algorithm = newTemplate.algorithm;
+      }
     },
   },
 };
