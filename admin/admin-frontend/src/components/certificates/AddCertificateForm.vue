@@ -184,15 +184,15 @@ export default {
     },
     request: {},
     certPurposes: [
-      { text: "Digital signature", value: "128" },
-      { text: "CRL sign", value: "2" },
-      { text: "Data encipherment", value: "16" },
-      { text: "Decipher only", value: "32768" },
-      { text: "Encipher only", value: "1" },
-      { text: "Key agreement", value: "8" },
-      { text: "Key certificate sign", value: "4" },
-      { text: "Key encipherment", value: "32" },
-      { text: "Non repudiation", value: "64" },
+      { text: "Digital Signature", value: "128" },
+      { text: "CRL Sign", value: "2" },
+      { text: "Data Encipherment", value: "16" },
+      { text: "Decipher Only", value: "32768" },
+      { text: "Encipher Only", value: "1" },
+      { text: "Key Agreement", value: "8" },
+      { text: "Key Certificate Sign", value: "4" },
+      { text: "Key Encipherment", value: "32" },
+      { text: "Non Repudiation", value: "64" },
     ],
     cryptAlgorithms: [
       { text: "SHA 256 with RSA", value: "SHA256WithRSAEncryption" },
@@ -205,18 +205,38 @@ export default {
         value: { custom: true },
       },
       {
-        text: "Digital Signature and CRL Sign with SHA256, for 6 months",
+        text: "Digital Signature, CRL Sign and Key Certificate Sign - SHA512 - 13 months (hospitals)",
         value: {
-          time: "6 months",
-          purpose: ["128", "2"],
+          time: 13,
+          purpose: ["128", "2", "4"],
+          algorithm: "SHA512WithRSAEncryption",
+          custom: false,
+        },
+      },
+      {
+        text: "Digital Signature, CRL Sign and Key Certificate Sign - SHA512 - 39 months (hospitals)",
+        value: {
+          time: 39,
+          purpose: ["128", "2", "4"],
+          algorithm: "SHA512WithRSAEncryption",
+          custom: false,
+        },
+      },
+      {
+        text:
+          "Digital Signature and Data Encipherment - SHA256 - 13 months (devices/logs)",
+        value: {
+          time: 13,
+          purpose: ["128", "16"],
           algorithm: "SHA256WithRSAEncryption",
           custom: false,
         },
       },
       {
-        text: "Digital Signature and Data encipherment with SHA512, for 1 year",
+        text:
+          "Digital Signature and Data Encipherment - SHA512 - 13 months (devices/logs)",
         value: {
-          time: "1 year",
+          time: 13,
           purpose: ["128", "16"],
           algorithm: "SHA512WithRSAEncryption",
           custom: false,
@@ -282,18 +302,10 @@ export default {
   watch: {
     chosenTemplate: function (newTemplate) {
       if (!newTemplate.custom) {
-        if (newTemplate.time == "1 year") {
-          this.certificate.validFrom = moment().format("YYYY-MM-DD");
-          this.certificate.validTo = moment()
-            .add(1, "years")
-            .format("YYYY-MM-DD");
-        }
-        if (newTemplate.time == "6 months") {
-          this.certificate.validFrom = moment().format("YYYY-MM-DD");
-          this.certificate.validTo = moment()
-            .add(6, "months")
-            .format("YYYY-MM-DD");
-        }
+        this.certificate.validFrom = moment().format("YYYY-MM-DD");
+        this.certificate.validTo = moment()
+          .add(newTemplate.time, "months")
+          .format("YYYY-MM-DD");
         this.certificate.purpose = newTemplate.purpose;
         this.certificate.algorithm = newTemplate.algorithm;
       }

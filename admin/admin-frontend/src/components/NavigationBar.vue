@@ -24,15 +24,13 @@
     <v-list nav dense>
       <v-list-item-group v-model="selectedItem" color="primary">
         <router-link :to="{ name: 'ViewCertificates' }" v-slot="{ navigate }">
-          <v-list-item>
+          <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-certificate-outline</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
-              <v-list-item-title @click="navigate"
-                >Active Certificates</v-list-item-title
-              >
+              <v-list-item-title>Active Certificates</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
@@ -41,15 +39,13 @@
           :to="{ name: 'ViewRevokedCertificates' }"
           v-slot="{ navigate }"
         >
-          <v-list-item>
+          <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-clipboard-remove-outline</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
-              <v-list-item-title @click="navigate"
-                >Revoked Certificates</v-list-item-title
-              >
+              <v-list-item-title>Revoked Certificates</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
@@ -58,27 +54,25 @@
           :to="{ name: 'ManageCertificateRequests' }"
           v-slot="{ navigate }"
         >
-          <v-list-item>
+          <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-clipboard-text-search-outline</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
-              <v-list-item-title @click="navigate"
-                >CS Requests</v-list-item-title
-              >
+              <v-list-item-title>CS Requests</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
         <v-divider></v-divider>
         <router-link :to="{ name: 'ManageHospitals' }" v-slot="{ navigate }">
-          <v-list-item>
+          <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-hospital-box-outline</v-icon>
             </v-list-item-icon>
 
             <v-list-item-content>
-              <v-list-item-title @click="navigate">Hospitals</v-list-item-title>
+              <v-list-item-title>Hospitals</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>

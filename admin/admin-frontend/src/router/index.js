@@ -20,7 +20,6 @@ const routes = [
   },
   {
     component: Home,
-    name: "Home",
     path: "/",
     beforeEnter: guardRouteLoggedIn,
     children: [
