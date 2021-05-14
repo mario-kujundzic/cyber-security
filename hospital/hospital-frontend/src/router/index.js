@@ -5,6 +5,8 @@ Vue.use(VueRouter);
 
 import Login from '../views/Login';
 import Home from '../views/Home';
+import CSRForm from '../components/certificates/CSRForm';
+import PublicKeyViewer from '../components/certificates/PublicKeyViewer';
 
 const routes = [
     {
@@ -17,8 +19,21 @@ const routes = [
         name: 'Home',
         path: '/',
         beforeEnter : guardRouteLoggedIn,
+        children: [
+            {
+                component: CSRForm,
+                name: "CSRForm",
+                path: "/csr"
+            },
+            {
+                component: PublicKeyViewer,
+                name: "PublicKeyViewer",
+                path: "/key"
+            }
+        ]
         
     },
+    
 ]
 
 //todo: token expired

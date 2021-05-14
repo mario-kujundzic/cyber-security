@@ -74,7 +74,7 @@ public class UserService {
 		String jwt = tokenUtils.generateToken(user.getUsername());
 		long expiresIn = tokenUtils.getExpiredIn();
 
-		return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getRole());
+		return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname(), user.getRole());
 	}
 
 	public User getOne(String username) throws NoSuchElementException {
