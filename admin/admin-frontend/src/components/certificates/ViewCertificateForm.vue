@@ -57,98 +57,39 @@
           </v-list>
         </v-tab-item>
         <v-tab-item>
-          <v-form>
-            <v-container>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.commonName"
-                    label="Common name"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.organization"
-                    label="Organization"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.organizationUnit"
-                    label="Organization unit"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.locality"
-                    label="Locality"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.state"
-                    label="State"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.country"
-                    label="Country"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.email"
-                    label="Email"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    label="Valid from"
-                    :value="certificate.validFrom.toDateString()"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.validTo.toDateString()"
-                    label="Valid until"
-                    prepend-icon="mdi-calendar"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    :value="certificate.purposeReadable[0]"
-                    label="Certificate purpose"
-                    readonly
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="certificate.algorithm"
-                    label="Crypting algorithm"
-                    required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-form>
+          <v-card-title class="pb-1">Certificate Details</v-card-title>
+          <v-simple-table class="ml-4 mr-4">
+              <tbody>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-email-edit</v-icon><b>Email</b></td>
+                  <td>{{ certificate.email }}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-account-group</v-icon><b>Organization</b></td>
+                  <td>{{ certificate.organization }}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-account-group</v-icon><b>Organization Unit</b></td>
+                  <td>{{ certificate.organizationUnit }}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-map-marker</v-icon><b>Locality</b></td>
+                  <td>{{certificate.locality}}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-map-marker</v-icon><b>State</b></td>
+                  <td>{{certificate.state}}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-map-marker</v-icon><b>Country</b></td>
+                  <td>{{certificate.country}}</td>
+                </tr>
+                <tr>
+                  <td><v-icon class="pr-3">mdi-calendar-outline</v-icon><b>Crypting algorithm</b></td>
+                  <td>{{certificate.algorithm}}</td>
+                </tr>
+              </tbody>
+          </v-simple-table>
         </v-tab-item>
       </v-tabs-items>
     </div>
@@ -163,6 +104,14 @@ export default {
   props: {
     certificate: Object,
   },
+  methods: {
+
+  },
+  watch: {
+    certificate: function() {
+      this.tab = 0;
+    }
+  }
 };
 </script>
 
