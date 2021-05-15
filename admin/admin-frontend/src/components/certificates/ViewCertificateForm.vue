@@ -85,7 +85,7 @@
                   <td>{{certificate.country}}</td>
                 </tr>
                 <tr>
-                  <td><v-icon class="pr-3">mdi-calendar-outline</v-icon><b>Crypting algorithm</b></td>
+                  <td><v-icon class="pr-3">mdi-shield-lock</v-icon><b>Crypting algorithm</b></td>
                   <td>{{certificate.algorithm}}</td>
                 </tr>
               </tbody>

@@ -3,7 +3,7 @@
     <v-row align="center" justify="center">
       <v-col cols="6">
         <v-card class="mt-10" style="height: 400px;">
-          <v-card-title class="pl-5">Public Key </v-card-title>
+          <v-card-title centered class="pl-5">Public Key </v-card-title>
           <v-textarea
             class="pl-5 pr-5"
             v-model="publicKey"
@@ -11,11 +11,11 @@
             rows="8"
           ></v-textarea>
           <v-card-actions>
-              <v-container class="pl-2 pr-2">
-                    <v-btn block color="indigo accent-1"  @click="onCopyClicked">
-                        COPY
-                    </v-btn>
-              </v-container>
+            <v-container class="pl-2 pr-2">
+              <v-btn block color="indigo accent-1" @click="onCopyClicked">
+                COPY
+              </v-btn>
+            </v-container>
           </v-card-actions>
         </v-card>
       </v-col>
