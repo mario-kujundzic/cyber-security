@@ -27,7 +27,7 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-dialog v-model="detailsDialog" :retain-focus="false" width="600">
+              <v-dialog v-model="detailsDialog" :retain-focus="false" width="600" height="100%">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     icon

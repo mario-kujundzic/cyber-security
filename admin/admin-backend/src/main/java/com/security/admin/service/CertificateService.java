@@ -80,8 +80,8 @@ public class CertificateService {
 		Extension ex = holder.getExtension(holder.getExtensions().getExtensionOIDs()[0]);
 		ASN1OctetString octString = ex.getExtnValue();
 		String octStr = octString.toString().substring(1);
-		Integer intValue = Integer.parseInt(octStr, 16);
-		String binaryString = Integer.toBinaryString(intValue);
+		Long number = Long.parseLong(octStr, 16);
+		String binaryString = Long.toBinaryString(number);
 		List<String> purposes = getCertificatePurpose(binaryString);
 		dto.setPurposeReadable(purposes);
 

@@ -279,7 +279,6 @@ export default {
   },
   methods: {
     addCert: function () {
-      alert(this.certificate.validFrom);
       this.$refs.form.validate();
       if (!this.valid) return;
       const dto = {

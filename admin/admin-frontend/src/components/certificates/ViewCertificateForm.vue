@@ -1,5 +1,5 @@
 <template>
-  <v-card width="600" height="100%">
+  <v-card width="600" height="700px" max-height="700px">
     <v-layout justify-center align-center>
       <v-flex shrink>
         <div>
@@ -13,7 +13,7 @@
       </v-flex>
     </v-layout>
 
-    <div class="tab-wrapper">
+    <div>
       <v-tabs v-model="tab" centered slider-color="blue">
         <v-tab>General</v-tab>
         <v-tab>Details</v-tab>
@@ -58,6 +58,7 @@
         </v-tab-item>
         <v-tab-item>
           <v-card-title class="pb-1">Certificate Details</v-card-title>
+          <v-divider class="ml-4 mr-4"></v-divider>
           <v-simple-table class="ml-4 mr-4">
               <tbody>
                 <tr>

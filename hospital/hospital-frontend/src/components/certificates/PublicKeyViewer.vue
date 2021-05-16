@@ -11,11 +11,9 @@
             rows="8"
           ></v-textarea>
           <v-card-actions>
-            <v-container class="pl-2 pr-2">
               <v-btn block color="indigo accent-1" @click="onCopyClicked">
                 COPY
               </v-btn>
-            </v-container>
           </v-card-actions>
         </v-card>
       </v-col>
