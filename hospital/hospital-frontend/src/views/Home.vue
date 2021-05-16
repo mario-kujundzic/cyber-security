@@ -14,7 +14,7 @@
       >
     </v-app-bar>
 
-    <v-main class="blue-grey lighten-5">
+    <v-main class="blue-grey lighten-5 mt-10">
       <router-view></router-view>
     </v-main>
   </v-app>

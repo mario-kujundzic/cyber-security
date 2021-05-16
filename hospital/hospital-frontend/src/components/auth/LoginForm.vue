@@ -1,13 +1,13 @@
 <template>
-  <v-content>
+  <v-container fill-height>
     <v-container>
-        <v-row align="center" justify="center" class="mt-10">
+        <v-row align="center" justify="center">
             <h1>Login to your account!</h1>
         </v-row>
         <v-row align="center" justify="center">
             <v-col>
                 <v-form v-model="valid" ref="form">
-                    <v-row class="pt-10">
+                    <v-row>
                         <v-text-field
                             v-model="user.username"
                             :rules="[rules.email, rules.required]"
@@ -29,15 +29,15 @@
                 <v-row align="center" justify="center">
                     <a>FORGOT PASSWORD?</a>
                 </v-row>
-                <v-row class="pt-15">
-                    <v-col>
+                <v-row>
+                    <v-col class="mt-6">
                         <v-btn color="#8C9EFF" @click="login()" block>Login</v-btn>
                     </v-col>
                 </v-row>
             </v-col>
         </v-row>
     </v-container>
-  </v-content>
+  </v-container>
 </template>
 <script>
 const apiURL = "/auth/login";

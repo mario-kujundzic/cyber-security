@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row align="center" justify="center">
       <v-col cols="8">
-        <v-card class="mt-10">
+        <v-card>
           <v-form v-model="valid" ref="form">
             <v-container fluid>
               <v-row>

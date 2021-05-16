@@ -4,7 +4,7 @@
       <navigation-bar></navigation-bar>
     </v-navigation-drawer>
 
-    <v-app-bar app color="#c2e5cf">
+    <v-app-bar app color="#c2e5cf" >
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>Admin Application</v-toolbar-title>
@@ -12,7 +12,7 @@
         <v-btn class="ml-3" icon @click="logout()"><v-icon>mdi-logout</v-icon></v-btn>
     </v-app-bar>
 
-    <v-main class="blue-grey lighten-5">
+    <v-main class="blue-grey lighten-5 mt-10">
       <router-view></router-view>
     </v-main>
   </v-app>
