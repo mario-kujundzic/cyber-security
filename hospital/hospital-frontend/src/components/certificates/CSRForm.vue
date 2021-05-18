@@ -130,6 +130,7 @@ export default {
       this.axios
         .post("/api/admin/requestCertificate", this.csr)
         .then((response) => {
+          this.$refs.form.reset();
           alert(response.data.message);
         })
         .catch((error) => {

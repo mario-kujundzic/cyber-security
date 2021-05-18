@@ -29,23 +29,22 @@ public class AdminService {
 	private TokenUtils tokenUtils;
 	private AuthenticationManager authenticationManager;
 	private CustomUserDetailsService userDetailsService;
-	private AuthorityService authorityService;
 
 	private String resourceFolderPath;
 
 	@Autowired
 	public AdminService(UserRepository userRepository, TokenUtils tokenUtils,
-                        AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
-                        AuthorityService authorityService, @Value("${server.ssl.key-store-folder}") String resourceFolderPath) {
+			AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
+			@Value("${server.ssl.key-store-folder}") String resourceFolderPath) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
 		this.userDetailsService = userDetailsService;
-		this.authorityService = authorityService;
 		this.resourceFolderPath = resourceFolderPath;
 	}
 
-	public GenericMessageDTO makeCertificateRequest(CertificateRequestDTO certificateRequest, String adminEndpointURI, Admin admin) throws IOException, RestClientException {
+	public GenericMessageDTO makeCertificateRequest(CertificateRequestDTO certificateRequest, String adminEndpointURI,
+			Admin admin) throws IOException, RestClientException {
 		RestTemplate restTemplate = new RestTemplate();
 
 		// Add email and public key
@@ -65,10 +64,7 @@ public class AdminService {
 
 		csrResponse = restTemplate.postForObject(adminEndpointURI, certificateRequest, GenericMessageDTO.class);
 
-
 		return csrResponse;
 	}
-
-
 
 }

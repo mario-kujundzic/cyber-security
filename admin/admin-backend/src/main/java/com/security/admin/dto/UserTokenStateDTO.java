@@ -16,15 +16,17 @@ public class UserTokenStateDTO {
 	private String username;
 	private String name;
 	private String surname;
+	private String role;
 
 	public UserTokenStateDTO(Long id, String accessToken, long expiresIn, String username, String name,
-			String surname) {
+			String surname, String role) {
 		this.id = id;
 		this.accessToken = accessToken;
 		this.expiresIn = expiresIn;
 		this.username = username;
 		this.name = name;
 		this.surname = surname;
+		this.role = role;
 	}
 
 }

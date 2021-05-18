@@ -42,7 +42,7 @@ public class PublicKeyController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<String> getPublicKey() {
         return new ResponseEntity<>(this.readPublicKey(), HttpStatus.OK);
     }

@@ -31,21 +31,21 @@ public class CertificateController {
 	}
 
 	@GetMapping()
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<List<CertificateDTO>> getAllCerts() throws UserException {
 		List<CertificateDTO> results = certService.getAll();
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
 	@PostMapping()
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
 	public ResponseEntity<CertificateDTO> createCert(@RequestBody CertificateDTO dto) throws UserException {
 		CertificateDTO created = certService.createCertificate(dto);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/{serialNumber}")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
 	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber, @RequestBody String revocationReason) {
 		CertificateDTO revoked = null;
 		try {
@@ -57,7 +57,7 @@ public class CertificateController {
 	}
 	
 	@GetMapping("/revoked")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<List<CertificateDTO>> getAllRevokedCerts() {
 		List<CertificateDTO> revoked = certService.getRevokedCerts();
 		return new ResponseEntity<>(revoked, HttpStatus.OK);

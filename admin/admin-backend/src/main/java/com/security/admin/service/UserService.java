@@ -1,6 +1,5 @@
 package com.security.admin.service;
 
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import com.security.admin.dto.UserTokenStateDTO;
 import com.security.admin.exception.UserException;
 import com.security.admin.model.User;
 import com.security.admin.repository.UserRepository;
-import com.security.admin.security.CustomUserDetailsService;
 import com.security.admin.security.TokenUtils;
 
 @Service
@@ -25,17 +23,12 @@ public class UserService {
     private UserRepository userRepository;
     private TokenUtils tokenUtils;
     private AuthenticationManager authenticationManager;
-    private CustomUserDetailsService userDetailsService;
-    private AuthorityService authorityService;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager,
-                       CustomUserDetailsService userDetailsService, AuthorityService authorityService) {
+    public UserService(UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.authorityService = authorityService;
     }
 
     public User findByUsername(String username) {
@@ -80,7 +73,8 @@ public class UserService {
         User user = (User) authentication.getPrincipal();
         String jwt = tokenUtils.generateToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
+        String role = user.getRoles().get(0).getName();
 
-        return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname());
+        return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname(), role);
     }
 }

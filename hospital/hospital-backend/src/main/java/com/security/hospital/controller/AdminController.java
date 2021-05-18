@@ -34,7 +34,7 @@ public class AdminController {
     }
 
     @PostMapping("/requestCertificate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO certificateRequest,
                                                                 HttpServletResponse response, @AuthenticationPrincipal Admin admin) throws JsonProcessingException {
 

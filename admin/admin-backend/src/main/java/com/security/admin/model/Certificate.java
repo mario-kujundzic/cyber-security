@@ -35,6 +35,9 @@ public class Certificate {
 	@Column(name = "email")
 	private String email;
 	
+	@Column(name = "commonName")
+	private String commonName;
+	
 	@Column(name = "revocation_status")
 	private boolean revocationStatus;
 	

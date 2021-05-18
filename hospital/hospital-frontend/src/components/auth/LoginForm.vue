@@ -76,16 +76,16 @@ export default {
                         id : response.data.id,
                         token : response.data.accessToken,
                         expiresIn : response.data.expiresIn,
-                        role : response.data.userRole,
+                        role : response.data.role,
                         username : response.data.username,
                         name : response.data.name,
                         surname: response.data.surname
                     }
-                    localStorage.setItem('role', response.data.userRole);
+                    localStorage.setItem('role', response.data.role);
                     localStorage.setItem('authKey', 'Bearer ' + response.data.accessToken);
                     localStorage.setItem('user', JSON.stringify(loggedInUser));
                     this.axios.defaults.headers['Authorization'] = 'Bearer ' + response.data.accessToken;
-                    this.$router.push({ name: "Home" })
+                    this.$router.push({ name: "CSRForm" })
                 }
                 
             )

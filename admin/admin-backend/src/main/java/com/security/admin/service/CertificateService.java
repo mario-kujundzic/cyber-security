@@ -168,6 +168,7 @@ public class CertificateService {
 			dto.setValidFrom(c.getValidFrom().getTime());
 			dto.setValidTo(c.getValidTo().getTime());
 			dto.setEmail(c.getEmail());
+			dto.setCommonName(c.getCommonName());
 			crtsDTO.add(dto);
 		}
 		return crtsDTO;
@@ -208,6 +209,7 @@ public class CertificateService {
 	public void createCertificateModel(CertificateDTO dto, String serial, boolean isRootAuthority) {
 		com.security.admin.model.Certificate modelCert = new com.security.admin.model.Certificate();
 
+		modelCert.setCommonName(dto.getCommonName());
 		modelCert.setEmail(dto.getEmail());
 		modelCert.setRevocationStatus(false);
 		modelCert.setRootAuthority(isRootAuthority);

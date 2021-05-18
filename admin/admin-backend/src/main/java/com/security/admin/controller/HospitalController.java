@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class HospitalController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<HospitalDTO> getOneHospital(@PathVariable long id) {
         HospitalDTO hospital = hospitalService.getOne(id);
 
@@ -28,6 +30,7 @@ public class HospitalController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<List<HospitalDTO>> getAllHospitals() {
         ArrayList<HospitalDTO> hospitalDTOs = hospitalService.getAll();
 
@@ -35,6 +38,7 @@ public class HospitalController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<HospitalDTO> createHospital(@RequestBody HospitalDTO dto) {
         HospitalDTO hospitalDTO = hospitalService.create(dto);
 
@@ -43,6 +47,7 @@ public class HospitalController {
 
 
     @PutMapping
+    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<HospitalDTO> updateHospital(@RequestBody HospitalDTO dto) {
         HospitalDTO hospitalDTO = hospitalService.update(dto);
 
@@ -50,6 +55,7 @@ public class HospitalController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_PRIVILEGE')")
     public ResponseEntity<GenericMessageDTO> deleteHospital(@PathVariable long id) {
         hospitalService.delete(id);
 

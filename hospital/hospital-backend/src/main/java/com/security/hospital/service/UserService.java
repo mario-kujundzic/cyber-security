@@ -15,7 +15,6 @@ import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.UserException;
 import com.security.hospital.model.User;
 import com.security.hospital.repository.UserRepository;
-import com.security.hospital.security.CustomUserDetailsService;
 import com.security.hospital.security.TokenUtils;
 
 @Service
@@ -24,18 +23,13 @@ public class UserService {
 	private UserRepository userRepository;
 	private TokenUtils tokenUtils;
 	private AuthenticationManager authenticationManager;
-	private CustomUserDetailsService userDetailsService;
-	private AuthorityService authorityService;
 
 	@Autowired
 	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService,
-			AuthorityService authorityService) {
+			AuthenticationManager authenticationManager) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
-		this.userDetailsService = userDetailsService;
-		this.authorityService = authorityService;
 	}
 
 	public User findByUsername(String username) {
