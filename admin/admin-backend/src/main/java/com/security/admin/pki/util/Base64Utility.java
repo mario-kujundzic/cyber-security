@@ -26,7 +26,7 @@ public class Base64Utility {
     }
     
     public static PublicKey decodePublicKeyPEM(String base64PEMString) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-    	String cleanString = base64PEMString.split("-----BEGIN RSA PUBLIC KEY-----")[1].split("-----END RSA PUBLIC KEY-----")[0];
+    	String cleanString = base64PEMString.split("-----BEGIN PUBLIC KEY-----")[1].split("-----END PUBLIC KEY-----")[0];
     	cleanString = cleanString.replace("\r\n", "");
 		byte[] publicBytes = decode(cleanString);
 		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);

@@ -25,7 +25,7 @@ public class CryptographicUtility {
         return null;
     }
 
-    public boolean verify(byte[] data, byte[] signature, PublicKey publicKey) {
+    public static boolean verify(byte[] data, byte[] signature, PublicKey publicKey) {
         try {
             Signature sig = Signature.getInstance("SHA1withRSA");
 

@@ -2,6 +2,9 @@ package com.security.hospital.dto;
 
 import lombok.*;
 
+import java.nio.charset.Charset;
+import java.nio.charset.spi.CharsetProvider;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;

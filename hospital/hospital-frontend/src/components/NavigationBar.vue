@@ -33,7 +33,6 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
-        <v-divider></v-divider>
         <router-link :to="{ name: 'PublicKeyViewer'}" v-slot="{ navigate }">
             <v-list-item @click="navigate">
                 <v-list-item-icon>
@@ -41,6 +40,17 @@
                 </v-list-item-icon>
                 <v-list-item-content>
                     <v-list-item-title>Public Key Viewer</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+        </router-link>
+        <v-divider></v-divider>
+        <router-link :to="{ name: 'ManageDevices'}" v-slot="{ navigate }">
+            <v-list-item @click="navigate">
+                <v-list-item-icon>
+                    <v-icon>mdi-gauge</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title>Devices</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
         </router-link>

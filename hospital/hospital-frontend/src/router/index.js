@@ -7,6 +7,7 @@ import Login from '../views/Login';
 import Home from '../views/Home';
 import CSRForm from '../components/certificates/CSRForm';
 import PublicKeyViewer from '../components/certificates/PublicKeyViewer';
+import ManageDevices from '../views/ManageDevices';
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
                 component: PublicKeyViewer,
                 name: "PublicKeyViewer",
                 path: "/key"
+            },
+            {
+                component: ManageDevices,
+                name: "ManageDevices",
+                path: "/devices"
             }
         ]
         
