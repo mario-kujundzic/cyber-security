@@ -9,6 +9,10 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.security.hospital.dto.UserTokenStateDTO;
@@ -18,18 +22,20 @@ import com.security.hospital.repository.UserRepository;
 import com.security.hospital.security.TokenUtils;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
 	private UserRepository userRepository;
 	private TokenUtils tokenUtils;
 	private AuthenticationManager authenticationManager;
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager) {
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	public User findByUsername(String username) {
@@ -83,6 +89,42 @@ public class UserService {
 			throw new NoSuchElementException("User with this username doesn't exist!");
 		}
 		return user;
+	}
+	
+	// custom user details service
+	
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
+		} else {
+			return user;
+		}
+	}
+
+	// Funkcija pomocu koje korisnik menja svoju lozinku
+	public String changePassword(String oldPassword, String newPassword) {
+
+		// Ocitavamo trenutno ulogovanog korisnika
+		Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+		String username = currentUser.getName();
+		
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, oldPassword));
+		User user = (User) loadUserByUsername(username);
+		changePasswordUtil(user, newPassword);
+		
+		userRepository.save(user);
+		
+		return username;
+	}
+		
+	public void changePasswordUtil(User user, String newPassword) {
+		user.setPassword(passwordEncoder.encode(newPassword));
+	}
+	
+	public String encodePassword(String password) {
+		return passwordEncoder.encode(password);
 	}
 
 }

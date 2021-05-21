@@ -23,7 +23,7 @@ public class Certificate {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 		
-	@Column(name = "serial_number")
+	@Column(name = "serial_number", unique = true)
 	private BigInteger serialNumber;
 	
 	@Column(name = "valid_from")

@@ -27,3 +27,5 @@ hs_err_pid*
 
 # cert files
 **/cert_id*
+
+**/.idea/*

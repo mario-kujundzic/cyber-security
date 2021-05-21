@@ -75,12 +75,11 @@ public class DeviceController {
     @PostMapping("/request-cert")
     public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto) {
         try {
-        	deviceService.requestCertificate(dto);
+        	GenericMessageDTO mess = deviceService.requestCertificate(dto);
+        	return new ResponseEntity<>(mess, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity<>(new GenericMessageDTO("Certificate request successfully created! Wait for the Super Admin to respond."), HttpStatus.OK);
     }
 
     @PostMapping("/data")

@@ -27,21 +27,25 @@ import com.security.admin.pki.data.SubjectData;
 import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.util.Base64Utility;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
-
+import com.security.admin.pki.util.PEMUtility;
 import com.security.admin.pki.util.RandomUtil;
 import com.security.admin.repository.CertificateRepository;
 
 @Service
 public class CertificateService {
 
-	@Autowired
 	private KeyStoreManager keyStoreManager;
 
-	@Autowired
 	private CertificateRepository certificateRepository;
 
-	@Autowired
 	private CertificateSigningRequestService certRequestService;
+	
+	@Autowired
+	public CertificateService(KeyStoreManager keyStoreManager, CertificateRepository certificateRepository, CertificateSigningRequestService certRequestService) {
+		this.keyStoreManager = keyStoreManager;
+		this.certificateRepository = certificateRepository;
+		this.certRequestService = certRequestService;
+	}
 
 	public List<CertificateDTO> getAll() {
 		List<CertificateDTO> list = new ArrayList<>();
@@ -102,7 +106,7 @@ public class CertificateService {
 			// od onog ko je requestovao
 			CertificateSigningRequest req = certRequestService.getOne(dto.getRequestId());
 
-			PublicKey pubKey = Base64Utility.decodePublicKeyPEM(req.getPublicKey());
+			PublicKey pubKey = PEMUtility.PEMToPublicKey(req.getPublicKey());
 
 			PrivateKey privKey = keyStoreManager.readPrivateKey("sslCertificate");
 
@@ -127,7 +131,7 @@ public class CertificateService {
 
 			createCertificateModel(dto, serial, false);
 
-			Base64Utility.writeCertToFilePEM(cert, subjectData.getSerialNumber());
+			PEMUtility.writeCertToPEM(cert, "./cert_" + dto.getCommonName() + ".crt");
 
 			return toDTO(cert);
 

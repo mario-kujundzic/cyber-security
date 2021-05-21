@@ -1,8 +1,11 @@
 package com.security.admin;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,6 +17,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.security.admin.security.CustomUserDetailsService;
 import com.security.admin.security.TokenUtils;
@@ -35,6 +41,17 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
+	@Autowired
+	private TokenUtils tokenUtils;
+	
+//	@Autowired
+//	public AdminSecurityConfiguration(CustomUserDetailsService jwtUserDetailsService,
+//			RestAuthenticationEntryPoint restAuthenticationEntryPoint, TokenUtils tokenUtils) {
+//		this.jwtUserDetailsService = jwtUserDetailsService;
+//		this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+//		this.tokenUtils = tokenUtils;
+//	}
+
 	// Registrujemo authentication manager koji ce da uradi autentifikaciju
 	// korisnika za nas
 	@Bean
@@ -54,20 +71,18 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
 	}
 
-	// Injektujemo implementaciju iz TokenUtils klase kako bismo mogli da koristimo
-	// njene metode za rad sa JWT u TokenAuthenticationFilteru
-	@Autowired
-	private TokenUtils tokenUtils;
-
 	// Definisemo prava pristupa odredjenim URL-ovima
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		/*http.authorizeRequests().anyRequest().authenticated()
-			.and()
-			.x509()
-				.subjectPrincipalRegex("CN=(.*?)(?:,|$)")
-				.userDetailsService(userDetailsService());*/
-		
+//		CorsConfiguration config = new CorsConfiguration();
+//		config.setAllowedOriginPatterns(
+//				Arrays.asList("https://localhost:*", "https://localhost:*/*", "https://localhost:*/"));
+//		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//		config.setAllowedHeaders(Arrays.asList("*"));
+//		config.setExposedHeaders(Arrays.asList("*"));
+//		config.setAllowCredentials(true);
+
+
 		http
 				// komunikacija izmedju klijenta i servera je stateless posto je u pitanju REST
 				// aplikacija
@@ -82,19 +97,31 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 				// za svaki drugi zahtev korisnik mora biti autentifikovan
 				.anyRequest().authenticated().and()
-				// za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
-				.cors().and()
+//				.cors().configurationSource(corsConfigurationSource()).and()
 
 				// umetni custom filter TokenAuthenticationFilter kako bi se vrsila provera JWT
 				// tokena umesto cistih korisnickog imena i lozinke (koje radi
 				// BasicAuthenticationFilter)
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, jwtUserDetailsService),
-						BasicAuthenticationFilter.class);
+						BasicAuthenticationFilter.class)
+				.x509();
 		// zbog jednostavnosti primera
 		http.csrf().disable();
-		
 	}
 	
+//	@Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//		config.setAllowedOriginPatterns(
+//				Arrays.asList("https://localhost:*", "https://localhost:*/*", "https://localhost:*/"));
+//		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//		config.setAllowedHeaders(Arrays.asList("*"));
+//		config.setExposedHeaders(Arrays.asList("*"));
+//		config.setAllowCredentials(true);
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
 
 	// Generalna bezbednost aplikacije
 	@Override

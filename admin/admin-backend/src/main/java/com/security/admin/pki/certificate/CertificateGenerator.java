@@ -54,7 +54,7 @@ public class CertificateGenerator {
 				KeyUsage certKeyUsage = new KeyUsage(keyUsageData);
 				certGen.addExtension(Extension.keyUsage, true, certKeyUsage);
 			}
-
+			
 			// Generise se sertifikat
 			X509CertificateHolder certHolder = certGen.build(contentSigner);
 

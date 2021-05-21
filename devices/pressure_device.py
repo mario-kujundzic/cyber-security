@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
+import cryptography.x509 as crypto_cert
 
 # Private and public key file names
 private_key_path = 'key.priv'
@@ -18,7 +19,7 @@ certificate_file_path = 'pressure_device_sert.crt'
 certificate_secret = 'sadpotato'
 
 # Host of endpoint
-api_hospital_root = 'localhost'
+api_hospital_root = 'localhost:9002'
 
 # Endpoints
 endpoint_request_cert = '/api/devices/request-cert'
@@ -86,7 +87,7 @@ def request_cert(private_key, public_key):
     # Define the client certificate settings for https connection
 
     # Create a connection to submit HTTP requests
-    connection = http.client.HTTPConnection(api_hospital_root, port=9002)
+    connection = http.client.HTTPConnection(api_hospital_root)
 
     # Defining parts of the HTTP request
     request_headers = {
@@ -130,12 +131,16 @@ def request_cert(private_key, public_key):
 
 
 def establish_connection():
+    file_cert = open(certificate_file_path, 'rb')
+    cert = crypto_cert.load_pem_x509_certificate(file_cert.read())
+
     # Define the client certificate settings for https connection
-    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-    context.load_cert_chain(certfile=certificate_file_path, password=certificate_secret)
+    context = ssl.create_default_context()
+    # context.load_cert_chain()
+    context.load_cert_chain(certfile=certificate_file_path, password=certificate_secret, keyfile=private_key_path)
 
     # Create a connection to submit HTTP requests
-    connection = http.client.HTTPSConnection(api_hospital_root, port=9002, context=context)
+    connection = http.client.HTTPSConnection(api_hospital_root, context=context)
     return connection
 
 

@@ -22,10 +22,10 @@ Object.defineProperty(Vue.prototype, '$role', {
 Vue.use(VueAxios, Axios);
 
 Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
-Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
+// Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
 
 // TODO: Vratiti na https kada je podesen
-Vue.axios.defaults.baseURL = 'http://localhost:9002/';
+Vue.axios.defaults.baseURL = 'https://localhost:9002/';
 
 new Vue({
   vuetify,

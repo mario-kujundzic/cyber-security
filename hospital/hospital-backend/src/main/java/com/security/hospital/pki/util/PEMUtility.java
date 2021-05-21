@@ -1,9 +1,13 @@
 package com.security.hospital.pki.util;
 
+import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -17,6 +21,9 @@ public class PEMUtility {
     private static final String publicKeyPrefix = "-----BEGIN PUBLIC KEY-----";
     private static final String publicKeySuffix = "-----END PUBLIC KEY-----";
 
+    private static final String certPrefix = "-----BEGIN CERTIFICATE-----";
+    private static final String certSuffix = "-----END CERTIFICATE-----";
+    
     private static String byteArrayToPEM(byte[] input) {
         String base64Encoded = Base64.getEncoder().encodeToString(input);
 
@@ -46,7 +53,8 @@ public class PEMUtility {
     }
 
     public static PrivateKey PEMToPrivateKey(String PEM) {
-        String base64Content = PEM.substring(privateKeyPrefix.length(), PEM.length() - privateKeySuffix.length());
+    	String base64Content = PEM.replace(privateKeyPrefix, "");
+    	base64Content = base64Content.replace(privateKeySuffix, "");
         base64Content = base64Content.replace("\n", "");
         base64Content = base64Content.replace("\r", "");
         byte[] byteContent = Base64.getDecoder().decode(base64Content);
@@ -74,6 +82,19 @@ public class PEMUtility {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
         }
+
+        return null;
+    }
+
+
+    public static Certificate PEMToCertificate(InputStream certStream) {
+        try {
+            CertificateFactory certFactory = CertificateFactory.getInstance("x.509");
+            return certFactory.generateCertificate(certStream);
+        } catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         return null;
     }

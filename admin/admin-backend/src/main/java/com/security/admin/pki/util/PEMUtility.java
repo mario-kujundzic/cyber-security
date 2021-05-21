@@ -1,13 +1,20 @@
 package com.security.admin.pki.util;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 public class PEMUtility {
 
@@ -46,7 +53,8 @@ public class PEMUtility {
     }
 
     public static PrivateKey PEMToPrivateKey(String PEM) {
-        String base64Content = PEM.substring(privateKeyPrefix.length(), PEM.length() - privateKeySuffix.length());
+    	String base64Content = PEM.replace(publicKeyPrefix, "");
+    	base64Content = base64Content.replace(publicKeySuffix, "");
         base64Content = base64Content.replace("\n", "");
         base64Content = base64Content.replace("\r", "");
         byte[] byteContent = Base64.getDecoder().decode(base64Content);
@@ -76,5 +84,13 @@ public class PEMUtility {
         }
 
         return null;
+    }
+    
+    public static void writeCertToPEM(Certificate cert, String fileName) throws IOException, CertificateEncodingException {
+    	FileWriter fileWriter = new FileWriter(new File(fileName));
+    	try (JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter)) {
+    		pemWriter.writeObject(cert);
+    		pemWriter.flush();
+    	}
     }
 }

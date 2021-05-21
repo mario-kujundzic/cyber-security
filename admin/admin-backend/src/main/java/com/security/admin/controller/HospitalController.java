@@ -17,8 +17,12 @@ import java.util.List;
 @RequestMapping(value = "/api/hospitals", produces = MediaType.APPLICATION_JSON_VALUE)
 public class HospitalController {
 
-    @Autowired
     private HospitalService hospitalService;
+    
+    @Autowired
+    public HospitalController(HospitalService hospitalService) {
+    	this.hospitalService = hospitalService;
+    }
 
 
     @GetMapping("/{id}")
