@@ -124,6 +124,7 @@ public class DeviceService {
 
 	public void processMessage(DeviceMessageDTO dto) {
 		// neka logika za proveru sertifikata
-		System.out.println("Success!");
+		System.out.println("Success! Message from device:");
+		System.out.println(dto.getMessage());
 	}
 }
