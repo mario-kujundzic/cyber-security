@@ -4,7 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-src/main/resources/keystore/
+# sklonjeno za sinhronizaciju projekta
+#src/main/resources/keystore/
 
 ### STS ###
 .apt_generated
