@@ -16,6 +16,7 @@ import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.service.CertificateSigningRequestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,7 @@ public class CertificateSigningRequestController {
     }
 
     @PostMapping("/request")
-    public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody CertificateSigningRequestDTO dto) {
+    public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody @Valid CertificateSigningRequestDTO dto) {
         try {
             certificateSigningRequestService.addRequest(dto);
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class HospitalController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-    public ResponseEntity<HospitalDTO> createHospital(@RequestBody HospitalDTO dto) {
+    public ResponseEntity<HospitalDTO> createHospital(@RequestBody @Valid HospitalDTO dto) {
         HospitalDTO hospitalDTO = hospitalService.create(dto);
 
         return new ResponseEntity<HospitalDTO>(hospitalDTO, HttpStatus.OK);
@@ -52,7 +53,7 @@ public class HospitalController {
 
     @PutMapping
     @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-    public ResponseEntity<HospitalDTO> updateHospital(@RequestBody HospitalDTO dto) {
+    public ResponseEntity<HospitalDTO> updateHospital(@RequestBody @Valid HospitalDTO dto) {
         HospitalDTO hospitalDTO = hospitalService.update(dto);
 
         return new ResponseEntity<HospitalDTO>(hospitalDTO, HttpStatus.OK);

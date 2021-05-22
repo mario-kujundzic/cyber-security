@@ -20,6 +20,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -35,7 +36,7 @@ public class AdminController {
 
     @PostMapping("/requestCertificate")
     @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO certificateRequest,
+    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody @Valid CertificateRequestDTO certificateRequest,
                                                                 HttpServletResponse response, @AuthenticationPrincipal Admin admin) throws JsonProcessingException {
 
         GenericMessageDTO csrResponse;

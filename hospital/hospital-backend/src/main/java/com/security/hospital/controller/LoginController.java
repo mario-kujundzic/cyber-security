@@ -37,6 +37,5 @@ public class LoginController {
         String password = authenticationRequest.getPassword();
         UserTokenStateDTO token = userService.login(username, password);
         return new ResponseEntity<>(token, HttpStatus.OK);
-
     }
 }

@@ -2,6 +2,7 @@ package com.security.admin.controller;
 
 import java.util.List;
 
+import com.security.admin.util.ValidationUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.security.admin.dto.CertificateDTO;
 import com.security.admin.exception.UserException;
 import com.security.admin.service.CertificateService;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/certificates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +42,7 @@ public class CertificateController {
 
 	@PostMapping()
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<CertificateDTO> createCert(@RequestBody CertificateDTO dto) throws UserException {
+	public ResponseEntity<CertificateDTO> createCert(@RequestBody @Valid CertificateDTO dto) throws UserException {
 		CertificateDTO created = certService.createCertificate(dto);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
@@ -47,12 +50,17 @@ public class CertificateController {
 	@PostMapping("/{serialNumber}")
 	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
 	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber, @RequestBody String revocationReason) {
+		if (!ValidationUtility.isEnglishText(revocationReason)) {
+			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		}
+
 		CertificateDTO revoked = null;
 		try {
 			revoked = certService.revokeCertificate(serialNumber, revocationReason);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
+
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
 	

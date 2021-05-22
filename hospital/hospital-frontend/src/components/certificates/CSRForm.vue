@@ -134,7 +134,19 @@ export default {
           alert(response.data.message);
         })
         .catch((error) => {
-          alert(error.response.data.message);
+          let response = error.response.data;
+
+          if (!response.errors || !Array.isArray(response.errors)) {
+            alert(error.response.data.message);
+            return;
+          }
+
+          let errorMessage = "";
+          response.errors.forEach((err) => {
+            errorMessage += err.defaultMessage + "\n";
+          });
+
+          alert(errorMessage);
         });
     },
   },

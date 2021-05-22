@@ -139,9 +139,7 @@ export default {
       .then((response) => {
         this.hospitals = response.data;
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch(this.handleCRUDError);
     },
 
     updateHospital(item) {
@@ -151,9 +149,7 @@ export default {
         //alert(`Successfully updated hospital ${response.data.commonName}`);
         this.getHospitals();
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch(this.handleCRUDError);
     },
 
     addHospital(item) {
@@ -163,9 +159,7 @@ export default {
         alert(`Successfully added hospital ${response.data.commonName}`);
         this.getHospitals();
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch(this.handleCRUDError);
 
       this.addDialog = false;
     },
@@ -183,10 +177,23 @@ export default {
         alert(response.data.message);
         this.getHospitals();
       })
-      .catch((error) => {
-        alert(error);
-      });
+      .catch(this.handleCRUDError);
     },
+
+    handleCRUDError(error) {
+      let responseData = error.response.data;
+      if (!responseData.errors || !Array.isArray(responseData.errors)) {
+        alert(responseData.message);
+        return;
+      }
+
+      let errorMessage = "";
+      responseData.errors.forEach((err) => {
+        errorMessage += err.defaultMessage + "\n";
+      });
+
+      alert(errorMessage);
+    }
   },
 };
 </script>

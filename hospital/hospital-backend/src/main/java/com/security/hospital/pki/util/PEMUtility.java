@@ -15,14 +15,11 @@ import java.util.Base64;
 
 public class PEMUtility {
 
-    private static final String privateKeyPrefix = "-----BEGIN PRIVATE KEY-----";
-    private static final String privateKeySuffix = "-----END PRIVATE KEY-----";
+    public static final String privateKeyPrefix = "-----BEGIN PRIVATE KEY-----";
+    public static final String privateKeySuffix = "-----END PRIVATE KEY-----";
 
-    private static final String publicKeyPrefix = "-----BEGIN PUBLIC KEY-----";
-    private static final String publicKeySuffix = "-----END PUBLIC KEY-----";
-
-    private static final String certPrefix = "-----BEGIN CERTIFICATE-----";
-    private static final String certSuffix = "-----END CERTIFICATE-----";
+    public static final String publicKeyPrefix = "-----BEGIN PUBLIC KEY-----";
+    public static final String publicKeySuffix = "-----END PUBLIC KEY-----";
     
     private static String byteArrayToPEM(byte[] input) {
         String base64Encoded = Base64.getEncoder().encodeToString(input);

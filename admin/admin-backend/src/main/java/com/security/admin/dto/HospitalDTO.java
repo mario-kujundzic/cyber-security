@@ -1,6 +1,7 @@
 package com.security.admin.dto;
 
 import com.security.admin.model.Hospital;
+import com.security.admin.util.ValidationUtility;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -21,10 +22,12 @@ public class HospitalDTO {
 		
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Common name must be alphanumeric!")
 	private String commonName;
 
 	@NonNull
 	@NotBlank(message = "Public key is required!")
+	@Pattern(regexp = ValidationUtility.PEMRegex, message = "Public key should be in PEM format!")
 	private String publicKey;
 
 	public HospitalDTO(Hospital hospital) {
