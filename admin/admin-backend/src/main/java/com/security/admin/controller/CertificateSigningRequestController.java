@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.service.CertificateSigningRequestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,14 +29,19 @@ public class CertificateSigningRequestController {
         this.certificateSigningRequestService = certificateRequestService;
     }
 
-    @PostMapping()
-    public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody CertificateSigningRequestDTO dto) {
-        certificateSigningRequestService.addRequest(dto);
+    @PostMapping("/request")
+    public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody @Valid CertificateSigningRequestDTO dto) {
+        try {
+            certificateSigningRequestService.addRequest(dto);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(new GenericMessageDTO("Certificate request successfully created! Wait for the Super Admin to respond."), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<CertificateSigningRequestDTO> getCertificate(@PathVariable long id) {
     	CertificateSigningRequestDTO dto = certificateSigningRequestService.getUnsignedRequestDTO(id);
 
@@ -42,6 +49,7 @@ public class CertificateSigningRequestController {
     }
 
     @GetMapping()
+    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
     public ResponseEntity<List<CertificateSigningRequestDTO>> getAllCertificateRequests() {
         List<CertificateSigningRequestDTO> dtos = certificateSigningRequestService.getAllRequestsDTO();
 
@@ -49,6 +57,7 @@ public class CertificateSigningRequestController {
     }
     
     @GetMapping("/decline/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
     public ResponseEntity<Object> declineCertificateRequest(@PathVariable long id) {
     	certificateSigningRequestService.declineRequest(id);
     	return new ResponseEntity<>("Successfully declined request", HttpStatus.OK);

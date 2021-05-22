@@ -6,8 +6,8 @@ module.exports = {
   ],
   devServer: {
         https: {
-          key: fs.readFileSync('./ssl/server.key'),
-          cert: fs.readFileSync('./ssl/server.crt'),
+          key: fs.readFileSync('./ssl/hospitalFront.key'),
+          cert: fs.readFileSync('./ssl/hospitalFront.crt'),
         },
         public: 'https://localhost:8082/'
     }

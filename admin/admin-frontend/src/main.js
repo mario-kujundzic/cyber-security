@@ -5,7 +5,7 @@ import VueAxios  from 'vue-axios'
 import Axios from 'axios'
 import router from './router/index'
 import moment from 'moment'
-
+import https from 'https'
 Vue.config.productionTip = false
 
 const role = Vue.observable({ role: localStorage.getItem('role') })
@@ -28,9 +28,14 @@ Vue.filter('formatDate', function(value) {
 // axios config
 Vue.use(VueAxios, Axios);
 
-Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
-Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
-Vue.axios.defaults.baseURL = 'http://localhost:9001/';
+Vue.axios.defaults.httpsAgent = new https.Agent ({ rejectUnauthorized: false});
+if (localStorage.getItem('authKey') != null) {
+  Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
+}
+// Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
+Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
+Vue.axios.defaults.baseURL = 'https://localhost:9001/';
+
 
 new Vue({
   vuetify,

@@ -44,7 +44,8 @@ export default {
       dialog: false,
       headers: [
         { text: "Serial Number", value: "serialNumber" },
-        { text: "Common Name", value: "email" },
+        { text: "Common Name", value: "commonName" },
+        { text: "Revocation Reason", value: "revocationReason"},
         { text: "Valid From", value: "validFrom" },
         { text: "Valid To", value: "validTo" },
       ],

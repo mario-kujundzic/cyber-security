@@ -1,8 +1,5 @@
 package com.security.hospital;
 
-import com.security.hospital.pki.certificate.CertificateGenerator;
-import com.security.hospital.pki.data.IssuerData;
-import com.security.hospital.pki.data.SubjectData;
 import com.security.hospital.pki.keystore.KeyStoreManager;
 import com.security.hospital.pki.util.KeyIssuerSubjectGenerator;
 import com.security.hospital.pki.util.PEMUtility;
@@ -12,8 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.security.KeyPair;
-import java.security.cert.Certificate;
-import java.util.Base64;
 
 @Component
 public class FirstTimeSetup {
@@ -31,12 +26,24 @@ public class FirstTimeSetup {
 		File keyStoreFile = new File(keyStoreFolderPath + "/keystore.p12");
 		File privateKeyFile = new File(keyStoreFolderPath + "/key.priv");
 		File publicKeyFile = new File(keyStoreFolderPath + "/key.pub");
+		File certFile = new File(keyStoreFolderPath + "/cert_Hospital1.crt");
 
 		if (keyStoreFile.exists() && privateKeyFile.exists() && publicKeyFile.exists()) {
 			System.out.println("FirstTimeSetup: KeyStore, private key and public key found at specified path.");
 			keyStoreManager.loadKeyStore();
+			if (certFile.exists()) {
+				if (keyStoreManager.certExists()) {
+					System.out.println("Certificate file found, KeyStore already has cert: ignoring...");
+				} else {
+					System.out.println("Certificate file found, KeyStore empty: loading into KeyStore...");
+					keyStoreManager.loadCertificate(certFile, privateKeyFile);
+					keyStoreManager.saveKeyStore();
+				}
+			}
 			return;
 		}
+		
+		// TODO: dodati neki generisani cert da bi mogao prvi put da posalje zahtev za novim cert-om
 
 		keyStoreManager.createKeyStore();
 		System.out.println("FirstTimeSetup: KeyStore created.");

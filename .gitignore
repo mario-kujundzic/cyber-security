@@ -24,3 +24,8 @@ hs_err_pid*
 
 **/metadata/*
 /.metadata/
+
+# cert files
+**/cert_id*
+
+**/.idea/*

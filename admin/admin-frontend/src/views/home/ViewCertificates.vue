@@ -27,27 +27,48 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-dialog v-model="dialog">
+              <v-dialog v-model="detailsDialog" :retain-focus="false" width="600" height="100%">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     icon
                     small
                     v-bind="attrs"
                     v-on="on"
-                    @click="dialog = !dialog"
+                    @click="showCertDetails(item)"
                   >
                     <v-icon dark>mdi-certificate-outline</v-icon>
                   </v-btn>
                 </template>
                 <view-certificate-form
-                  v-bind:certificate="item"
+                  v-bind:certificate="certDetails"
                 ></view-certificate-form>
               </v-dialog>
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
-              <v-btn icon small :disabled="item.rootAuthority" @click="revokeCert(item)">
-                <v-icon dark>mdi-close-thick</v-icon>
-              </v-btn>
+              <v-dialog
+                v-model="revokeDialog"
+                :retain-focus="false"
+                width="400"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    small
+                    :disabled="item.rootAuthority"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="revokeCertificate(item)"
+                  >
+                    <v-icon dark>mdi-close-thick</v-icon>
+                  </v-btn>
+                </template>
+                <revoke-certificate
+                    v-on:remove-certificate="removeCertificate"
+                    v-on:close-revoke-dialog="revokeDialog = false"
+                    v-bind:serialNumber="serialNumber"
+                  >
+                  </revoke-certificate>
+              </v-dialog>
             </template>
           </v-data-table>
         </v-card>
@@ -58,15 +79,19 @@
 
 <script>
 import ViewCertificateForm from "../../components/certificates/ViewCertificateForm.vue";
+import RevokeCertificate from "../../components/certificates/RevokeCertificateForm.vue";
 const apiURL = "/api/certificates";
 
 export default {
   name: "ViewCertificates",
-  components: { ViewCertificateForm },
+  components: { ViewCertificateForm, RevokeCertificate },
   data() {
     return {
       search: "",
-      dialog: false,
+      detailsDialog: false,
+      revokeDialog: false,
+      serialNumber: "",
+      certDetails: "",
       headers: [
         { text: "Serial Number", value: "serialNumber" },
         { text: "Common Name", value: "commonName" },
@@ -97,22 +122,26 @@ export default {
         });
       })
       .catch((error) => {
-        alert(error);
+        console.log(error);
       });
   },
   methods: {
-    revokeCert(item) {
+    revokeCertificate(item) {
       if (item.rootAuthority) {
         return;
       }
-      this.axios
-        .post(apiURL + "/" + item.serialNumber)
-        .then(() => {
-          this.certificates = this.certificates.filter(f => f.serialNumber != item.serialNumber)
-        })
-        .catch(() => {
-          alert("Something went wrong.");
-        });
+      this.revokeDialog = true;
+      this.serialNumber = item.serialNumber;
+    },
+    removeCertificate(serialNumber) {
+      this.certificates = this.certificates.filter(
+        (f) => f.serialNumber != serialNumber
+      );
+      this.revokeDialog = false;
+    },
+    showCertDetails(item) {
+      this.certDetails = item;
+      this.detailsDialog = true;
     },
   },
 };

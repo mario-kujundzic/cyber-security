@@ -3,6 +3,7 @@ package com.security.admin.security;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,13 +23,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 	protected final Log LOGGER = LogFactory.getLog(getClass());
 
 	private UserRepository userRepository;
+	
+	@Autowired
+	@Lazy(true)
 	private AuthenticationManager authenticationManager;
+	
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public CustomUserDetailsService(UserRepository userRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+	public CustomUserDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
-		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
 	}
 

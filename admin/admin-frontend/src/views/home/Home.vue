@@ -1,34 +1,41 @@
 <template>
-  <v-container fluid fill-height class="blue-grey lighten-5">
-    <v-app-bar app color="#c2e5cf">
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+  <v-app>
+    <v-navigation-drawer v-model="drawer" app>
+      <navigation-bar></navigation-bar>
+    </v-navigation-drawer>
 
-      <v-toolbar-title>Cyber Security Admin Application</v-toolbar-title>
+    <v-app-bar app color="#c2e5cf" >
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+      <v-toolbar-title>Admin Application</v-toolbar-title>
       <v-spacer />
-      <router-link :to="{ name: 'ManageCertificateRequests' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Requests</v-btn>
-      </router-link>
-      <router-link :to="{ name: 'ViewCertificates' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Certificates</v-btn>
-      </router-link>
-      <router-link :to="{ name: 'ViewRevokedCertificates' }" v-slot="{navigate}">
-        <v-btn @click="navigate" class="ml-3">Revoked certificates</v-btn>
-      </router-link>
+        <v-btn class="ml-3" icon @click="logout()"><v-icon>mdi-logout</v-icon></v-btn>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="blue-grey lighten-5 mt-10">
       <router-view></router-view>
     </v-main>
-  </v-container>
+  </v-app>
 </template>
 
 <script>
+import NavigationBar from "../../components/NavigationBar.vue";
+
 export default {
   name: "Home",
-  components: {},
-  data: () => ({}),
+  components: { NavigationBar },
+  data: () => ({ drawer: true }),
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$router.push({ name: "Login" })
+    }
+  }
 };
 </script>
 
 <style scoped>
+.container {
+  height: 100% !important;
+}
 </style>

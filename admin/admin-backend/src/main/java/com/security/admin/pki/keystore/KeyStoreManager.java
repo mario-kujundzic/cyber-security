@@ -77,9 +77,9 @@ public class KeyStoreManager {
 		}
 	}
 
-	public void write(String alias, PrivateKey privateKey, Certificate certificate) {
+	public void write(String alias, PrivateKey privateKey, Certificate[] certificateChain) {
 		try {
-			keyStore.setKeyEntry(alias, privateKey, this.password, new Certificate[] { certificate });
+			keyStore.setKeyEntry(alias, privateKey, this.password, certificateChain);
 		} catch (KeyStoreException e) {
 			e.printStackTrace();
 		}

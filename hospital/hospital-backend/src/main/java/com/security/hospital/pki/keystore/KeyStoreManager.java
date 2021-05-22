@@ -1,15 +1,22 @@
 package com.security.hospital.pki.keystore;
 
 import com.security.hospital.pki.data.IssuerData;
+import com.security.hospital.pki.util.PEMUtility;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -17,17 +24,18 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class KeyStoreManager {
-	
+
 	// KeyStore je Java klasa za citanje specijalizovanih datoteka koje se koriste
 	// za cuvanje kljuceva
 	// Tri tipa entiteta koji se obicno nalaze u ovakvim datotekama su:
 	// - Sertifikati koji ukljucuju javni kljuc
 	// - Privatni kljucevi
 	// - Tajni kljucevi, koji se koriste u simetricnima siframa
-	
+
 	private KeyStore keyStore;
 
 	private String fileName;
@@ -116,6 +124,16 @@ public class KeyStoreManager {
 		return null;
 	}
 
+	public boolean certExists() {
+		try {
+			return keyStore.isKeyEntry("sslCertificate");
+		} catch (KeyStoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public List<Certificate> readAllCertificates() {
 		List<Certificate> list = new ArrayList<>();
 		try {
@@ -135,5 +153,25 @@ public class KeyStoreManager {
 
 	}
 
+	public void loadCertificate(File certFile, File privateKeyFile) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(privateKeyFile));
+			String privateKeyString = reader.lines().collect(Collectors.joining());
+			PrivateKey privateKey = PEMUtility.PEMToPrivateKey(privateKeyString);
+			reader.close();
+			FileInputStream certStream = new FileInputStream(certFile);
+			Certificate cert = PEMUtility.PEMToCertificate(certStream);
+
+			keyStore.setKeyEntry("sslCertificate", privateKey, this.password, new Certificate[] { cert });
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

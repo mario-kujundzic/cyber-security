@@ -23,7 +23,7 @@ public class Certificate {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 		
-	@Column(name = "serial_number")
+	@Column(name = "serial_number", unique = true)
 	private BigInteger serialNumber;
 	
 	@Column(name = "valid_from")
@@ -35,10 +35,16 @@ public class Certificate {
 	@Column(name = "email")
 	private String email;
 	
-	@Column(name= "revocation_status")
+	@Column(name = "commonName")
+	private String commonName;
+	
+	@Column(name = "revocation_status")
 	private boolean revocationStatus;
 	
-	@Column(name= "root_authority")
+	@Column(name = "revocation_reason")
+	private String revocationReason;
+	
+	@Column(name = "root_authority")
 	private boolean rootAuthority;
 	
 }

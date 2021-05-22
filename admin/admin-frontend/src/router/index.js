@@ -10,6 +10,7 @@ import ViewCertificates from "../views/home/ViewCertificates";
 import ViewRevokedCertificates from "../views/home/ViewRevokedCertificates";
 import Error404 from "../views/errors/Error404"
 import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
+import ManageHospitals from "../views/home/ManageHospitals";
 
 const routes = [
   {
@@ -19,7 +20,6 @@ const routes = [
   },
   {
     component: Home,
-    name: "Home",
     path: "/",
     beforeEnter: guardRouteLoggedIn,
     children: [
@@ -42,6 +42,11 @@ const routes = [
         component: AddCertificate,
         name: "AddCertificate",
         path: "add-certificate/:id",
+      },
+      {
+        component: ManageHospitals,
+        name: "ManageHospitals",
+        path: "hospitals",
       },
     ],
   },

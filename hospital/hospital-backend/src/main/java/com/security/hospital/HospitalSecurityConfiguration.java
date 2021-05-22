@@ -1,5 +1,7 @@
 package com.security.hospital;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
-import com.security.hospital.security.CustomUserDetailsService;
 import com.security.hospital.security.TokenUtils;
 import com.security.hospital.security.auth.RestAuthenticationEntryPoint;
 import com.security.hospital.security.auth.TokenAuthenticationFilter;
+import com.security.hospital.service.UserService;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -30,7 +33,7 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 	}
 
 	@Autowired
-	private CustomUserDetailsService jwtUserDetailsService;
+	private UserService userService;
 
 	@Autowired
 	private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
@@ -51,7 +54,7 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 	// lozinka)
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+		auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
 	}
 
 	// Injektujemo implementaciju iz TokenUtils klase kako bismo mogli da koristimo
@@ -62,6 +65,13 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 	// Definisemo prava pristupa odredjenim URL-ovima
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowedOriginPatterns(Arrays.asList("https://localhost:*", "https://localhost:*/*", "https://localhost:*/"));
+//        config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//        config.setAllowedHeaders(Arrays.asList("*"));
+//        config.setExposedHeaders(Arrays.asList("*"));
+//        config.setAllowCredentials(true);
+//        
 		http
 				// komunikacija izmedju klijenta i servera je stateless posto je u pitanju REST
 				// aplikacija
@@ -76,23 +86,25 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 
 				// za svaki drugi zahtev korisnik mora biti autentifikovan
 				.anyRequest().authenticated().and()
-				// za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
-				.cors().and()
+				// custom cors
+//				.cors().configurationSource(request -> config).and()
 
 				// umetni custom filter TokenAuthenticationFilter kako bi se vrsila provera JWT
 				// tokena umesto cistih korisnickog imena i lozinke (koje radi
 				// BasicAuthenticationFilter)
-				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, jwtUserDetailsService),
-						BasicAuthenticationFilter.class);
+				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, userService),
+						BasicAuthenticationFilter.class)
+				.x509();
 		// zbog jednostavnosti primera
 		http.csrf().disable();
 	}
-
+		
+	
 	// Generalna bezbednost aplikacije
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
-		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login");
+		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/request-cert", "/api/devices/data");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

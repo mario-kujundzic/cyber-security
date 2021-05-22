@@ -5,20 +5,41 @@ Vue.use(VueRouter);
 
 import Login from '../views/Login';
 import Home from '../views/Home';
+import CSRForm from '../components/certificates/CSRForm';
+import PublicKeyViewer from '../components/certificates/PublicKeyViewer';
+import ManageDevices from '../views/ManageDevices';
 
 const routes = [
-    {
-        component: Home,
-        name: 'Home',
-        path: '/',
-        beforeEnter : guardRouteLoggedIn,
-        
-    },
     {
         component: Login,
         name: 'Login',
         path: '/login',
     },
+    {
+        component: Home,
+        name: 'Home',
+        path: '/',
+        beforeEnter : guardRouteLoggedIn,
+        children: [
+            {
+                component: CSRForm,
+                name: "CSRForm",
+                path: "/csr"
+            },
+            {
+                component: PublicKeyViewer,
+                name: "PublicKeyViewer",
+                path: "/key"
+            },
+            {
+                component: ManageDevices,
+                name: "ManageDevices",
+                path: "/devices"
+            }
+        ]
+        
+    },
+    
 ]
 
 //todo: token expired

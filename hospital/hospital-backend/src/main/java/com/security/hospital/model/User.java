@@ -1,6 +1,8 @@
 package com.security.hospital.model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -20,6 +22,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DiscriminatorOptions;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Data;
@@ -74,11 +77,9 @@ public abstract class User implements UserDetails {
 	@Column(name = "role", insertable = false, updatable = false)
 	private String role;
 
-	@ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-	@JoinTable(name = "user_authority", 
-		joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), 
-		inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
-	private List<Authority> authorities;
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+	protected List<Role> roles;
 
 	@Column(name = "last_password_reset_date")
 	private Timestamp lastPasswordResetDate;
@@ -159,12 +160,17 @@ public abstract class User implements UserDetails {
 	}
 
 	@Override
-	public List<Authority> getAuthorities() {
-		return authorities;
-	}
-
-	public void setAuthorities(List<Authority> authorities) {
-		this.authorities = authorities;
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// always one role
+		if (!this.roles.isEmpty()) {
+			Role role = this.roles.iterator().next();
+			List<Privilege> privileges = new ArrayList<Privilege>();
+			for (Privilege p : role.getPrivileges()) {
+				privileges.add(p);
+			}
+			return privileges;
+		}
+		return null;
 	}
 
 	public Timestamp getLastPasswordResetDate() {
