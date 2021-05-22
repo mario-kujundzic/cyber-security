@@ -121,9 +121,12 @@ public class CertificateService {
 
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(),
 					dto.getAlgorithm());
+			
+			Certificate rootCert = keyStoreManager.readCertificate("sslCertificate");
 
+			Certificate[] certChain = {cert, rootCert};
 			// da li je ok da alias bude serial number?
-			keyStoreManager.write(subjectData.getSerialNumber(), privKey, cert);
+			keyStoreManager.write(subjectData.getSerialNumber(), privKey, certChain);
 			keyStoreManager.saveKeyStore();
 			req.setStatus(CertificateSigningRequestStatus.SIGNED);
 

@@ -4,6 +4,7 @@ import vuetify from './plugins/vuetify';
 import VueAxios  from 'vue-axios'
 import Axios from 'axios'
 import router from './router/index'
+import https from 'https'
 
 Vue.config.productionTip = false
 
@@ -21,10 +22,12 @@ Object.defineProperty(Vue.prototype, '$role', {
 // axios config
 Vue.use(VueAxios, Axios);
 
-Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
-// Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
-
-// TODO: Vratiti na https kada je podesen
+Vue.axios.defaults.httpsAgent = new https.Agent ({ rejectUnauthorized: false});
+if (localStorage.getItem('authKey') != null) {
+  Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
+}
+// Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
+Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
 Vue.axios.defaults.baseURL = 'https://localhost:9002/';
 
 new Vue({

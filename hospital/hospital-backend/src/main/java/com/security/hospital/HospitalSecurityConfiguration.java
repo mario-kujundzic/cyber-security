@@ -65,13 +65,13 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 	// Definisemo prava pristupa odredjenim URL-ovima
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("https://localhost:*", "https://localhost:*/*", "https://localhost:*/"));
-        config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.setExposedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true);
-        
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowedOriginPatterns(Arrays.asList("https://localhost:*", "https://localhost:*/*", "https://localhost:*/"));
+//        config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//        config.setAllowedHeaders(Arrays.asList("*"));
+//        config.setExposedHeaders(Arrays.asList("*"));
+//        config.setAllowCredentials(true);
+//        
 		http
 				// komunikacija izmedju klijenta i servera je stateless posto je u pitanju REST
 				// aplikacija
@@ -87,7 +87,7 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 				// za svaki drugi zahtev korisnik mora biti autentifikovan
 				.anyRequest().authenticated().and()
 				// custom cors
-				.cors().configurationSource(request -> config).and()
+//				.cors().configurationSource(request -> config).and()
 
 				// umetni custom filter TokenAuthenticationFilter kako bi se vrsila provera JWT
 				// tokena umesto cistih korisnickog imena i lozinke (koje radi
@@ -98,6 +98,7 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 		// zbog jednostavnosti primera
 		http.csrf().disable();
 	}
+		
 	
 	// Generalna bezbednost aplikacije
 	@Override

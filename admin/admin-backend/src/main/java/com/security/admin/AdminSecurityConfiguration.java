@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -35,6 +36,9 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
+//    @Autowired
+//    private CertificateAuthFilter certAuthFilter;
+
 	@Autowired
 	private CustomUserDetailsService jwtUserDetailsService;
 
@@ -43,7 +47,7 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private TokenUtils tokenUtils;
-	
+
 //	@Autowired
 //	public AdminSecurityConfiguration(CustomUserDetailsService jwtUserDetailsService,
 //			RestAuthenticationEntryPoint restAuthenticationEntryPoint, TokenUtils tokenUtils) {
@@ -82,7 +86,6 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 //		config.setExposedHeaders(Arrays.asList("*"));
 //		config.setAllowCredentials(true);
 
-
 		http
 				// komunikacija izmedju klijenta i servera je stateless posto je u pitanju REST
 				// aplikacija
@@ -104,11 +107,13 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				// BasicAuthenticationFilter)
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, jwtUserDetailsService),
 						BasicAuthenticationFilter.class)
-				.x509();
+//				;
+				.x509().disable();
+//				.x509AuthenticationFilter(certAuthFilter);
 		// zbog jednostavnosti primera
 		http.csrf().disable();
 	}
-	
+
 //	@Bean
 //    CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration config = new CorsConfiguration();
@@ -127,7 +132,8 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
-		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/api/certificateRequests");
+		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/api/certificateRequests",
+				"/api/certificateRequests/request");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

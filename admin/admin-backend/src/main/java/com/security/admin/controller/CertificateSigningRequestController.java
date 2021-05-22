@@ -28,7 +28,7 @@ public class CertificateSigningRequestController {
         this.certificateSigningRequestService = certificateRequestService;
     }
 
-    @PostMapping()
+    @PostMapping("/request")
     public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody CertificateSigningRequestDTO dto) {
         try {
             certificateSigningRequestService.addRequest(dto);

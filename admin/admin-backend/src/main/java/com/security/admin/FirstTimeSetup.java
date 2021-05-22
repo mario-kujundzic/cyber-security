@@ -71,7 +71,9 @@ public class FirstTimeSetup {
 
 		certificateService.createCertificateModel(dto, "139095100165847", true);
 
-		keyStoreManager.write("sslCertificate", kp.getPrivate(), cert);
+		Certificate[] certChain = {cert};
+		
+		keyStoreManager.write("sslCertificate", kp.getPrivate(), certChain);
 		keyStoreManager.saveKeyStore();
 
 		File privateKeyFile = new File(keyStoreFolderPath + "/key.priv");

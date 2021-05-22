@@ -1,4 +1,4 @@
-package com.security.admin.security;
+package com.security.hospital.security;
 
 import java.io.IOException;
 
@@ -26,7 +26,8 @@ public class SimpleCORSFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		
-		String[] origins = {"https://localhost:8081", "https://localhost:9002" };
+		// dodati za uredjaj adresu
+		String[] origins = {"https://localhost:8082", "https://localhost:9001" };
 		for (String s : origins) {
 			if (request.getHeader("Origin") != null) {
 				if (s.equals(request.getHeader("Origin"))) {

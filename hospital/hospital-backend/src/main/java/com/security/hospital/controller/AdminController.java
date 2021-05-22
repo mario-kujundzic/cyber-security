@@ -42,7 +42,7 @@ public class AdminController {
 
         try {
             csrResponse = adminService.makeCertificateRequest(certificateRequest,
-                    "http://localhost:9001/api/certificateRequests", admin);
+                    "https://localhost:9001/api/certificateRequests/request", admin);
         } catch (IOException exception) {
             return new ResponseEntity<>(new GenericMessageDTO("Something went wrong while trying to read the public key."), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (HttpClientErrorException e) {
@@ -51,6 +51,9 @@ public class AdminController {
             GenericMessageDTO messageDTO = objectMapper.readValue(responseString, GenericMessageDTO.class);
             return new ResponseEntity<>(messageDTO, HttpStatus.BAD_REQUEST);
         } catch (RestClientException e) {
+            return new ResponseEntity<>(new GenericMessageDTO("Something went wrong with the admin server: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+        	System.out.println("Nesto jos je poslo po zlu, super xd");
             return new ResponseEntity<>(new GenericMessageDTO("Something went wrong with the admin server: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
