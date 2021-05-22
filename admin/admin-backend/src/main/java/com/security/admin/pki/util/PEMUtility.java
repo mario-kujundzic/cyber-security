@@ -11,11 +11,11 @@ import java.util.Base64;
 
 public class PEMUtility {
 
-    private static final String privateKeyPrefix = "-----BEGIN RSA PRIVATE KEY-----";
-    private static final String privateKeySuffix = "-----END RSA PRIVATE KEY-----";
+    public static final String privateKeyPrefix = "-----BEGIN RSA PRIVATE KEY-----";
+    public static final String privateKeySuffix = "-----END RSA PRIVATE KEY-----";
 
-    private static final String publicKeyPrefix = "-----BEGIN RSA PUBLIC KEY-----";
-    private static final String publicKeySuffix = "-----END RSA PUBLIC KEY-----";
+    public static final String publicKeyPrefix = "-----BEGIN RSA PUBLIC KEY-----";
+    public static final String publicKeySuffix = "-----END RSA PUBLIC KEY-----";
 
     private static String byteArrayToPEM(byte[] input) {
         String base64Encoded = Base64.getEncoder().encodeToString(input);

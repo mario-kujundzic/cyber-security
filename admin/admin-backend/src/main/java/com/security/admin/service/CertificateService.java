@@ -48,7 +48,7 @@ public class CertificateService {
 		keyStoreManager.readAllCertificates().forEach(c -> {
 			try {
 				list.add(toDTO(c));
-			} catch (CertificateEncodingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -91,7 +91,9 @@ public class CertificateService {
 		com.security.admin.model.Certificate crt = certificateRepository
 				.findOneBySerialNumber(holder.getSerialNumber());
 
-		dto.setRootAuthority(crt.isRootAuthority());
+		if (crt != null) {
+			dto.setRootAuthority(crt.isRootAuthority());
+		}
 
 		return dto;
 	}

@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 
 import com.security.admin.model.CertificateSigningRequest;
 import com.security.admin.model.CertificateSigningRequestStatus;
+import com.security.admin.util.ValidationUtility;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -19,22 +20,27 @@ public class CertificateSigningRequestDTO {
 
 	@NonNull
 	@NotBlank(message = "Common Name is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Common name must be alphanumeric!")
 	private String commonName;
 	
 	@NonNull
 	@NotBlank(message = "Organization is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Organization must be made of alphanumeric characters!")
 	private String organization;
 	
 	@NonNull
 	@NotBlank(message = "Organizaton Unit is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Organization unit must be made of alphanumeric characters!")
 	private String organizationUnit;
 	
 	@NonNull
 	@NotBlank(message = "Locality is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Locality must be made of alphanumeric characters!")
 	private String locality;
 	
 	@NonNull
 	@NotBlank(message = "State is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "State must be made of alphanumeric characters!")
 	private String state;
 	
 	@NonNull
@@ -42,13 +48,17 @@ public class CertificateSigningRequestDTO {
 	private String country;
 	
 	@NonNull
-	@Email(message = "Email should be in valid format!")
+	@Pattern(regexp = ValidationUtility.emailRegex, message = "Email should be in valid format!")
 	private String email;
 	
 	@NonNull
 	@NotBlank(message = "Public key is required!")
+	@Pattern(regexp = ValidationUtility.PEMRegex, message = "Public key should be in PEM format!")
 	private String publicKey;
 
+	@NonNull
+	@NotBlank(message = "Signature is required!")
+	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")
 	private String signature;
 
 	private CertificateSigningRequestStatus status;
