@@ -3,6 +3,7 @@ import json
 import ssl
 import os
 import base64
+from distutils.command.check import check
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives import hashes
@@ -15,7 +16,7 @@ private_key_path = 'key.priv'
 public_key_path = 'key.pub'
 
 # Certificate file name
-certificate_file_path = 'pressure_device_sert.crt'
+certificate_file_path = 'device.crt'
 certificate_secret = 'sadpotato'
 
 # Host of endpoint
@@ -136,7 +137,9 @@ def establish_connection():
 
     # Define the client certificate settings for https connection
     context = ssl.create_default_context()
-    # context.load_cert_chain()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
     context.load_cert_chain(certfile=certificate_file_path, password=certificate_secret, keyfile=private_key_path)
 
     # Create a connection to submit HTTP requests
