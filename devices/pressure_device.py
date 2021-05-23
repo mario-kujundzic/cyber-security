@@ -148,8 +148,6 @@ def establish_connection():
 
 
 def send_data(connection, private_key):
-    # neki deo sa kriptovanjem sa private key?
-
     # Defining parts of the HTTP request
     request_headers = {
         'Content-Type': 'application/json'
