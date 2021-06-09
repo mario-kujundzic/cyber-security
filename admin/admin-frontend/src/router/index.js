@@ -11,12 +11,18 @@ import ViewRevokedCertificates from "../views/home/ViewRevokedCertificates";
 import Error404 from "../views/errors/Error404"
 import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 import ManageHospitals from "../views/home/ManageHospitals";
+import ForgotPassword from '../views/auth/ForgotPassword';
 
 const routes = [
   {
     component: Login,
     name: "Login",
     path: "/login",
+  },
+  {
+    component: ForgotPassword,
+    name: "ForgotPassword",
+    path: "/forgot-password",
   },
   {
     component: Home,
