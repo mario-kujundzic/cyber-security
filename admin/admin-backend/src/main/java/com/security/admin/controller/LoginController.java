@@ -1,5 +1,8 @@
 package com.security.admin.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +34,12 @@ public class LoginController {
 
 	@PostMapping("/login")
 	public ResponseEntity<UserTokenStateDTO> login(@RequestBody JwtAuthenticationRequest authenticationRequest,
-			HttpServletResponse response) throws UserException {
+			HttpServletResponse response) throws UserException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		String username = authenticationRequest.getUsername();
 		String password = authenticationRequest.getPassword();
 		UserTokenStateDTO token = userService.login(username, password);
+		String cookie = "cookie=" + token.getCookie() + ";";
+		response.setHeader("Set-Cookie", cookie);
 		return new ResponseEntity<>(token, HttpStatus.OK);
 	}
 

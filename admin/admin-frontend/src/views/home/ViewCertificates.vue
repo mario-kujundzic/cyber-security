@@ -27,7 +27,12 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-dialog v-model="detailsDialog" :retain-focus="false" width="600" height="100%">
+              <v-dialog
+                v-model="detailsDialog"
+                :retain-focus="false"
+                width="600"
+                height="100%"
+              >
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     icon
@@ -63,11 +68,11 @@
                   </v-btn>
                 </template>
                 <revoke-certificate
-                    v-on:remove-certificate="removeCertificate"
-                    v-on:close-revoke-dialog="revokeDialog = false"
-                    v-bind:serialNumber="serialNumber"
-                  >
-                  </revoke-certificate>
+                  v-on:remove-certificate="removeCertificate"
+                  v-on:close-revoke-dialog="revokeDialog = false"
+                  v-bind:serialNumber="serialNumber"
+                >
+                </revoke-certificate>
               </v-dialog>
             </template>
           </v-data-table>
@@ -124,6 +129,22 @@ export default {
       .catch((error) => {
         console.log(error);
       });
+    // this.axios.post(
+    //   apiURL, {
+    //   headers: {
+    //     'Cookie': this.$cookies
+    //   },
+    //   credentials: 'include'
+    //   }
+    // ).then((response) => {
+    //   response.data.forEach((r) => {
+    //     r.validFrom = new Date(r.validFrom);
+    //     r.validTo = new Date(r.validTo);
+    //     this.certificates.push(r);
+    //   });
+    // }).catch((error) => {
+    //     console.log(error);
+    // });
   },
   methods: {
     revokeCertificate(item) {

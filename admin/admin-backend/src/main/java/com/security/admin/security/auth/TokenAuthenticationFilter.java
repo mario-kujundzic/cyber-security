@@ -2,6 +2,7 @@ package com.security.admin.security.auth;
 
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,6 +36,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
 		String username;
 		String authToken = tokenUtils.getToken(request);
+		String cookie = tokenUtils.getCookieFromHeader(request);
 
 		if (authToken != null) {
 			// uzmi username iz tokena
@@ -48,7 +50,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 //				if (u.getLastPasswordResetDate() != null || (u.getRole().equals("ADMIN") && u.getLastPasswordResetDate() == null
 //				&& request.getRequestURI().equals("/auth/change-password"))) {
 					// proveri da li je prosledjeni token validan
-					if (tokenUtils.validateToken(authToken, userDetails)) {
+					if (tokenUtils.validateToken(authToken, cookie, userDetails)) {
 						// kreiraj autentifikaciju
 						TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
 						authentication.setToken(authToken);

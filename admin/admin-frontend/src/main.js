@@ -1,12 +1,15 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from 'vue';
+import App from './App.vue';
 import vuetify from './plugins/vuetify';
-import VueAxios  from 'vue-axios'
-import Axios from 'axios'
-import router from './router/index'
-import moment from 'moment'
-import https from 'https'
-Vue.config.productionTip = false
+import VueAxios  from 'vue-axios';
+import Axios from 'axios';
+import router from './router/index';
+import moment from 'moment';
+import https from 'https';
+// import VueCookies from 'vue-cookies';
+
+// Vue.use(VueCookies);
+Vue.config.productionTip = false;
 
 const role = Vue.observable({ role: localStorage.getItem('role') })
 
@@ -33,7 +36,8 @@ if (localStorage.getItem('authKey') != null) {
   Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
 }
 // Vue.axios.defaults.headers['Access-Control-Allow-Origin'] = '*';
-Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
+// Vue.axios.defaults.headers['Access-Control-Allow-Credentials'] = 'true';
+// Vue.axios.defaults.withCredentials = true;
 Vue.axios.defaults.baseURL = 'https://localhost:9001/';
 
 

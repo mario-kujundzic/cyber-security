@@ -1,5 +1,8 @@
 package com.security.admin.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-	public UserTokenStateDTO login(String username, String password) throws UserException {
+	public UserTokenStateDTO login(String username, String password) throws UserException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		User existUser = null;
       try {
           existUser = getOne(username);
@@ -59,7 +62,7 @@ public class UserService {
         return user;
     }
     
-    public UserTokenStateDTO generateToken(String username, String password) throws UserException {
+    public UserTokenStateDTO generateToken(String username, String password) throws UserException, NoSuchAlgorithmException, UnsupportedEncodingException {
         Authentication authentication = null;
         try {
             authentication =
@@ -71,10 +74,12 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // create token
         User user = (User) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user.getUsername());
+        HashMap<String, String> token = tokenUtils.generateToken(user.getUsername());
+        String jwt = token.get("jwt");
+        String cookie = token.get("cookie");
         int expiresIn = tokenUtils.getExpiredIn();
         String role = user.getRoles().get(0).getName();
 
-        return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname(), role);
+        return new UserTokenStateDTO(user.getId(), jwt, cookie, expiresIn, user.getUsername(), user.getName(), user.getSurname(), role);
     }
 }

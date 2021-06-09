@@ -69,8 +69,9 @@ export default {
             this.axios({
                 url: apiURL,
                 method: 'POST',
-                data: this.user
-            }).then(
+                data: this.user},
+                {withCredentials: true}
+                ).then(
                 response => {
                     let loggedInUser = {
                         id : response.data.id,
@@ -79,13 +80,16 @@ export default {
                         role : response.data.role,
                         username : response.data.username,
                         name : response.data.name,
-                        surname: response.data.surname
+                        surname: response.data.surname,
+                        cookie: response.data.cookie
                     }
                     console.log(loggedInUser);
                     localStorage.setItem('role', response.data.role);
                     localStorage.setItem('authKey', 'Bearer ' + response.data.accessToken);
                     localStorage.setItem('user', JSON.stringify(loggedInUser));
                     this.axios.defaults.headers['Authorization'] = 'Bearer ' + response.data.accessToken;
+                    // this.axios.defaults.headers['Cookie'] = 'cookie=' + response.cookie + ';';
+                    // this.$cookies.set("cookie", response.data.cookie, "1h");
                     this.$router.push({ name: "ViewCertificates" })
                 }
                 
