@@ -1,8 +1,8 @@
 <template>
   <v-container fluid fill-height class="custom-background">
-    <v-container class="white">
-      <v-row> 
-          <img src="../../assets/admin-login.png" />
+    <v-container class="white" style="width: 50%;">
+      <v-row justify="center"> 
+          <img src="../../assets/forgot.gif" />
       </v-row>
       <v-row align="center">
         <ForgotPasswordForm />
@@ -21,10 +21,10 @@ export default {
 
 <style scoped>
 img {
-  height: 100%;
-  width: 100%;
+  height: 300px;
+  width: 300px;
 }
 .custom-background {
-  background-color: #c2e5cf;
+  background-color: rgb(119, 99, 211);
 }
 </style>

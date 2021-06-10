@@ -16,6 +16,7 @@ import com.security.admin.exception.UserException;
 import com.security.admin.model.User;
 import com.security.admin.repository.UserRepository;
 import com.security.admin.security.TokenUtils;
+import com.security.admin.util.RandomUtility;
 
 @Service
 public class UserService {
@@ -23,12 +24,14 @@ public class UserService {
     private UserRepository userRepository;
     private TokenUtils tokenUtils;
     private AuthenticationManager authenticationManager;
+    private MailSenderService mailSenderService;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager, MailSenderService mailSenderService) {
         this.userRepository = userRepository;
         this.tokenUtils = tokenUtils;
         this.authenticationManager = authenticationManager;
+        this.mailSenderService = mailSenderService;
     }
 
     public User findByUsername(String username) {
@@ -76,5 +79,16 @@ public class UserService {
         String role = user.getRoles().get(0).getName();
 
         return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname(), role);
+    }
+
+    public void forgotPassword(String username) {
+        User user = getOne(username);
+        if (!user.isEnabled()) {
+            throw new DisabledException("Your account hasn't been activated yet. Please check your email first!");
+        }
+        String generatedKey = RandomUtility.buildAuthString(30);
+        user.setResetKey(generatedKey);
+        mailSenderService.forgotPassword(user.getUsername(), generatedKey);
+        userRepository.save(user);
     }
 }

@@ -4,7 +4,7 @@
       <navigation-bar></navigation-bar>
     </v-navigation-drawer>
 
-    <v-app-bar app color="#c2e5cf" >
+    <v-app-bar app color="#BF94E4" >
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>Admin Application</v-toolbar-title>
