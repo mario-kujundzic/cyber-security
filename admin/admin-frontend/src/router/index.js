@@ -12,6 +12,8 @@ import Error404 from "../views/errors/Error404"
 import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 import ManageHospitals from "../views/home/ManageHospitals";
 import ForgotPassword from '../views/auth/ForgotPassword';
+import ResetPassword from '../views/auth/ResetPassword';
+
 
 const routes = [
   {
@@ -23,6 +25,11 @@ const routes = [
     component: ForgotPassword,
     name: "ForgotPassword",
     path: "/forgot-password",
+  },
+  {
+    component: ResetPassword,
+    name: "ResetPassword",
+    path: "/reset-password/:key",
   },
   {
     component: Home,
