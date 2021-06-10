@@ -1,6 +1,8 @@
 package com.security.hospital.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.UserException;
 import com.security.hospital.model.User;
@@ -127,4 +130,12 @@ public class UserService implements UserDetailsService {
 		return passwordEncoder.encode(password);
 	}
 
+	public List<UserDTO> getAll() {
+		List<UserDTO> users = userRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+		return users;
+	}
+
+	private UserDTO toDTO(User u) {
+		return new UserDTO(u);		
+	}
 }

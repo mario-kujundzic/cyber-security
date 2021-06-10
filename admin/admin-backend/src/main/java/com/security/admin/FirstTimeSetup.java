@@ -92,7 +92,7 @@ public class FirstTimeSetup {
 			bufferedWriter.close();
 			System.out.println("FirstTimeSetup: Public key saved to file.");
 			
-			PEMUtility.writeCertToPEM(cert, keyStoreFolderPath + "/rootCA.crt");
+			PEMUtility.writeCertToPEM(certChain, keyStoreFolderPath + "/rootCA.crt");
 		}
 		catch (Exception e) {
 			System.out.println("Failed saving keys and cert to file");

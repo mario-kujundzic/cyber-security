@@ -86,11 +86,13 @@ public class PEMUtility {
         return null;
     }
     
-    public static void writeCertToPEM(Certificate cert, String fileName) throws IOException, CertificateEncodingException {
+    public static void writeCertToPEM(Certificate[] certChain, String fileName) throws IOException, CertificateEncodingException {
     	FileWriter fileWriter = new FileWriter(new File(fileName));
     	try (JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter)) {
-    		pemWriter.writeObject(cert);
-    		pemWriter.flush();
+    		for (Certificate cert : certChain) {
+    			pemWriter.writeObject(cert);
+    			pemWriter.flush();    			
+    		}
     	}
     }
 }

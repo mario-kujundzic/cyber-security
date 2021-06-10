@@ -136,7 +136,7 @@ public class CertificateService {
 
 			createCertificateModel(dto, serial, false);
 
-			PEMUtility.writeCertToPEM(cert, "./cert_" + dto.getCommonName() + ".crt");
+			PEMUtility.writeCertToPEM(certChain, "./cert_" + dto.getCommonName() + ".crt");
 
 			return toDTO(cert);
 

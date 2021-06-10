@@ -8,6 +8,7 @@ import Home from '../views/Home';
 import CSRForm from '../components/certificates/CSRForm';
 import PublicKeyViewer from '../components/certificates/PublicKeyViewer';
 import ManageDevices from '../views/ManageDevices';
+import ManageUsers from '../views/ManageUsers';
 
 const routes = [
     {
@@ -35,6 +36,11 @@ const routes = [
                 component: ManageDevices,
                 name: "ManageDevices",
                 path: "/devices"
+            },
+            {
+                component: ManageUsers,
+                name: "ManageUsers",
+                path: "/users"
             }
         ]
         
