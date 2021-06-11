@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.security.admin.dto.ResetPasswordDTO;
 import com.security.admin.dto.UserDTO;
 import com.security.admin.dto.UserTokenStateDTO;
+import com.security.admin.exception.OftenUsedPasswordException;
 import com.security.admin.exception.UserException;
 import com.security.admin.security.auth.JwtAuthenticationRequest;
 import com.security.admin.service.UserService;
@@ -48,9 +49,9 @@ public class LoginController {
     }
 	
 	@PostMapping("/reset-password")
-    public ResponseEntity<UserTokenStateDTO> resetPassword(@Valid @RequestBody ResetPasswordDTO dto) throws UserException {
-    	UserTokenStateDTO user = userService.resetPassword(dto);
-    	return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<Object> resetPassword(@Valid @RequestBody ResetPasswordDTO dto) throws UserException, OftenUsedPasswordException {
+    	userService.resetPassword(dto);
+    	return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

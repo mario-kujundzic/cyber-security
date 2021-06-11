@@ -37,9 +37,11 @@
                 :rules="[rules.required]"
                 label="Password"
                 prepend-icon="mdi-lock"
-                type="password"
                 class="description"
                 style="font-size: 18px"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPassword ? 'text' : 'password'"
+                @click:append="showPassword = !showPassword"
               />
             </v-row>
           </v-form>
@@ -90,6 +92,7 @@ export default {
       },
       valid: true,
       error: false,
+      showPassword: false
     };
   },
   methods: {
@@ -117,6 +120,9 @@ export default {
         this.axios.defaults.headers["Authorization"] =
           "Bearer " + response.data.accessToken;
         this.$router.push({ name: "ViewCertificates" });
+      }).catch(() => {
+        //TODO sredi ovo na snackbarove u nekom trenutku
+        alert("Incorrect username or password!");
       });
     },
   },

@@ -3,18 +3,25 @@
     <v-row class="description" style="font-size: 50px;" justify="center"
       >Reset your password
     </v-row>
+    <v-row class="description" style="font-size: 27.5px;" justify="center">
+      Password should contain at least one special character, number and
+      uppercase letter
+    </v-row>
     <v-form v-model="valid" ref="form">
       <div class="example-custom-css">
         <div class="input-container">
           <v-text-field
             id="custom-css-input"
             filled
-            type="password"
             v-model="password"
             ref="password"
             label="Password"
             style="font-size: 18px"
             :rules="[rules.required, rules.counter]"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showPassword ? 'text' : 'password'"
+            @click:append="showPassword = !showPassword"
+            required
           />
           <password-meter :password="password" @score="onScore" />
         </div>
@@ -22,10 +29,13 @@
       <v-text-field
         filled
         v-model="confirmPassword"
-        type="password"
         label="Confirm password"
         style="font-size: 18px"
         :rules="[rules.required, rules.counter, rules.passwordMatch]"
+        :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        @click:append="showConfirmPassword = !showConfirmPassword"
+        required
       />
       <v-row>
         <v-btn
@@ -51,7 +61,7 @@
 
 <script>
 import passwordMeter from "vue-simple-password-meter";
-const apiURL = "/auth/forgot-password";
+const apiURL = "/auth/reset-password";
 
 export default {
   name: "ResetPasswordForm",
@@ -63,38 +73,46 @@ export default {
       rules: {
         required: (value) => !!value || "Field is required.",
         counter: (value) =>
-          value.length > 4 || "Password must have a minimum of 5 characters",
+          value.length > 9 || "Password must have a minimum of 10 characters",
         passwordMatch: () =>
           this.password == this.confirmPassword || "Passwords must match.",
       },
       valid: true,
       error: false,
       score: null,
+      strength: null,
+      showConfirmPassword: false,
+      showPassword: false,
     };
   },
   methods: {
     forgotPassword() {
+      let key = this.$route.params.key;
       this.$refs.form.validate();
       if (!this.valid) return;
-      var config = {
-        headers: {
-          "Content-Type": "text/plain",
-        },
+      if (this.score <= 2)
+        alert("Your password is weak! Use numbers and special characters!");
+      let resetPassword = {
+        newPassword: this.password,
+        resetKey: key,
       };
       this.axios
-        .post(apiURL, this.username, config)
+        .post(apiURL, resetPassword)
         .then(() => {
-          alert("We've sent you recovery link! Please check your email!");
+          alert("You've successfully changed your password!");
           this.$refs.form.reset();
         })
         .catch(() => {
-          alert("Please check your email!");
+          alert(
+            "Password should contain at least one uppercase letter, one number and one special character. Don't use your personal data as a password."
+          );
         });
     },
     onScore({ score, strength }) {
-      console.log(score); // from 0 to 4
-      console.log(strength); // one of : 'risky', 'guessable', 'weak', 'safe' , 'secure'
+      // console.log(score); // from 0 to 4
+      // console.log(strength); // one of : 'risky', 'guessable', 'weak', 'safe' , 'secure'
       this.score = score;
+      this.strength = strength;
     },
   },
 };
@@ -142,9 +160,9 @@ export default {
     height: 30px;
     width: 30px;
     position: absolute;
-    right: 10px;
+    right: 50px;
     margin-top: auto;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
   }
 
   .po-password-strength-bar.risky {

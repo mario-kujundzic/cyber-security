@@ -1,6 +1,13 @@
 package com.security.admin.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.security.admin.dto.ResetPasswordDTO;
 import com.security.admin.dto.UserTokenStateDTO;
+import com.security.admin.exception.OftenUsedPasswordException;
 import com.security.admin.exception.UserException;
 import com.security.admin.model.User;
 import com.security.admin.repository.UserRepository;
@@ -99,16 +107,47 @@ public class UserService {
 		userRepository.save(user);
 	}
 
-	public UserTokenStateDTO resetPassword(ResetPasswordDTO dto) throws UserException {
+	public UserTokenStateDTO resetPassword(ResetPasswordDTO dto) throws UserException, OftenUsedPasswordException {
 		User user = userRepository.findByResetKey(dto.getResetKey());
 		if (user == null) {
 			throw new NoSuchElementException("The password is already reset or the link is invalid!");
 		}
-		userDetailsService.changePasswordUtil(user, dto.getNewPassword());
+		String newPassword = dto.getNewPassword();
+		if (oftenUsedPassword(newPassword)) {
+			throw new OftenUsedPasswordException("The password is often used and therefore weak!");
+		}
+		if (passwordContainsUserData(newPassword, user)) {
+			throw new OftenUsedPasswordException("The password should not contain your personal information!");
+		}
+		userDetailsService.changePasswordUtil(user, newPassword);
 		user.setResetKey(null);
 		userRepository.save(user);
 
-		UserTokenStateDTO token = generateToken(user.getUsername(), dto.getNewPassword());
+		UserTokenStateDTO token = generateToken(user.getUsername(), newPassword);
 		return token;
+	}
+	
+	private boolean oftenUsedPassword(String password) {
+		List<String> oftenUsedPasswords = new ArrayList<>();
+	    try (Stream<String> lines = Files.lines(Paths.get("./src/main/resources/common-passwords.txt"))) {
+	    	oftenUsedPasswords = lines.collect(Collectors.toList());
+	    } catch (IOException e) {
+			e.printStackTrace();
+		}
+	    
+	    if (oftenUsedPasswords.contains(password.toLowerCase()))
+	    	return true;
+	    return false;
+	}
+	
+	private boolean passwordContainsUserData(String password, User user) {
+		String lowerPass = password.toLowerCase();
+		if (lowerPass.contains(user.getName().toLowerCase()))
+			return true;
+		if (lowerPass.contains(user.getSurname().toLowerCase()))
+			return true;
+		if (lowerPass.contains(user.getUsername().split("@")[0].toLowerCase()))
+			return true;
+		return false;
 	}
 }

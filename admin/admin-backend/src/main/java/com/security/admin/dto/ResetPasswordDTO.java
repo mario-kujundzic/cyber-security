@@ -1,7 +1,9 @@
 package com.security.admin.dto;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
+
+import com.security.admin.util.ValidationUtility;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ResetPasswordDTO {
 	
 	@NotBlank(message = "Password is required!")
-    @Size(min = 5, message = "Password must be at least 5 characters!")
+	@Pattern(regexp = ValidationUtility.passwordRegex, message="Password should contain at least one special character, one uppercase letter and one number")
     private String newPassword;
     
     @NotBlank(message = "Reset key is required!")

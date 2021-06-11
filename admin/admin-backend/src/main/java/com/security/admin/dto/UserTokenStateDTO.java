@@ -6,14 +6,12 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Pattern;
 
-//import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
 public class UserTokenStateDTO {
 
 	private Long id;
-//    @NotBlank(message = "Access token is required!")
 	private String accessToken;
 	private Long expiresIn;
 
