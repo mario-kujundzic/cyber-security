@@ -1,54 +1,67 @@
-import Vue from "vue"
-import VueRouter from "vue-router"
+import Vue from "vue";
+import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Login from '../views/Login';
-import Home from '../views/Home';
-import CSRForm from '../components/certificates/CSRForm';
-import PublicKeyViewer from '../components/certificates/PublicKeyViewer';
-import ManageDevices from '../views/ManageDevices';
+import Login from "../views/auth/Login";
+import ForgotPassword from "../views/auth/ForgotPassword"
+import ResetPassword from "../views/auth/ResetPassword"
+import Home from "../views/home/Home";
+import CSRForm from "../components/certificates/CSRForm";
+import PublicKeyViewer from "../components/certificates/PublicKeyViewer";
+import ManageDevices from "../views/home/ManageDevices";
+import Error404 from "../views/errors/Error404";
 
 const routes = [
-    {
-        component: Login,
-        name: 'Login',
-        path: '/login',
-    },
-    {
-        component: Home,
-        name: 'Home',
-        path: '/',
-        beforeEnter : guardRouteLoggedIn,
-        children: [
-            {
-                component: CSRForm,
-                name: "CSRForm",
-                path: "/csr"
-            },
-            {
-                component: PublicKeyViewer,
-                name: "PublicKeyViewer",
-                path: "/key"
-            },
-            {
-                component: ManageDevices,
-                name: "ManageDevices",
-                path: "/devices"
-            }
-        ]
-        
-    },
-    
-]
+  {
+    component: Login,
+    name: "Login",
+    path: "/login",
+  },
+  {
+    component: ForgotPassword,
+    name: "ForgotPassword",
+    path: "/forgot-password",
+  },
+  {
+    component: ResetPassword,
+    name: "ResetPassword",
+    path: "/reset-password/:key",
+  },
+  {
+    component: Home,
+    path: "/",
+    beforeEnter: guardRouteLoggedIn,
+    children: [
+      {
+        component: CSRForm,
+        name: "CSRForm",
+        path: "/csr",
+      },
+      {
+        component: PublicKeyViewer,
+        name: "PublicKeyViewer",
+        path: "/key",
+      },
+      {
+        component: ManageDevices,
+        name: "ManageDevices",
+        path: "/devices",
+      },
+    ],
+  },
+  {
+    path: "/404",
+    alias: "*",
+    component: Error404
+  },
+];
 
 //todo: token expired
 function guardRouteLoggedIn(to, from, next) {
-    let user = JSON.parse(localStorage.getItem('user'));
-    if(!user || user['token'] === undefined)
-        next('/login');
-    else
-        next(); // allow to enter the route
+  let user = JSON.parse(localStorage.getItem("user"));
+  if (!user || user["token"] === undefined) next("/login");
+  else next(); // allow to enter the route
 }
 
 /*function guardRouteAdmin(to, from, next) {
@@ -64,6 +77,6 @@ function guardRouteLoggedIn(to, from, next) {
 }*/
 
 export default new VueRouter({
-    mode: 'history',
-    routes: routes
+  mode: "history",
+  routes: routes,
 });

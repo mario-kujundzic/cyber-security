@@ -40,9 +40,9 @@
       <v-row>
         <v-btn
           @click="resetPassword()"
-          color="rgb(104, 80, 215)"
+          color="#8C9EFF"
           block
-          class="description white--text"
+          class="description"
           style="font-size: 15px"
         >
           <b>Reset password</b>

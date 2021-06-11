@@ -130,9 +130,6 @@ export default {
 </script>
 
 <style scoped>
-a {
-  font-size: small;
-}
 .description {
   font-family: "Baloo2", Helvetica, Arial;
 }
