@@ -22,6 +22,17 @@ Object.defineProperty(Vue.prototype, '$role', {
 // axios config
 Vue.use(VueAxios, Axios);
 
+Vue.axios.interceptors.response.use(undefined, function (error) {
+  if (error) {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        localStorage.clear();
+        return router.push('/login');
+    }
+  }
+})
+
 Vue.axios.defaults.httpsAgent = new https.Agent ({ rejectUnauthorized: false});
 if (localStorage.getItem('authKey') != null) {
   Vue.axios.defaults.headers['Authorization'] = localStorage.getItem('authKey');
