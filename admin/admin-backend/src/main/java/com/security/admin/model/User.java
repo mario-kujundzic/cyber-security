@@ -71,6 +71,9 @@ public class User implements UserDetails {
 	@Column(name = "last_password_reset_date")
 	private Timestamp lastPasswordResetDate;
 
+	@Column(name = "last_login_date")
+	private Timestamp lastLoginDate;
+
 	public String getFullName() {
 		return this.name + " " + this.surname;
 	}
@@ -112,5 +115,9 @@ public class User implements UserDetails {
 			return privileges;
 		}
 		return null;
+	}
+
+	public void resetLastLoginDate() {
+		this.lastLoginDate = new Timestamp((new Date()).getTime());
 	}
 }

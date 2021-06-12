@@ -2,6 +2,7 @@ package com.security.hospital.service;
 
 import java.util.NoSuchElementException;
 
+import com.security.hospital.security.events.LoginAttemptResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,49 +25,62 @@ import com.security.hospital.security.TokenUtils;
 @Service
 public class UserService implements UserDetailsService {
 
+	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
 	private TokenUtils tokenUtils;
+
+	@Autowired
 	private AuthenticationManager authenticationManager;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.tokenUtils = tokenUtils;
-		this.authenticationManager = authenticationManager;
-		this.passwordEncoder = passwordEncoder;
-	}
+	private SecurityEventService securityEventService;
 
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
 
-	public UserTokenStateDTO login(String username, String password) throws DisabledException, UserException {
+	public UserTokenStateDTO login(String username, String password, String IPAddress) throws DisabledException, UserException {
 		User existUser = null;
 		try {
 			existUser = getOne(username);
 		} catch (NoSuchElementException e) {
+			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.USER_DOESNT_EXIST, IPAddress, -1);
 			throw new UserException("No such element!", "username", "User with this username doesn't exist.");
 		}
 
 		if (!existUser.isEnabled()) {
+			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.ACCOUNT_INACTIVE, IPAddress, -1);
 			throw new DisabledException("Your account hasn't been activated yet. Please check your email!");
 		}
 
-		UserTokenStateDTO token = generateToken(username, password);
+		UserTokenStateDTO token = null;
+		try {
+			token = generateToken(username, password);
+		} catch (BadCredentialsException e) {
+			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.PASSWORD_INCORRECT, IPAddress,
+					existUser.getLastLoginDate().getTime() / 1000);
+			throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
+		}
+
+		existUser.resetLastLoginDate();
+		userRepository.save(existUser);
+		securityEventService.invokeLoginAttempt(username, LoginAttemptResult.SUCCESS, IPAddress,
+				existUser.getLastLoginDate().getTime() / 1000);
 		return token;
 
 	}
 
-	public UserTokenStateDTO generateToken(String username, String password) throws UserException {
+	public UserTokenStateDTO generateToken(String username, String password) throws BadCredentialsException {
 		Authentication authentication = null;
-		try {
-			authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (BadCredentialsException e) {
-			throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
-		}
+
+		authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(username, password)
+		);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		// create token

@@ -1,5 +1,6 @@
 package com.security.admin.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,11 @@ public class LoginController {
 
 	@PostMapping("/login")
 	public ResponseEntity<UserTokenStateDTO> login(@RequestBody JwtAuthenticationRequest authenticationRequest,
+			HttpServletRequest request,
 			HttpServletResponse response) throws UserException {
 		String username = authenticationRequest.getUsername();
 		String password = authenticationRequest.getPassword();
-		UserTokenStateDTO token = userService.login(username, password);
+		UserTokenStateDTO token = userService.login(username, password, request.getRemoteAddr());
 		return new ResponseEntity<>(token, HttpStatus.OK);
 	}
 
