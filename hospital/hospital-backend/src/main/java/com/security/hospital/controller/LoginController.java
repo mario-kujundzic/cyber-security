@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.security.hospital.dto.ResetPasswordDTO;
-import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
@@ -44,7 +43,7 @@ public class LoginController {
     }
     
 	@PostMapping("/forgot-password")
-    public ResponseEntity<UserDTO> forgotPassword(@Valid @RequestBody String username) {
+    public ResponseEntity<Object> forgotPassword(@Valid @RequestBody String username) {
         userService.forgotPassword(username);
         return new ResponseEntity<>(HttpStatus.OK);
     }
