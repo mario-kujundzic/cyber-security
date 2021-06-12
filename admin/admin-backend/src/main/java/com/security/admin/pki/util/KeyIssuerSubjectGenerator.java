@@ -23,6 +23,8 @@ public class KeyIssuerSubjectGenerator {
 		builder.addRDN(BCStyle.CN, commonName);
 		builder.addRDN(BCStyle.O, "Cyber Security Hospital Center");
 		builder.addRDN(BCStyle.OU, "Cyber Security Administrative Center");
+		builder.addRDN(BCStyle.L, "Novi Sad");
+		builder.addRDN(BCStyle.ST, "Vojvodina");
 		builder.addRDN(BCStyle.C, "RS");
 		builder.addRDN(BCStyle.E, "lotusclinic505@gmail.com");
 

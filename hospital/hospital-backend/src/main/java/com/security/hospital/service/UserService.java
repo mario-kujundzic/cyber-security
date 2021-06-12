@@ -1,5 +1,7 @@
 package com.security.hospital.service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +26,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.security.hospital.dto.AddUserRequestDTO;
+import com.security.hospital.dto.DeleteUserRequestDTO;
+import com.security.hospital.dto.ModifyUserRequestDTO;
+import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
+import com.security.hospital.model.Admin;
+import com.security.hospital.model.Doctor;
+import com.security.hospital.model.Role;
 import com.security.hospital.model.User;
+import com.security.hospital.repository.RoleRepository;
 import com.security.hospital.repository.UserRepository;
 import com.security.hospital.security.TokenUtils;
 import com.security.hospital.util.RandomUtility;
@@ -38,15 +50,18 @@ public class UserService implements UserDetailsService {
 	private TokenUtils tokenUtils;
 	private AuthenticationManager authenticationManager;
 	private PasswordEncoder passwordEncoder;
+	private RoleRepository roleRepository;
 	private MailSenderService mailSenderService;
 
 	@Autowired
 	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, MailSenderService mailSenderService) {
+			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
+			MailSenderService mailSenderService, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
+		this.roleRepository = roleRepository;
 		this.mailSenderService = mailSenderService;
 	}
 
@@ -86,7 +101,8 @@ public class UserService implements UserDetailsService {
 		String jwt = tokenUtils.generateToken(user.getUsername());
 		long expiresIn = tokenUtils.getExpiredIn();
 
-		return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(), user.getSurname(), user.getRole());
+		return new UserTokenStateDTO(user.getId(), jwt, expiresIn, user.getUsername(), user.getName(),
+				user.getSurname(), user.getRole());
 	}
 
 	public User getOne(String username) throws NoSuchElementException {
@@ -96,15 +112,15 @@ public class UserService implements UserDetailsService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (user == null) {
 			throw new NoSuchElementException("User with this username doesn't exist!");
 		}
 		return user;
 	}
-	
+
 	// custom user details service
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
@@ -121,24 +137,24 @@ public class UserService implements UserDetailsService {
 		// Ocitavamo trenutno ulogovanog korisnika
 		Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
 		String username = currentUser.getName();
-		
+
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, oldPassword));
 		User user = (User) loadUserByUsername(username);
 		changePasswordUtil(user, newPassword);
-		
+
 		userRepository.save(user);
-		
+
 		return username;
 	}
-		
+
 	public void changePasswordUtil(User user, String newPassword) {
 		user.setPassword(passwordEncoder.encode(newPassword));
 	}
-	
+
 	public String encodePassword(String password) {
 		return passwordEncoder.encode(password);
 	}
-	
+
 	public void forgotPassword(String username) {
 		User user = getOne(username);
 		if (!user.isEnabled()) {
@@ -169,20 +185,20 @@ public class UserService implements UserDetailsService {
 		UserTokenStateDTO token = generateToken(user.getUsername(), newPassword);
 		return token;
 	}
-	
+
 	private boolean oftenUsedPassword(String password) {
 		List<String> oftenUsedPasswords = new ArrayList<>();
-	    try (Stream<String> lines = Files.lines(Paths.get("./src/main/resources/common-passwords.txt"))) {
-	    	oftenUsedPasswords = lines.collect(Collectors.toList());
-	    } catch (IOException e) {
+		try (Stream<String> lines = Files.lines(Paths.get("./src/main/resources/common-passwords.txt"))) {
+			oftenUsedPasswords = lines.collect(Collectors.toList());
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	    
-	    if (oftenUsedPasswords.contains(password.toLowerCase()))
-	    	return true;
-	    return false;
+
+		if (oftenUsedPasswords.contains(password.toLowerCase()))
+			return true;
+		return false;
 	}
-	
+
 	private boolean passwordContainsUserData(String password, User user) {
 		String lowerPass = password.toLowerCase();
 		if (lowerPass.contains(user.getName().toLowerCase()))
@@ -194,4 +210,58 @@ public class UserService implements UserDetailsService {
 		return false;
 	}
 
+	public List<UserDTO> getAll() {
+		List<UserDTO> users = userRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+		return users;
+	}
+
+	private UserDTO toDTO(User u) {
+		return new UserDTO(u);
+	}
+
+	public User getOneById(Long userId) {
+		return userRepository.getOne(userId);
+	}
+
+	public void deleteUser(@Valid DeleteUserRequestDTO dto) {
+		User u = userRepository.getOne(dto.getUserId());
+		userRepository.delete(u);
+	}
+
+	public void modifyRole(@Valid ModifyUserRequestDTO dto) {
+		User u = userRepository.getOne(dto.getUserId());
+		userRepository.delete(u);
+		List<Role> roles = new ArrayList<>();
+		roles.add(roleRepository.findByName("ROLE_" + dto.getNewRole()));
+		if (dto.getNewRole().equals("ADMIN")) {
+			Admin a = new Admin(u.getName(), u.getSurname(), u.getUsername(), u.getPassword());
+			a.setRoles(roles);
+			a.setLastPasswordResetDate(Timestamp.from(Instant.now()));
+			a.setEnabled(true);
+			userRepository.save(a);
+		} else {
+			Doctor d = new Doctor(u.getName(), u.getSurname(), u.getUsername(), u.getPassword());
+			d.setRoles(roles);
+			d.setLastPasswordResetDate(Timestamp.from(Instant.now()));
+			d.setEnabled(true);
+			userRepository.save(d);
+		}
+	}
+
+	public void addUser(@Valid AddUserRequestDTO dto) {
+		if (dto.getRole().equals("ADMIN")) {
+			String initPassword = "changeMe123";
+			Admin a = new Admin(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
+			a.setLastPasswordResetDate(null);
+			userRepository.save(a);
+			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
+
+		} else {
+			String initPassword = "changeMe123";
+			Doctor d = new Doctor(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
+			d.setLastPasswordResetDate(null);
+			userRepository.save(d);
+			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
+		}
+	}
 }

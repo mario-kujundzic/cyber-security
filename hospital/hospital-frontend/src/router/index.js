@@ -12,6 +12,10 @@ import PublicKeyViewer from "../components/certificates/PublicKeyViewer";
 import ManageDevices from "../views/home/ManageDevices";
 import Error404 from "../views/errors/Error404";
 import ViewPatients from "../views/home/ViewPatients";
+import ManageUsers from "../views/ManageUsers";
+import ManageAddUserRequests from "../views/ManageAddUserRequests";
+import ManageDeleteUserRequests from "../views/ManageDeleteUserRequests";
+import ManageModifyUserRequests from "../views/ManageModifyUserRequests";
 
 const routes = [
   {
@@ -56,6 +60,30 @@ const routes = [
         component: ManageDevices,
         name: "ManageDevices",
         path: "/devices",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: ManageUsers,
+        name: "ManageUsers",
+        path: "/users",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: ManageAddUserRequests,
+        name: "ManageAddUserRequests",
+        path: "add-user-requests",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: ManageDeleteUserRequests,
+        name: "ManageDeleteUserRequests",
+        path: "delete-user-requests",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: ManageModifyUserRequests,
+        name: "ManageModifyUserRequests",
+        path: "modify-user-requests",
         beforeEnter: guardRouteAdmin
       },
     ],

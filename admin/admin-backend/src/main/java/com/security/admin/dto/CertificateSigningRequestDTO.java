@@ -4,8 +4,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import com.security.admin.model.CertificateSigningRequest;
-import com.security.admin.model.CertificateSigningRequestStatus;
+import com.security.admin.model.requests.CertificateSigningRequest;
+import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.util.ValidationUtility;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -61,7 +61,7 @@ public class CertificateSigningRequestDTO {
 	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")
 	private String signature;
 
-	private CertificateSigningRequestStatus status;
+	private RequestStatus status;
 
 	public CertificateSigningRequestDTO(CertificateSigningRequest csr) {
 		commonName = csr.getCommonName();
@@ -153,11 +153,11 @@ public class CertificateSigningRequestDTO {
 		this.publicKey = publicKey;
 	}
 
-	public CertificateSigningRequestStatus getStatus() {
+	public RequestStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(CertificateSigningRequestStatus status) {
+	public void setStatus(RequestStatus status) {
 		this.status = status;
 	}
 

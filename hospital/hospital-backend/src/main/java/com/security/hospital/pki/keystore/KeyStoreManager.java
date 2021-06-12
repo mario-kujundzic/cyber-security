@@ -128,7 +128,6 @@ public class KeyStoreManager {
 		try {
 			return keyStore.isKeyEntry("sslCertificate");
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

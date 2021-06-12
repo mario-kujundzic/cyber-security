@@ -1,4 +1,4 @@
-package com.security.admin.model;
+package com.security.admin.model.requests;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,12 +9,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Entity
-@Table(name = "requests")
+@Table(name = "requests_csr")
 @Data
 @NoArgsConstructor
 public class CertificateSigningRequest {
@@ -48,7 +49,7 @@ public class CertificateSigningRequest {
 	private String email;
 	
 	@Column(name = "status")
-	private CertificateSigningRequestStatus status;
+	private RequestStatus status;
 
 	public CertificateSigningRequest(CertificateSigningRequestDTO dto) {
 		commonName = dto.getCommonName();
@@ -59,7 +60,7 @@ public class CertificateSigningRequest {
 		country = dto.getCountry();
 		publicKey = dto.getPublicKey();
 		email = dto.getEmail();
-		status = CertificateSigningRequestStatus.PENDING;
+		status = RequestStatus.PENDING;
 	}
 
 	@Override
@@ -141,11 +142,11 @@ public class CertificateSigningRequest {
 		this.publicKey = publicKey;
 	}
 
-	public CertificateSigningRequestStatus getStatus() {
+	public RequestStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(CertificateSigningRequestStatus status) {
+	public void setStatus(RequestStatus status) {
 		this.status = status;
 	}
 
