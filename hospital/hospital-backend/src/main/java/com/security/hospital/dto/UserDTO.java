@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.security.hospital.model.User;
+
 import com.security.hospital.util.ValidationUtility;
 
 import lombok.Data;
@@ -49,5 +50,4 @@ public class UserDTO {
 		username = u.getUsername();
 		role = u.getRole();
 	}
-
 }

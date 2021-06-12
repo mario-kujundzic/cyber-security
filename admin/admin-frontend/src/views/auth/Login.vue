@@ -4,7 +4,7 @@
       class="white">
       <v-row>
         <v-col no-gutters cols="12" md>
-          <img src="../../assets/admin-login.png" />
+          <img src="../../assets/admin-login-test.png" />
         </v-col>
         <v-col no-gutters cols="12" md>
           <LoginForm />
@@ -28,6 +28,7 @@ img {
   width: 100%;
 }
 .custom-background {
-  background-color: #c2e5cf;
+  /* background-color: #c2e5cf; */
+  background-color: rgb(104, 80, 215);
 }
 </style>

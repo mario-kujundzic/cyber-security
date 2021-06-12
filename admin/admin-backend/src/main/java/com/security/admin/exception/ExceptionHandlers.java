@@ -16,6 +16,12 @@ public class ExceptionHandlers {
 		message.getErrors().put(ex.getCauseField(), ex.getCauseMessage());
 		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(OftenUsedPasswordException.class)
+	public ResponseEntity<ErrorMessage> OftenUsedPasswordExceptionHandler(OftenUsedPasswordException ex, WebRequest request) {
+		ErrorMessage message = new ErrorMessage(ex.getMessage());
+		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+	}
 		
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorMessage> globalExceptionHandler(Exception ex, WebRequest request) {

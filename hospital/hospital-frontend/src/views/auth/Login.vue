@@ -4,7 +4,7 @@
       class="white">
       <v-row>
         <v-col no-gutters cols="12" md>
-          <img src="../assets/doctor.png" />
+          <img src="../../assets/doctor.png" />
         </v-col>
         <v-col no-gutters cols="12" md>
           <LoginForm />
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import LoginForm from "../components/auth/LoginForm.vue";
+import LoginForm from "../../components/auth/LoginForm.vue";
 export default {
   name: "Login",
   components: { LoginForm },

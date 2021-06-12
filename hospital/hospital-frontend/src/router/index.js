@@ -3,11 +3,14 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-import Login from "../views/Login";
-import Home from "../views/Home";
+import Login from "../views/auth/Login";
+import ForgotPassword from "../views/auth/ForgotPassword"
+import ResetPassword from "../views/auth/ResetPassword"
+import Home from "../views/home/Home";
 import CSRForm from "../components/certificates/CSRForm";
 import PublicKeyViewer from "../components/certificates/PublicKeyViewer";
-import ManageDevices from "../views/ManageDevices";
+import ManageDevices from "../views/home/ManageDevices";
+import Error404 from "../views/errors/Error404";
 import ManageUsers from "../views/ManageUsers";
 import ManageAddUserRequests from "../views/ManageAddUserRequests";
 import ManageDeleteUserRequests from "../views/ManageDeleteUserRequests";
@@ -20,8 +23,17 @@ const routes = [
     path: "/login",
   },
   {
+    component: ForgotPassword,
+    name: "ForgotPassword",
+    path: "/forgot-password",
+  },
+  {
+    component: ResetPassword,
+    name: "ResetPassword",
+    path: "/reset-password/:key",
+  },
+  {
     component: Home,
-    name: "Home",
     path: "/",
     beforeEnter: guardRouteLoggedIn,
     children: [
@@ -61,6 +73,11 @@ const routes = [
         path: "modify-user-requests",
       },
     ],
+  },
+  {
+    path: "/404",
+    alias: "*",
+    component: Error404
   },
 ];
 

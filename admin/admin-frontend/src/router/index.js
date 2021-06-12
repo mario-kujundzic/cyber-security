@@ -14,12 +14,25 @@ import ManageHospitals from "../views/home/ManageHospitals";
 import ManageAddUserRequests from "../views/home/ManageAddUserRequests";
 import ManageDeleteUserRequests from "../views/home/ManageDeleteUserRequests";
 import ManageModifyUserRequests from "../views/home/ManageModifyUserRequests";
+import ForgotPassword from '../views/auth/ForgotPassword';
+import ResetPassword from '../views/auth/ResetPassword';
+
 
 const routes = [
   {
     component: Login,
     name: "Login",
     path: "/login",
+  },
+  {
+    component: ForgotPassword,
+    name: "ForgotPassword",
+    path: "/forgot-password",
+  },
+  {
+    component: ResetPassword,
+    name: "ResetPassword",
+    path: "/reset-password/:key"
   },
   {
     component: Home,
