@@ -7,6 +7,7 @@ module.exports = {
       key: fs.readFileSync('./ssl/adminFront.key'),
       cert: fs.readFileSync('./ssl/adminFront.crt'),
     },
-    public: 'https://localhost:8081/'
+    public: 'https://localhost:8081/',
+    port: 8081
   }
 };

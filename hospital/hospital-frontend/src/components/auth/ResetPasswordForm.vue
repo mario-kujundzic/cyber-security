@@ -73,7 +73,7 @@ export default {
       rules: {
         required: (value) => !!value || "Field is required.",
         counter: (value) =>
-          value.length > 9 || "Password must have a minimum of 10 characters",
+          value ? value.length > 9 : false || "Password must have a minimum of 10 characters",
         passwordMatch: () =>
           this.password == this.confirmPassword || "Passwords must match.",
       },

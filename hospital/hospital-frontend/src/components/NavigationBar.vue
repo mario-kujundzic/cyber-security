@@ -21,7 +21,7 @@
       </v-list-item>
     </v-list>
     <v-divider></v-divider>
-    <v-list nav dense>
+    <v-list v-if="user.role === 'ADMIN'" nav dense>
       <v-list-item-group v-model="selectedItem" color="primary">
         <router-link :to="{ name: 'CSRForm' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
@@ -29,30 +29,44 @@
               <v-icon>mdi-certificate-outline</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-                <v-list-item-title>CS Request</v-list-item-title>
+              <v-list-item-title>CS Request</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
-        <router-link :to="{ name: 'PublicKeyViewer'}" v-slot="{ navigate }">
-            <v-list-item @click="navigate">
-                <v-list-item-icon>
-                    <v-icon>mdi-key-outline</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-list-item-title>Public Key Viewer</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+        <router-link :to="{ name: 'PublicKeyViewer' }" v-slot="{ navigate }">
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-key-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Public Key Viewer</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </router-link>
         <v-divider></v-divider>
-        <router-link :to="{ name: 'ManageDevices'}" v-slot="{ navigate }">
-            <v-list-item @click="navigate">
-                <v-list-item-icon>
-                    <v-icon>mdi-gauge</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-list-item-title>Devices</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+        <router-link :to="{ name: 'ManageDevices' }" v-slot="{ navigate }">
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-gauge</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Devices</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+      </v-list-item-group>
+    </v-list>
+    <v-list v-if="user.role === 'DOCTOR'" nav dense>
+      <v-list-item-group v-model="selectedItem" color="primary">
+        <router-link :to="{ name: 'ViewPatients' }" v-slot="{ navigate }">
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-medical-bag</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Medical Records</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </router-link>
       </v-list-item-group>
     </v-list>
@@ -68,5 +82,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

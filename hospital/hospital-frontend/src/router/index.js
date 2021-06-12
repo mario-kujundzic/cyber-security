@@ -11,6 +11,7 @@ import CSRForm from "../components/certificates/CSRForm";
 import PublicKeyViewer from "../components/certificates/PublicKeyViewer";
 import ManageDevices from "../views/home/ManageDevices";
 import Error404 from "../views/errors/Error404";
+import ViewPatients from "../views/home/ViewPatients";
 
 const routes = [
   {
@@ -34,19 +35,28 @@ const routes = [
     beforeEnter: guardRouteLoggedIn,
     children: [
       {
+        component: ViewPatients,
+        name: "ViewPatients",
+        path: "/patients",
+        beforeEnter: guardRouteDoctor
+      },
+      {
         component: CSRForm,
         name: "CSRForm",
         path: "/csr",
+        beforeEnter: guardRouteAdmin
       },
       {
         component: PublicKeyViewer,
         name: "PublicKeyViewer",
         path: "/key",
+        beforeEnter: guardRouteAdmin
       },
       {
         component: ManageDevices,
         name: "ManageDevices",
         path: "/devices",
+        beforeEnter: guardRouteAdmin
       },
     ],
   },
@@ -57,24 +67,23 @@ const routes = [
   },
 ];
 
-//todo: token expired
 function guardRouteLoggedIn(to, from, next) {
   let user = JSON.parse(localStorage.getItem("user"));
   if (!user || user["token"] === undefined) next("/login");
   else next(); // allow to enter the route
 }
 
-/*function guardRouteAdmin(to, from, next) {
-    let user = localStorage.getItem('user');
+function guardRouteAdmin(to, from, next) {
+    let user = JSON.parse(localStorage.getItem('user'));
     if(user['role'] === 'ADMIN')
         next();
-}*/
+}
 
-/*function guardRouteDoctor(to, from, next) {
-    let user = localStorage.getItem('user');
+function guardRouteDoctor(to, from, next) {
+    let user = JSON.parse(localStorage.getItem('user'));
     if(user['role'] === 'DOCTOR')
         next();
-}*/
+}
 
 export default new VueRouter({
   mode: "history",

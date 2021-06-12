@@ -121,7 +121,12 @@ export default {
           localStorage.setItem("user", JSON.stringify(loggedInUser));
           this.axios.defaults.headers["Authorization"] =
             "Bearer " + response.data.accessToken;
-          this.$router.push({ name: "CSRForm" });
+          if (loggedInUser.role === "ADMIN") {
+            this.$router.push({ name: "CSRForm" });
+          }
+          else {
+            this.$router.push({ name: "ViewPatients" });
+          }
         })
         .catch(() => {
           //TODO sredi ovo na snackbarove u nekom trenutku

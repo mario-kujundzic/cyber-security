@@ -75,7 +75,7 @@ export default {
           this.$refs.form.reset();
         })
         .catch(() => {
-          alert("Please check your email!");
+          alert("Something bad happened! Please check your email!");
         });
     },
   },

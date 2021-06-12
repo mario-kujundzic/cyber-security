@@ -70,7 +70,6 @@ const routes = [
   },
 ];
 
-//todo: token expired
 function guardRouteLoggedIn(to, from, next) {
   let user = JSON.parse(localStorage.getItem("user"));
   if (!user || !user["token"]) next("/login");
@@ -78,13 +77,13 @@ function guardRouteLoggedIn(to, from, next) {
 }
 
 /*function guardRouteAdmin(to, from, next) {
-    let user = localStorage.getItem('user');
+    let user = JSON.parse(localStorage.getItem('user'));
     if(user['role'] === 'ADMIN')
         next();
 }*/
 
 /*function guardRouteDoctor(to, from, next) {
-    let user = localStorage.getItem('user');
+    let user = JSON.parse(localStorage.getItem('user'));
     if(user['role'] === 'DOCTOR')
         next();
 }*/
