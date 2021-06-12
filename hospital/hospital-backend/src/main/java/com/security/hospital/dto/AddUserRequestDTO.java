@@ -55,6 +55,7 @@ public class AddUserRequestDTO {
 	@NotBlank(message = "Signature is required!")
 	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")
 	private String signature;
+	
 
 	private RequestStatus status;
 

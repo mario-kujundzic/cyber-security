@@ -45,6 +45,14 @@ public class MailSenderService {
     	return sendEmail(username, username + ", we've made it easy to get back on CyberHeaven application", content);
     			
     }
+    
+    @Async
+    public Future<SimpleMailMessage> resetPassword(String username, String key) {
+    	String content = "Hi " + username + "!" + "\n\nWelcome to CyberHeaven application." + 
+    			"\n\nWe can help you start using your account.\n\n" +
+    			"Please follow this link to reset your password:\n" + recoveryLink + "/" + key;
+    	return sendEmail(username, username + ", wellcome to CyberHeaven application", content);
+    }
 	
 
 }

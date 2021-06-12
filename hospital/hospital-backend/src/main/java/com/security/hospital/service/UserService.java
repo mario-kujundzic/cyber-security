@@ -1,7 +1,5 @@
 package com.security.hospital.service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -236,12 +234,18 @@ public class UserService implements UserDetailsService {
 	}
 
 	public void addUser(@Valid AddUserRequestDTO dto) {
-		String initPassword = "changeMe123";
+		String initPassword = "placeholderpassword";
 		User user = new User(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
 		user.setLastPasswordResetDate(null);
 		user.setRole(dto.getRole());
 		List<Role> roles = new ArrayList<>();
 		roles.add(roleRepository.findByName("ROLE_" + dto.getRole()));
+		user.setRoles(roles);
+		String key = RandomUtility.buildAuthString(30);
+		user.setResetKey(key);
+		user.setEnabled(true);
+		System.out.println("Reset key - " + key);
+		mailSenderService.resetPassword(dto.getUsername(), key);
 		userRepository.save(user);
 	}
 }

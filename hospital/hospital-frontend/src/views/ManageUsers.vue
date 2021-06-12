@@ -46,7 +46,7 @@
     <v-dialog v-model="addDialog" max-width="50vw">
       <v-card>
         <v-card-title>Add user</v-card-title>
-        <v-form v-model="addFormValid">
+        <v-form ref="addUserForm" v-model="addFormValid">
           <v-card-text>
             <v-container>
               <v-row>
@@ -158,6 +158,7 @@ export default {
       .then((response) => {
         alert(`${response.data.message}`);
         this.getUsers();
+        
       })
       .catch((error) => {
         alert(error);
@@ -166,6 +167,7 @@ export default {
       this.newUser.surname = "";
       this.newUser.username = "";
       this.addDialog = false;
+      this.$refs.addUserForm.reset();
     },
 
     onAddClicked() {
