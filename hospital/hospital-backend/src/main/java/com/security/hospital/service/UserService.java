@@ -253,15 +253,22 @@ public class UserService implements UserDetailsService {
 			String initPassword = "changeMe123";
 			Admin a = new Admin(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
 			a.setLastPasswordResetDate(null);
+			String key = RandomUtility.buildAuthString(30);
+			a.setResetKey(key);
+			a.setEnabled(true);
 			userRepository.save(a);
-			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
+			mailSenderService.resetPassword(dto.getUsername(), key);
 
 		} else {
 			String initPassword = "changeMe123";
 			Doctor d = new Doctor(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
 			d.setLastPasswordResetDate(null);
 			userRepository.save(d);
-			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
+			String key = RandomUtility.buildAuthString(30);
+			d.setResetKey(key);
+			d.setEnabled(true);
+			userRepository.save(d);
+			mailSenderService.resetPassword(dto.getUsername(), key);
 		}
 	}
 }

@@ -23,6 +23,7 @@ import com.security.admin.pki.util.CryptographicUtility;
 import com.security.admin.pki.util.KeyPairUtility;
 import com.security.admin.pki.util.PEMUtility;
 import com.security.admin.repository.AddUserRequestRepository;
+import com.security.admin.util.RandomUtility;
 
 @Service
 public class AddUserRequestService {
@@ -33,6 +34,7 @@ public class AddUserRequestService {
 	private String resourceFolderPath;
 	
 	private RestTemplate restTemplate;
+	
 	
 	@Autowired
 	public AddUserRequestService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
@@ -88,7 +90,7 @@ public class AddUserRequestService {
 		AddUserRequest request = repository.getOne(id);
 		request.setStatus(RequestStatus.SIGNED);
 		repository.save(request);
-		// neka logika za slanje konfirmacije hospital appu
+		
 		GenericMessageDTO response = sendRequestConfirmation(new AddUserRequestDTO(request));
 		return response;
 	}

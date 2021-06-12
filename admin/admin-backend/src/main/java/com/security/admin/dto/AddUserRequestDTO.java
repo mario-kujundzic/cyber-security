@@ -50,7 +50,7 @@ public class AddUserRequestDTO {
 
 	@NonNull
 	private Long adminId;
-
+	
 	@NonNull
 	@NotBlank(message = "Signature is required!")
 	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")

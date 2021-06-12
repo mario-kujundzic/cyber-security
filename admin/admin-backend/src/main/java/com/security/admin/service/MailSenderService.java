@@ -21,7 +21,7 @@ public class MailSenderService {
     
     @Value("${recovery.link}")
     private String recoveryLink;
-
+    
     @Autowired
     public MailSenderService(JavaMailSender emailSender) {
         this.emailSender = emailSender;
