@@ -11,6 +11,9 @@ import ViewRevokedCertificates from "../views/home/ViewRevokedCertificates";
 import Error404 from "../views/errors/Error404"
 import ManageCertificateRequests from "../views/home/ManageCertificateRequests";
 import ManageHospitals from "../views/home/ManageHospitals";
+import ManageAddUserRequests from "../views/home/ManageAddUserRequests";
+import ManageDeleteUserRequests from "../views/home/ManageDeleteUserRequests";
+import ManageModifyUserRequests from "../views/home/ManageModifyUserRequests";
 
 const routes = [
   {
@@ -47,6 +50,21 @@ const routes = [
         component: ManageHospitals,
         name: "ManageHospitals",
         path: "hospitals",
+      },
+      {
+        component: ManageAddUserRequests,
+        name: "ManageAddUserRequests",
+        path: "add-user-requests",
+      },
+      {
+        component: ManageDeleteUserRequests,
+        name: "ManageDeleteUserRequests",
+        path: "delete-user-requests",
+      },
+      {
+        component: ManageModifyUserRequests,
+        name: "ManageModifyUserRequests",
+        path: "modify-user-requests",
       },
     ],
   },

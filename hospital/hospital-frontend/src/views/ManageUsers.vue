@@ -34,7 +34,7 @@
             </template>
 
             <template v-slot:[`item.roleChange`]="{ item }">
-                <v-btn>
+                <v-btn @click="updateUser(item)">
                     Change to {{item.role == 'ADMIN' ? 'USER' : 'ADMIN'}}
                 </v-btn>
             </template>
@@ -51,18 +51,18 @@
             <v-container>
               <v-row>
                 <v-col>
-                  <v-text-field label="Name" v-model="tempCommonName" :rules="commonNameRules"></v-text-field>
+                  <v-text-field label="Name" v-model="newUser.name" :rules="[rules.required]"></v-text-field>
                 </v-col>
                 <v-col>
-                  <v-text-field label="Surname" v-model="tempCommonName" :rules="commonNameRules"></v-text-field>
+                  <v-text-field label="Surname" v-model="newUser.surname" :rules="[rules.required]"></v-text-field>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col>
-                  <v-text-field label="Username" v-model="tempCommonName" :rules="commonNameRules"></v-text-field>
+                  <v-text-field label="Username" v-model="newUser.username" :rules="[rules.required, rules.email]"></v-text-field>
                 </v-col>
                 <v-col>
-                  <v-text-field label="Role" v-model="tempCommonName" :rules="commonNameRules"></v-text-field>
+                  <v-select :items="roles" label="Role" v-model="newUser.role" :rules="[rules.required]"></v-select>
                 </v-col>
               </v-row>
             </v-container>
@@ -70,7 +70,7 @@
         </v-form>
 
         <v-card-actions class="d-flex justify-end">
-          <v-btn color="success" :disabled="!addFormValid" @click="addUser({ commonName: tempCommonName, publicKey: tempPublicKey })">Submit</v-btn>
+          <v-btn color="success" :disabled="!addFormValid" @click="addUser()">Submit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -97,15 +97,28 @@ export default {
       users: [],
       addDialog: false,
       
-      commonNameRules: [
-        v => !!v || "Common name is required!"
-      ],
-      publicKeyRules: [
-        v => !!v || "Public key is required!"
-      ],
+      rules: {
+        required: v => !!v || "Field is required!",
+        email:  v => !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be in valid format!'        
+      },
 
-      tempCommonName: "",
-      tempPublicKey: "",
+      newUser: {
+        name: "",
+        surname: "",
+        username: "",
+        role: ""
+      },
+
+      roles: [
+        {
+          text: 'Doctor',
+          value: 'DOCTOR'
+        },
+        {
+          text: 'Admin',
+          value: 'ADMIN'
+        }
+      ],
 
       addFormValid: false
     };
@@ -129,9 +142,9 @@ export default {
 
     updateUser(item) {
       this.axios
-      .put(apiURL, item)
+      .put(apiURL + '/' + item.id)
       .then((response) => {
-        alert(`Successfully updated user ${response.data.commonName}`);
+        alert(`${response.data.message}`);
         this.getUsers();
       })
       .catch((error) => {
@@ -139,17 +152,19 @@ export default {
       });
     },
 
-    addUser(item) {
+    addUser() {
       this.axios
-      .post(apiURL, item)
+      .post(apiURL, this.newUser)
       .then((response) => {
-        alert(`Successfully added user ${response.data.commonName}`);
+        alert(`${response.data.message}`);
         this.getUsers();
       })
       .catch((error) => {
         alert(error);
       });
-
+      this.newUser.name = "";
+      this.newUser.surname = "";
+      this.newUser.username = "";
       this.addDialog = false;
     },
 

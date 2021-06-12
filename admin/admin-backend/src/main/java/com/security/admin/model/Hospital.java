@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.math.BigInteger;
-import java.util.Date;
 
 @Entity
 @Table(name = "hospitals")
@@ -20,7 +18,10 @@ public class Hospital {
 		
 	@Column(name = "common_name")
 	private String commonName;
-
+	
+	@Column(name = "hospital_url")
+	private String hospitalUrl;
+	
 	@Column(name = "public_key", columnDefinition = "TEXT")
 	private String publicKey;
 
@@ -28,6 +29,7 @@ public class Hospital {
 		id = dto.getId();
 		commonName = dto.getCommonName();
 		publicKey = dto.getPublicKey();
+		hospitalUrl = dto.getHospitalUrl();
 	}
 
 	public Long getId() {

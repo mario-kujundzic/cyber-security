@@ -19,13 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.security.admin.dto.CertificateDTO;
-import com.security.admin.model.CertificateSigningRequest;
-import com.security.admin.model.CertificateSigningRequestStatus;
+import com.security.admin.model.requests.CertificateSigningRequest;
+import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.pki.certificate.CertificateGenerator;
 import com.security.admin.pki.data.IssuerData;
 import com.security.admin.pki.data.SubjectData;
 import com.security.admin.pki.keystore.KeyStoreManager;
-import com.security.admin.pki.util.Base64Utility;
+import com.security.admin.pki.keystore.TrustStoreManager;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
 import com.security.admin.pki.util.PEMUtility;
 import com.security.admin.pki.util.RandomUtil;
@@ -40,11 +40,15 @@ public class CertificateService {
 
 	private CertificateSigningRequestService certRequestService;
 	
+	private TrustStoreManager trustStoreManager;
+
 	@Autowired
-	public CertificateService(KeyStoreManager keyStoreManager, CertificateRepository certificateRepository, CertificateSigningRequestService certRequestService) {
+	public CertificateService(KeyStoreManager keyStoreManager, CertificateRepository certificateRepository,
+			CertificateSigningRequestService certRequestService, TrustStoreManager trustStoreManager) {
 		this.keyStoreManager = keyStoreManager;
 		this.certificateRepository = certificateRepository;
 		this.certRequestService = certRequestService;
+		this.trustStoreManager = trustStoreManager;
 	}
 
 	public List<CertificateDTO> getAll() {
@@ -119,18 +123,21 @@ public class CertificateService {
 					dto.getCountry(), dto.getEmail(), dto.getValidFrom(), dto.getValidTo());
 
 			// za sada samo jedan issuer
-			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(privKey, "rootCA");
+			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(privKey, "LotusClinic");
 
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(),
 					dto.getAlgorithm());
-			
+
 			Certificate rootCert = keyStoreManager.readCertificate("sslCertificate");
 
-			Certificate[] certChain = {cert, rootCert};
+			Certificate[] certChain = { cert, rootCert };
 			// da li je ok da alias bude serial number?
 			keyStoreManager.write(subjectData.getSerialNumber(), privKey, certChain);
+			trustStoreManager.writeCert(subjectData.getSerialNumber(), cert);
+
 			keyStoreManager.saveKeyStore();
-			req.setStatus(CertificateSigningRequestStatus.SIGNED);
+			trustStoreManager.saveKeyStore();
+			req.setStatus(RequestStatus.SIGNED);
 
 			certRequestService.save(req);
 

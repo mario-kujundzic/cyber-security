@@ -2,13 +2,11 @@ package com.security.admin.service;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
 import com.security.admin.dto.HospitalDTO;
-import com.security.admin.model.CertificateSigningRequest;
-import com.security.admin.model.CertificateSigningRequestStatus;
+import com.security.admin.model.requests.CertificateSigningRequest;
+import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.pki.util.CryptographicUtility;
 import com.security.admin.pki.util.PEMUtility;
 import com.security.admin.repository.CertificateSigningRequestRepository;
-
-import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,7 +54,7 @@ public class CertificateSigningRequestService {
 	}
 
 	public CertificateSigningRequestDTO getUnsignedRequestDTO(long id) {
-		return toDTO(repository.getOneByIdAndStatus(id, CertificateSigningRequestStatus.PENDING));
+		return toDTO(repository.getOneByIdAndStatus(id, RequestStatus.PENDING));
 	}
 
 	public List<CertificateSigningRequestDTO> getAllRequestsDTO() {
@@ -80,7 +78,7 @@ public class CertificateSigningRequestService {
 
 	public void declineRequest(long id) {
 		CertificateSigningRequest request = repository.getOne(id);
-		request.setStatus(CertificateSigningRequestStatus.REJECTED);
+		request.setStatus(RequestStatus.REJECTED);
 		repository.save(request);
 	}
 }
