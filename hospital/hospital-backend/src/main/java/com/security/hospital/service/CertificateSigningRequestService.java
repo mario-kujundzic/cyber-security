@@ -10,26 +10,24 @@ import org.springframework.web.client.RestTemplate;
 
 import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
-import com.security.hospital.model.Admin;
+import com.security.hospital.model.User;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 
 @Service
-public class AdminService {
+public class CertificateSigningRequestService {
 	private String resourceFolderPath;
 
 	private RestTemplate restTemplate;
 
 	@Autowired
-	public AdminService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate) {
+	public CertificateSigningRequestService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate) {
 		this.resourceFolderPath = resourceFolderPath;
 		this.restTemplate = restTemplate;
 	}
 
 	public GenericMessageDTO makeCertificateRequest(CertificateRequestDTO certificateRequest, String adminEndpointURI,
-			Admin admin) throws Exception {
-		// Add email and public key
-//		RestTemplate restTemplate = new RestTemplate();
+			User admin) throws Exception {
 		certificateRequest.setEmail(admin.getUsername());
 
 		String publicKeyPEM = KeyPairUtility.readPEM(resourceFolderPath + "/key.pub");

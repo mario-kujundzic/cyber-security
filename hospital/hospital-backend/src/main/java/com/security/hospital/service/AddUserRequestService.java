@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import com.security.hospital.dto.AddUserRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.dto.UserDTO;
-import com.security.hospital.model.Admin;
+import com.security.hospital.model.User;
 import com.security.hospital.model.requests.AddUserRequest;
 import com.security.hospital.model.requests.RequestStatus;
 import com.security.hospital.pki.util.CryptographicUtility;
@@ -41,7 +41,7 @@ public class AddUserRequestService {
 		this.restTemplate = restTemplate;
 	}
 
-	public GenericMessageDTO create(UserDTO dto, Admin admin) throws IOException {
+	public GenericMessageDTO create(UserDTO dto, User admin) throws IOException {
 		AddUserRequest request = new AddUserRequest();
 		request.setName(dto.getName());
 		request.setSurname(dto.getSurname());

@@ -34,8 +34,6 @@ import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
-import com.security.hospital.model.Admin;
-import com.security.hospital.model.Doctor;
 import com.security.hospital.model.Role;
 import com.security.hospital.model.User;
 import com.security.hospital.repository.RoleRepository;
@@ -230,38 +228,20 @@ public class UserService implements UserDetailsService {
 
 	public void modifyRole(@Valid ModifyUserRequestDTO dto) {
 		User u = userRepository.getOne(dto.getUserId());
-		userRepository.delete(u);
 		List<Role> roles = new ArrayList<>();
 		roles.add(roleRepository.findByName("ROLE_" + dto.getNewRole()));
-		if (dto.getNewRole().equals("ADMIN")) {
-			Admin a = new Admin(u.getName(), u.getSurname(), u.getUsername(), u.getPassword());
-			a.setRoles(roles);
-			a.setLastPasswordResetDate(Timestamp.from(Instant.now()));
-			a.setEnabled(true);
-			userRepository.save(a);
-		} else {
-			Doctor d = new Doctor(u.getName(), u.getSurname(), u.getUsername(), u.getPassword());
-			d.setRoles(roles);
-			d.setLastPasswordResetDate(Timestamp.from(Instant.now()));
-			d.setEnabled(true);
-			userRepository.save(d);
-		}
+		u.setRoles(roles);
+		u.setRole(dto.getNewRole());
+		userRepository.save(u);
 	}
 
 	public void addUser(@Valid AddUserRequestDTO dto) {
-		if (dto.getRole().equals("ADMIN")) {
-			String initPassword = "changeMe123";
-			Admin a = new Admin(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
-			a.setLastPasswordResetDate(null);
-			userRepository.save(a);
-			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
-
-		} else {
-			String initPassword = "changeMe123";
-			Doctor d = new Doctor(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
-			d.setLastPasswordResetDate(null);
-			userRepository.save(d);
-			// neka logika za slanje mejla za promenu pw i proveru kad se loguje
-		}
+		String initPassword = "changeMe123";
+		User user = new User(dto.getName(), dto.getSurname(), dto.getUsername(), initPassword);
+		user.setLastPasswordResetDate(null);
+		user.setRole(dto.getRole());
+		List<Role> roles = new ArrayList<>();
+		roles.add(roleRepository.findByName("ROLE_" + dto.getRole()));
+		userRepository.save(user);
 	}
 }

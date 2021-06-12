@@ -2,7 +2,6 @@ package com.security.hospital.dto;
 
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 
 import com.security.hospital.model.Patient;

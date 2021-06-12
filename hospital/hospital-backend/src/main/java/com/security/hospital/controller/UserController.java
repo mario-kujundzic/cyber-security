@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.security.hospital.dto.AddUserRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.dto.UserDTO;
-import com.security.hospital.model.Admin;
+import com.security.hospital.model.User;
 import com.security.hospital.service.AddUserRequestService;
 import com.security.hospital.service.DeleteUserRequestService;
 import com.security.hospital.service.ModifyUserRequestService;
@@ -52,21 +51,21 @@ public class UserController {
 
 	@PostMapping()
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<Object> addUser(@RequestBody UserDTO dto, @AuthenticationPrincipal Admin admin) throws IOException {
+	public ResponseEntity<Object> addUser(@RequestBody UserDTO dto, @AuthenticationPrincipal User admin) throws IOException {
 		GenericMessageDTO message = addUserRequestService.create(dto, admin);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-	public ResponseEntity<Object> changeUserRole(@PathVariable("id") Long id, @AuthenticationPrincipal Admin admin) throws IOException {
+	public ResponseEntity<Object> changeUserRole(@PathVariable("id") Long id, @AuthenticationPrincipal User admin) throws IOException {
 		GenericMessageDTO message = modifyUserRequestService.create(id, admin);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('DELETE_PRIVILEGE')")
-	public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id, @AuthenticationPrincipal Admin admin)
+	public ResponseEntity<Object> deleteUser(@PathVariable("id") Long id, @AuthenticationPrincipal User admin)
 			throws IOException {
 		GenericMessageDTO dto = deleteUserRequestService.create(id, admin);
 		return new ResponseEntity<>(dto, HttpStatus.OK);

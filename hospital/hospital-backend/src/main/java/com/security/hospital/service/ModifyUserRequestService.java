@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.dto.ModifyUserRequestDTO;
-import com.security.hospital.model.Admin;
 import com.security.hospital.model.User;
 import com.security.hospital.model.requests.ModifyUserRequest;
 import com.security.hospital.model.requests.RequestStatus;
@@ -40,7 +39,7 @@ public class ModifyUserRequestService {
 		this.restTemplate = restTemplate;
 	}
 
-	public GenericMessageDTO create(Long userId, Admin admin) throws IOException {
+	public GenericMessageDTO create(Long userId, User admin) throws IOException {
 		User user = userService.getOneById(userId);
 		ModifyUserRequest request = new ModifyUserRequest();
 		request.setUsername(user.getUsername());

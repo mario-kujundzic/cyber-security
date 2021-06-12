@@ -1,16 +1,14 @@
 package com.security.hospital.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.hospital.dto.CertificateRequestDTO;
-import com.security.hospital.dto.GenericMessageDTO;
-import com.security.hospital.model.Admin;
-import com.security.hospital.service.AdminService;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,30 +17,33 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.hospital.dto.CertificateRequestDTO;
+import com.security.hospital.dto.GenericMessageDTO;
+import com.security.hospital.model.User;
+import com.security.hospital.service.CertificateSigningRequestService;
 
 @RestController
-@RequestMapping("/api/admin")
-public class AdminController {
+@RequestMapping("/api/csr")
+public class CertificateSigningRequestController {
 
-    private AdminService adminService;
+    private CertificateSigningRequestService service;
 
     @Autowired
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
+    public CertificateSigningRequestController(CertificateSigningRequestService service) {
+        this.service = service;
     }
 
     @PostMapping("/requestCertificate")
     @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
     public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody @Valid CertificateRequestDTO certificateRequest,
-                                                                HttpServletResponse response, @AuthenticationPrincipal Admin admin) throws JsonProcessingException {
+                                                                HttpServletResponse response, @AuthenticationPrincipal User admin) throws JsonProcessingException {
 
         GenericMessageDTO csrResponse;
 
         try {
-            csrResponse = adminService.makeCertificateRequest(certificateRequest,
+            csrResponse = service.makeCertificateRequest(certificateRequest,
                     "https://localhost:9001/api/certificateRequests/request", admin);
         } catch (IOException exception) {
             return new ResponseEntity<>(new GenericMessageDTO("Something went wrong while trying to read the public key."), HttpStatus.INTERNAL_SERVER_ERROR);

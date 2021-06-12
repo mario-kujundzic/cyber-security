@@ -128,7 +128,7 @@ export default {
       if (!this.valid) return;
 
       this.axios
-        .post("/api/admin/requestCertificate", this.csr)
+        .post("/api/csr/requestCertificate", this.csr)
         .then((response) => {
           this.$refs.form.reset();
           alert(response.data.message);
