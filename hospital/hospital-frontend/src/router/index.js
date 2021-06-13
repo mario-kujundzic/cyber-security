@@ -16,6 +16,7 @@ import ManageUsers from "../views/ManageUsers";
 import ManageAddUserRequests from "../views/ManageAddUserRequests";
 import ManageDeleteUserRequests from "../views/ManageDeleteUserRequests";
 import ManageModifyUserRequests from "../views/ManageModifyUserRequests";
+import ViewCertificates from "../views/home/ViewCertificates";
 
 const routes = [
   {
@@ -71,19 +72,25 @@ const routes = [
       {
         component: ManageAddUserRequests,
         name: "ManageAddUserRequests",
-        path: "add-user-requests",
+        path: "/add-user-requests",
         beforeEnter: guardRouteAdmin
       },
       {
         component: ManageDeleteUserRequests,
         name: "ManageDeleteUserRequests",
-        path: "delete-user-requests",
+        path: "/delete-user-requests",
         beforeEnter: guardRouteAdmin
       },
       {
         component: ManageModifyUserRequests,
         name: "ManageModifyUserRequests",
-        path: "modify-user-requests",
+        path: "/modify-user-requests",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: ViewCertificates,
+        name: "ViewCertificates",
+        path: "/certificates",
         beforeEnter: guardRouteAdmin
       },
     ],

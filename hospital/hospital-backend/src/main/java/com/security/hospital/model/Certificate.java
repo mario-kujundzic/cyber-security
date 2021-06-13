@@ -37,16 +37,15 @@ public class Certificate {
 	@Column(name = "email")
 	private String email;
 	
-	@Column(name = "commonName")
+	@Column(name = "common_name")
 	private String commonName;
 	
 	@Column(name = "revocation_status")
 	private boolean revocationStatus;
 	
-	@Column(name = "revocation_reason")
+	@Column(name = "revocation_reason", nullable = true)
 	private String revocationReason;
 	
 	@Column(name = "certificate_user")
 	private CertificateUser certificateUser;
-	
 }

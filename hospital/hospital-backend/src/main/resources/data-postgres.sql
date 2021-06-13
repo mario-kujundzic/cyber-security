@@ -49,3 +49,6 @@ IpqxazITBo7S8zw4VvwNPO8dreznEBbJsz2H2TjRougDEUGPuSE+doYOOndUtWPI
 q+aPNB3KysQTtIuwa4KaZlH4qS4B5s6+jeENGeb5kB/XjsmVAD8gF7jijZ7rlHBz
 YPM18z8V4M7jwiEmv84mcYTAKO375WiPgcXQJ4cnk5tKrS3mjEUpkt9ZHAgNR5Yv
 swIDAQAB-----END PUBLIC KEY-----');
+
+insert into certificates (serial_number, valid_from, valid_to, email, common_name, revocation_status, certificate_user) 
+	values ('672496789128620.00', '2021-06-11 02:00:00', '2022-07-11 02:00:00', 'admin1@gmail.com', 'Hospital1', false, 0);
