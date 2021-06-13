@@ -94,6 +94,8 @@ export default {
       search: "",
       headers: [
         { text: "Common Name", value: "commonName" },
+        { text: "Hospital name", value: "hospitalName" },
+        { text: "Requestee", value: "certificateUser" },
         { text: "Email", value: "email" },
         { text: "Locality", value: "locality" },
         { text: "Organization", value: "organization" },

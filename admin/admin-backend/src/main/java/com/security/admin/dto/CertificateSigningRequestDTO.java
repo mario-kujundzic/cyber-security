@@ -1,9 +1,9 @@
 package com.security.admin.dto;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import com.security.admin.model.CertificateUser;
 import com.security.admin.model.requests.CertificateSigningRequest;
 import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.util.ValidationUtility;
@@ -52,6 +52,11 @@ public class CertificateSigningRequestDTO {
 	private String email;
 	
 	@NonNull
+	@NotBlank(message = "Hospital name is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Hospital name must be made of alphanumeric characters!")
+	private String hospitalName;
+
+	@NonNull
 	@NotBlank(message = "Public key is required!")
 	@Pattern(regexp = ValidationUtility.PEMRegex, message = "Public key should be in PEM format!")
 	private String publicKey;
@@ -60,6 +65,8 @@ public class CertificateSigningRequestDTO {
 	@NotBlank(message = "Signature is required!")
 	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")
 	private String signature;
+	
+	private CertificateUser certificateUser;
 
 	private RequestStatus status;
 
@@ -73,11 +80,13 @@ public class CertificateSigningRequestDTO {
 		email = csr.getEmail();
 		publicKey = csr.getPublicKey();
 		status = csr.getStatus();
+		hospitalName = csr.getHospitalName();
 		id = csr.getId();
+		certificateUser = csr.getCertificateUser();
 	}
 
 	public byte[] getCSRBytes() {
-		String everything = commonName + organization + organizationUnit + locality + state + country + email;
+		String everything = commonName + organization + organizationUnit + locality + state + country + email + hospitalName + certificateUser;
 		return everything.getBytes();
 	}
 

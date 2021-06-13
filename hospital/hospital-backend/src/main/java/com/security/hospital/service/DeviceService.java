@@ -1,13 +1,10 @@
 package com.security.hospital.service;
 
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 
-import com.security.hospital.enums.LogMessageType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,9 +15,10 @@ import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.Device;
+import com.security.hospital.model.User;
+import com.security.hospital.model.requests.CertificateUser;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
-import com.security.hospital.pki.util.PEMUtility;
 import com.security.hospital.repository.DeviceRepository;
 
 @Service
@@ -86,7 +84,7 @@ public class DeviceService {
 		deviceRepository.deleteById(id);
 	}
 
-	public GenericMessageDTO requestCertificate(CertificateRequestDTO dto) throws Exception {
+	public GenericMessageDTO requestCertificate(CertificateRequestDTO dto, User user) throws Exception {
 		// Look up public key of hospital
 		String commonName = dto.getCommonName();
 		Device device = deviceRepository.getByCommonName(commonName);
@@ -97,31 +95,21 @@ public class DeviceService {
 					+ " not found. Contact a hospital admin to register this device's public key.");
 		}
 
-		// Verify signature
-		byte[] csrBytes = dto.getCSRBytes();
-		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
-		PublicKey publicKey = PEMUtility.PEMToPublicKey(publicKeyPEM);
-		boolean valid = CryptographicUtility.verify(csrBytes, signature, publicKey);
-
-		if (!valid) {
-			throw new Exception("Denied: Signature invalid.");
-		}
-
-		String publicKeyHospitalPEM = KeyPairUtility.readPEM(resourceFolderPath + "/key.pub");
 		dto.setPublicKey(publicKeyPEM);
-
-		dto.setCommonName("Hospital1");
+		dto.setEmail(user.getUsername());
+		dto.setHospitalName("Hospital1");
+		dto.setCertificateUser(CertificateUser.DEVICE);
 
 		// Add signature
-		csrBytes = dto.getCSRBytes();
+		byte[] csrBytes = dto.getCSRBytes();
 		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
-		signature = CryptographicUtility.sign(csrBytes, privateKey);
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
 		String base64Signature = Base64.getEncoder().encodeToString(signature);
 		dto.setSignature(base64Signature);
 
 		GenericMessageDTO csrResponse;
 
-		csrResponse = restTemplate.postForObject("http://localhost:9001/api/certificateRequests", dto,
+		csrResponse = restTemplate.postForObject("https://localhost:9001/api/certificateRequests/request", dto,
 				GenericMessageDTO.class);
 
 		return csrResponse;

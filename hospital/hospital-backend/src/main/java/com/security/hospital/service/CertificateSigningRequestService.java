@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.User;
+import com.security.hospital.model.requests.CertificateUser;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 
@@ -29,6 +30,8 @@ public class CertificateSigningRequestService {
 	public GenericMessageDTO makeCertificateRequest(CertificateRequestDTO certificateRequest, String adminEndpointURI,
 			User admin) throws Exception {
 		certificateRequest.setEmail(admin.getUsername());
+		certificateRequest.setCertificateUser(CertificateUser.HOSPITAL);
+		certificateRequest.setHospitalName("Hospital1");
 
 		String publicKeyPEM = KeyPairUtility.readPEM(resourceFolderPath + "/key.pub");
 		certificateRequest.setPublicKey(publicKeyPEM);

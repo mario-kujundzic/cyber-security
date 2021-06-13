@@ -34,8 +34,8 @@
             </template>
 
             <template v-slot:[`item.roleChange`]="{ item }">
-                <v-btn @click="updateUser(item)">
-                    Change to {{item.role == 'ADMIN' ? 'USER' : 'ADMIN'}}
+                <v-btn @click="updateUser(item)" text>
+                    Change to {{item.role == 'ADMIN' ? 'DOCTOR' : 'ADMIN'}}
                 </v-btn>
             </template>
           </v-data-table>

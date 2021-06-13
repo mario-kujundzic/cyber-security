@@ -40,3 +40,15 @@ insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight
 insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight, blood_type, blood_pressure, illness, vaccination) values ('Mini', 'Maus', '3007991816434', 'Female', '1998-05-31', '162', '59', 'B', '140/90', 'Ilness 1, Ilness 2', 'Vaccine1, Vaccine2');
 insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight, blood_type, blood_pressure, illness, vaccination) values ('Vuk', 'Karadzic', '3107981816038', 'Male', '1994-07-12', '171', '60', 'A', '140/90', 'Ilness 1, Ilness 2', 'Vaccine1, Vaccine2');
 
+insert into devices (common_name, public_key) values ('Pressure device 1', 
+'-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxvV8MQJSwNDWoH9Ykymz
+IpqxazITBo7S8zw4VvwNPO8dreznEBbJsz2H2TjRougDEUGPuSE+doYOOndUtWPI
+8AH92Ra3JY/gM846J5QfsUADOSLH+FomV6+56dR3drhCv/isu1L7Y/zZlmBBsSVm
+8SSp3MafSrh2gWzAR/2GTHB/HWwpBs++r6dedqLpZbuIoGHj49XNboLh1OL2EIIf
+q+aPNB3KysQTtIuwa4KaZlH4qS4B5s6+jeENGeb5kB/XjsmVAD8gF7jijZ7rlHBz
+YPM18z8V4M7jwiEmv84mcYTAKO375WiPgcXQJ4cnk5tKrS3mjEUpkt9ZHAgNR5Yv
+swIDAQAB-----END PUBLIC KEY-----');
+
+insert into certificates (serial_number, valid_from, valid_to, email, common_name, revocation_status, certificate_user) 
+	values ('672496789128620.00', '2021-06-11 02:00:00', '2022-07-11 02:00:00', 'admin1@gmail.com', 'Hospital1', false, 0);
