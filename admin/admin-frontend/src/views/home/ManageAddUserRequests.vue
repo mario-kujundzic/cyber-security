@@ -27,10 +27,10 @@
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn icon small @click="approve(item)" class="mr-4" :disabled="item.status != 'PENDING'">
+              <v-btn icon small @click="approve(item)" class="mr-4" :loading="loading[item.id]" :disabled="item.status != 'PENDING'">
                 <v-icon>mdi-check</v-icon>
               </v-btn>
-              <v-btn icon small @click="reject(item)" :disabled="item.status != 'PENDING'">
+              <v-btn icon small @click="reject(item)" :loading="loading[item.id]" :disabled="item.status != 'PENDING'">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </template>
@@ -61,6 +61,7 @@ export default {
         { text: "Actions", value: "actions" },
       ],
       requests: [],
+      loading: {}
     };
   },
   mounted() {
@@ -90,23 +91,29 @@ export default {
     },
 
     approve(item) {
+      this.loading[item.id] = true;
       this.axios
         .get(apiURL + "/confirm/" + item.id)
         .then(() => {
+          this.loading[item.id] = false;
           item.status = "SIGNED";
         })
         .catch(() => {
+          this.loading[item.id] = false;
           alert("Cannot decline!");
         });
     },
 
     reject(item) {
+      this.loading[item.id] = true;
       this.axios
         .get(apiURL + "/decline/" + item.id)
         .then(() => {
+          this.loading[item.id] = false;
           item.status = "REJECTED";
         })
         .catch(() => {
+          this.loading[item.id] = false;
           alert("Cannot decline!");
         });
     },
