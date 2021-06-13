@@ -3,6 +3,7 @@ package com.security.hospital.model;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -75,6 +76,9 @@ public class User implements UserDetails {
 
 	@Column(name = "last_password_reset_date")
 	private Timestamp lastPasswordResetDate;
+
+	@Column(name = "last_login_date")
+	private Timestamp lastLoginDate;
 
 	public Long getId() {
 		return id;
@@ -186,5 +190,9 @@ public class User implements UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
+	}
+	
+	public void resetLastLoginDate() {
+		this.lastLoginDate = new Timestamp((new Date()).getTime());
 	}
 }

@@ -4,8 +4,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
+import com.security.hospital.enums.LogMessageType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,12 @@ public class DeviceService {
 	private DeviceRepository deviceRepository;
 	private String resourceFolderPath;
 	private RestTemplate restTemplate;
+
+	@Autowired
+	private SecurityEventService securityEventService;
+
+	@Autowired
+	private LogService logService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository,
@@ -124,7 +132,8 @@ public class DeviceService {
 
 	public void processMessage(DeviceMessageDTO dto) {
 		// neka logika za proveru sertifikata
-		System.out.println("Success! Message from device:");
-		System.out.println(dto.getMessage());
+		String message = dto.getMessage();
+
+		logService.logInfo("Device: " + message);
 	}
 }
