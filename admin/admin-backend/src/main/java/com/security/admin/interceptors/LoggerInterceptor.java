@@ -15,7 +15,7 @@ public class LoggerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) {
-        logService.logInfo(request.getMethod() + " " + request.getContextPath() + " from " + request.getRemoteAddr());
+        //logService.logInfo(request.getMethod() + " " + request.getContextPath() + " from " + request.getRemoteAddr());
         return true;
     }
 }
