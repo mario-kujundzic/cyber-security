@@ -117,6 +117,20 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+        <router-link
+          :to="{ name: 'Logs' }"
+          v-slot="{ navigate }"
+        >
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-post-outline</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>Logs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
       </v-list-item-group>
     </v-list>
     <v-list v-if="user.role === 'DOCTOR'" nav dense>

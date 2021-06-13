@@ -58,10 +58,9 @@ public class UserService implements UserDetailsService {
 	private MailSenderService mailSenderService;
 
 	@Autowired
-	private SecurityEventService securityEventService;
+	private LogService logService;
 
 	@Autowired
-
 	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
 			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
 			MailSenderService mailSenderService, RoleRepository roleRepository) {
@@ -82,12 +81,12 @@ public class UserService implements UserDetailsService {
 		try {
 			existUser = getOne(username);
 		} catch (NoSuchElementException e) {
-			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.USER_DOESNT_EXIST, IPAddress, -1);
+			logService.logAuthError("Login failed, user '" + username + "' doesn't exist. IP: " + IPAddress);
 			throw new UserException("No such element!", "username", "User with this username doesn't exist.");
 		}
 
 		if (!existUser.isEnabled()) {
-			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.ACCOUNT_INACTIVE, IPAddress, -1);
+			logService.logAuthError("Login failed, account '" + username + "' not activated. IP: " + IPAddress);
 			throw new DisabledException("Your account hasn't been activated yet. Please check your email!");
 		}
 
@@ -95,15 +94,13 @@ public class UserService implements UserDetailsService {
 		try {
 			token = generateToken(username, password);
 		} catch (BadCredentialsException e) {
-			securityEventService.invokeLoginAttempt(username, LoginAttemptResult.PASSWORD_INCORRECT, IPAddress,
-					existUser.getLastLoginDate().getTime() / 1000);
+			logService.logAuthError("Login failed, wrong password for account '" + username + "'. IP: " + IPAddress);
 			throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
 		}
 
 		existUser.resetLastLoginDate();
 		userRepository.save(existUser);
-		securityEventService.invokeLoginAttempt(username, LoginAttemptResult.SUCCESS, IPAddress,
-				existUser.getLastLoginDate().getTime() / 1000);
+		logService.logAuthInfo("Login successful for account '" + username + "'");
 		return token;
 
 	}

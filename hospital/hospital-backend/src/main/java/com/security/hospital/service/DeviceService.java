@@ -28,9 +28,6 @@ public class DeviceService {
 	private RestTemplate restTemplate;
 
 	@Autowired
-	private SecurityEventService securityEventService;
-
-	@Autowired
 	private LogService logService;
 
 	@Autowired
