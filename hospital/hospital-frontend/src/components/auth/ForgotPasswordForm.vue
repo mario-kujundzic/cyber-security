@@ -21,6 +21,7 @@
         <v-btn
           @click="forgotPassword()"
           :disabled="!valid"
+          :loading = 'loading'
           color="#8C9EFF"
           block
           class="description"
@@ -57,12 +58,17 @@ export default {
       },
       valid: true,
       error: false,
+      loading: false
     };
   },
   methods: {
     forgotPassword: function() {
+      this.loading = true;
       this.$refs.form.validate();
-      if (!this.valid) return;
+      if (!this.valid) {
+        this.loading = false;
+        return;
+      }
       var config = {
         headers: {
           "Content-Type": "text/plain",
@@ -71,11 +77,13 @@ export default {
       this.axios
         .post(apiURL, this.username, config)
         .then(() => {
+          this.loading = false;
           alert("We've sent you recovery link! Please check your email!");
           this.$refs.form.reset();
         })
-        .catch(() => {
-          alert("Something bad happened! Please check your email!");
+        .catch((error) => {
+          this.loading = false;
+          alert(error.response.data.message);
         });
     },
   },

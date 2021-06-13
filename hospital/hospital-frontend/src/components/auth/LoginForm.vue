@@ -62,6 +62,7 @@
                 block
                 class="description"
                 style="font-size: 15px"
+                :loading="loading"
                 ><b>Login</b></v-btn
               >
             </v-col>
@@ -92,12 +93,17 @@ export default {
       valid: true,
       error: false,
       showPassword: false,
+      loading: false
     };
   },
   methods: {
     login: function() {
+      this.loading = true;
       this.$refs.form.validate();
-      if (!this.valid) return;
+      if (!this.valid) {
+        this.loading = false;
+        return;
+      }
       this.axios({
         url: apiURL,
         method: "POST",
@@ -121,6 +127,7 @@ export default {
           localStorage.setItem("user", JSON.stringify(loggedInUser));
           this.axios.defaults.headers["Authorization"] =
             "Bearer " + response.data.accessToken;
+          this.loading = false;
           if (loggedInUser.role === "ADMIN") {
             this.$router.push({ name: "CSRForm" });
           }
@@ -130,6 +137,7 @@ export default {
         })
         .catch(() => {
           //TODO sredi ovo na snackbarove u nekom trenutku
+          this.loading = false;
           alert("Incorrect username or password!");
         });
     },

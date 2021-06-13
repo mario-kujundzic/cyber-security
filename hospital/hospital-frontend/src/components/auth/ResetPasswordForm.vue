@@ -17,7 +17,7 @@
             ref="password"
             label="Password"
             style="font-size: 18px"
-            :rules="[rules.required, rules.counter]"
+            :rules="[rules.required, rules.counter, rules.lowerCase, rules.upperCase, rules.digit, rules.specialCharacter]"
             :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             :type="showPassword ? 'text' : 'password'"
             @click:append="showPassword = !showPassword"
@@ -44,6 +44,7 @@
           block
           class="description"
           style="font-size: 15px"
+          :loading="loading"
         >
           <b>Reset password</b>
         </v-btn>
@@ -72,8 +73,11 @@ export default {
       confirmPassword: "",
       rules: {
         required: (value) => !!value || "Field is required.",
-        counter: (value) =>
-          value ? value.length > 9 : false || "Password must have a minimum of 10 characters",
+        counter: (value) => (value && value.length > 9) || "Password must have a minimum of 10 characters",
+        lowerCase: (value) => (value && this.hasLowerCase(value)) || "Password must contain at least one lowercase letter",
+        upperCase: (value) => (value && this.hasUpperCase(value)) || "Password must contain at least one uppercase letter",
+        digit: (value) => (value && this.hasDigit(value)) || "Password must contain at least one number",
+        specialCharacter: (value) => (value && this.hasSpecialCharacter(value)) || "Password must contain at least one special character",
         passwordMatch: () =>
           this.password == this.confirmPassword || "Passwords must match.",
       },
@@ -83,15 +87,24 @@ export default {
       strength: null,
       showConfirmPassword: false,
       showPassword: false,
+      loading: false
     };
   },
   methods: {
     resetPassword() {
+      this.loading = true;
       let key = this.$route.params.key;
       this.$refs.form.validate();
-      if (!this.valid) return;
-      if (this.password != this.confirmPassword) return;
+      if (!this.valid) {
+        this.loading = false;
+        return;
+      }
+      if (this.password != this.confirmPassword) {
+        this.loading = false;
+        return;
+      }
       if (this.score <= 2) {
+        this.loading = false;
         alert("Your password is weak! Use numbers and special characters!");
         return;
       }
@@ -101,14 +114,16 @@ export default {
       };
       this.axios
         .post(apiURL, resetPassword)
-        .then(() => {
+        .then(response => {
+          this.loading = false;
           alert("You've successfully changed your password!");
           this.$refs.form.reset();
+          console.log(response);
         })
-        .catch(() => {
-          alert(
-            "Don't use your personal data as a password. Check if password contains at least one uppercase letter, one number and one special character. If you already used this link to reset your password, please request a new reset key."
-          );
+        .catch((error) => {
+          this.loading = false;
+          alert(error.response.data.message);
+          console.log(error.data);
         });
     },
     onScore({ score, strength }) {
@@ -117,6 +132,22 @@ export default {
       this.score = score;
       this.strength = strength;
     },
+    hasLowerCase(str) {
+      return str.toUpperCase() !== str;
+    },
+    hasUpperCase(str) {
+      return str.toLowerCase() !== str;
+    },
+    hasDigit(str) {
+      let digit = /\d/;
+      return digit.test(str);
+    },
+    hasSpecialCharacter(str) {
+      //eslint-disable-next-line
+      let reg = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+      return reg.test(str);
+    }
+
   },
 };
 </script>

@@ -30,6 +30,7 @@ Vue.axios.interceptors.response.use(undefined, function (error) {
         localStorage.clear();
         return router.push('/login');
     }
+    return Promise.reject(error);
   }
 })
 
