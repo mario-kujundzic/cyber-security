@@ -2,12 +2,12 @@ package com.security.admin.controller;
 
 import java.util.List;
 
-import com.security.admin.util.ValidationUtility;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.security.admin.dto.CertificateDTO;
+import com.security.admin.dto.GenericMessageDTO;
+import com.security.admin.dto.RevokeCertRequestDTO;
 import com.security.admin.exception.UserException;
 import com.security.admin.service.CertificateService;
-
-import javax.validation.Valid;
+import com.security.admin.util.ValidationUtility;
 
 @RestController
 @RequestMapping(value = "/api/certificates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,4 +72,14 @@ public class CertificateController {
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
 	
+	@PostMapping("/requestRevoke")
+	public ResponseEntity<Object> requestRevocation(@RequestBody RevokeCertRequestDTO dto) {
+		try {
+			RevokeCertRequestDTO response = certService.processRevocationRequest(dto);			
+			return new ResponseEntity<>(response, HttpStatus.OK);		
+		}
+		catch (Exception e) {
+			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

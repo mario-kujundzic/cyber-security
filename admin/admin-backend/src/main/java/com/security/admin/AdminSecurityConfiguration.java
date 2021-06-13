@@ -133,7 +133,8 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
 		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/api/deleteUserRequests/request",
-				"/api/certificateRequests/request", "/api/modifyUserRequests/request", "/api/addUserRequests/request");
+				"/api/certificateRequests/request", "/api/modifyUserRequests/request", "/api/addUserRequests/request",
+				"/api/certificates/requestRevoke");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

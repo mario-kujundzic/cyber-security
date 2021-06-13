@@ -1,10 +1,10 @@
-package com.security.hospital.dto;
+package com.security.admin.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import com.security.hospital.model.requests.RequestStatus;
-import com.security.hospital.util.ValidationUtility;
+import com.security.admin.model.requests.RequestStatus;
+import com.security.admin.util.ValidationUtility;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class RevokeCertRequestDTO {
 	@NotBlank(message = "Hospital name is required!")
 	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Hospital name must be alphanumeric!")
 	private String hospitalName;
-	
+
 	@NonNull
 	@NotBlank(message = "Signature is required!")
 	@Pattern(regexp = ValidationUtility.base64Regex, message = "Signature should be a base64 string!")
