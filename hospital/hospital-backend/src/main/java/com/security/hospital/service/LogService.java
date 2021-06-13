@@ -44,6 +44,23 @@ public class LogService {
         //securityEventService.invokeLogMessageCreated(message);
     }
 
+    public String[] findLogSources() throws IOException {
+        ArrayList<String> sources = new ArrayList<>();
+
+        tryCreateFolder();
+
+        File directory = new File(logsFolderPath);
+        for (File file : directory.listFiles()) {
+            if (!file.getName().endsWith(".log")) {
+                continue;
+            }
+
+            sources.add(file.getName().split("\\.")[0]);
+        }
+
+        return sources.toArray(new String[0]);
+    }
+
     public String loadLogsAsJson(long minUnixSeconds) throws Exception {
         HashMap<String, String[]> logLinesMap = loadLogLines(minUnixSeconds);
         Gson gson = new Gson();
