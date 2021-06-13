@@ -62,6 +62,12 @@
                 </template>
               </v-edit-dialog>
             </template>
+            
+            <template v-slot:[`item.certRequest`]="{ item }">
+                <v-btn @click="requestCert(item)" text>
+                    Request certificate
+                </v-btn>
+            </template>
           </v-data-table>
         </v-card>
       </v-col>
@@ -109,6 +115,7 @@ export default {
         { text: "ID", value: "id" },
         { text: "Common Name", value: "commonName" },
         { text: "Public key", value: "publicKey" },
+        { text: "Request certificate", value: "certRequest" },
         { text: "Actions", value: "actions", align: "right"},
       ],
       devices: [],
@@ -187,6 +194,39 @@ export default {
         alert(error);
       });
     },
+
+    requestCert(item) {
+      const csr = {
+        commonName: item.commonName,
+        hospitalName: item.commonName,
+        organization: "Cyber Security Hospital Center",
+        organizationUnit: "Cyber Security Administrative Center",
+        locality: "Novi Sad",
+        state: "Vojvodina",
+        country: "RS",
+      };
+      this.axios
+        .post("/api/devices/requestCertificate", csr)
+        .then((response) => {
+          this.$refs.form.reset();
+          alert(response.data.message);
+        })
+        .catch((error) => {
+          let response = error.response.data;
+
+          if (!response.errors || !Array.isArray(response.errors)) {
+            alert(error.response.data.message);
+            return;
+          }
+
+          let errorMessage = "";
+          response.errors.forEach((err) => {
+            errorMessage += err.defaultMessage + "\n";
+          });
+
+          alert(errorMessage);
+        });
+    }
   },
 };
 </script>

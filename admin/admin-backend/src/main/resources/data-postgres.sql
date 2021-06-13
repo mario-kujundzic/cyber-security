@@ -33,7 +33,7 @@ CZbUxz3U2naGbbYBFlbr8Ua6+YfxkQqTt2nWuCOT9GU5AkV6ftLSxBnxLtFpa9uI
 UwIDAQAB-----END PUBLIC KEY-----');
 
 
-insert into requests_csr (common_name, country, email, locality, organization, organization_unit, public_key, state, status) values ('Hospital1', 'RS', 'admin1@gmail.com', 'Novi Sad', 'Lotus Clinic Organization', 'Cyber Security Administrative Center', 
+insert into requests_csr (common_name, country, email, locality, organization, organization_unit, public_key, state, hospital_name, status, certificate_user) values ('Hospital1', 'RS', 'admin1@gmail.com', 'Novi Sad', 'Lotus Clinic Organization', 'Cyber Security Administrative Center', 
 '-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8ujeqk0wBwrZrT/DTG4S
 /nhs9qnqTjuwavcrf3scARCD6yB+k+4DsiPjtvt0eBWwCjcIGcEhJSuXP9Dapek4
@@ -42,4 +42,4 @@ Toj8fx0v7gOds7lxzmCo8Fe4IKWAAdODrL4bSKdjH8zMKVhadm3Zz/HZXCnFaf3s
 OqA+OomtD9NO0PFgkMWT11RRK/H2fypZ6NqZJyrw8H4K4cilXVf9sp3vefSd9AWv
 CZbUxz3U2naGbbYBFlbr8Ua6+YfxkQqTt2nWuCOT9GU5AkV6ftLSxBnxLtFpa9uI
 UwIDAQAB-----END PUBLIC KEY-----', 
-'Vojvodina', 1);
+'Vojvodina', 'Hospital1', 1, 0);

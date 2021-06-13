@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
+import com.security.hospital.model.User;
 import com.security.hospital.service.DeviceService;
 
 @RestController
@@ -72,10 +74,11 @@ public class DeviceController {
         return new ResponseEntity<>(new GenericMessageDTO("Device with ID " + id + " successfully deleted."), HttpStatus.OK);
     }
     
-    @PostMapping("/request-cert")
-    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto) {
+    @PostMapping("/requestCertificate")
+    @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
+    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto, @AuthenticationPrincipal User admin) {
         try {
-        	GenericMessageDTO mess = deviceService.requestCertificate(dto);
+        	GenericMessageDTO mess = deviceService.requestCertificate(dto, admin);
         	return new ResponseEntity<>(mess, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);

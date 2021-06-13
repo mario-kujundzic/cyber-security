@@ -6,13 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 
 import com.security.admin.dto.CertificateSigningRequestDTO;
+import com.security.admin.model.CertificateUser;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 @Entity
 @Table(name = "requests_csr")
@@ -48,8 +47,14 @@ public class CertificateSigningRequest {
 	@Column(name = "email")
 	private String email;
 	
+	@Column(name = "hospital_name")
+	private String hospitalName;
+	
 	@Column(name = "status")
 	private RequestStatus status;
+
+	@Column(name = "certificate_user")
+	private CertificateUser certificateUser;
 
 	public CertificateSigningRequest(CertificateSigningRequestDTO dto) {
 		commonName = dto.getCommonName();
@@ -60,7 +65,9 @@ public class CertificateSigningRequest {
 		country = dto.getCountry();
 		publicKey = dto.getPublicKey();
 		email = dto.getEmail();
+		hospitalName = dto.getHospitalName();
 		status = RequestStatus.PENDING;
+		certificateUser = dto.getCertificateUser();
 	}
 
 	@Override
@@ -75,86 +82,7 @@ public class CertificateSigningRequest {
 				", country='" + country + '\'' +
 				", publicKey='" + publicKey + '\'' +
 				", status=" + status +
+				", hospitalName=" + hospitalName +
 				'}';
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getCommonName() {
-		return commonName;
-	}
-
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
-	}
-
-	public String getOrganization() {
-		return organization;
-	}
-
-	public void setOrganization(String organization) {
-		this.organization = organization;
-	}
-
-	public String getOrganizationUnit() {
-		return organizationUnit;
-	}
-
-	public void setOrganizationUnit(String organizationUnit) {
-		this.organizationUnit = organizationUnit;
-	}
-
-	public String getLocality() {
-		return locality;
-	}
-
-	public void setLocality(String locality) {
-		this.locality = locality;
-	}
-
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public String getPublicKey() {
-		return publicKey;
-	}
-
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
-	}
-
-	public RequestStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(RequestStatus status) {
-		this.status = status;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
 	}
 }

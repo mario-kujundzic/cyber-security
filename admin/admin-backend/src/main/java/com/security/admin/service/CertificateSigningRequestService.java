@@ -26,12 +26,12 @@ public class CertificateSigningRequestService {
 
 	public void addRequest(CertificateSigningRequestDTO dto) throws Exception {
 		// Look up public key of hospital
-		String commonName = dto.getCommonName();
-		HospitalDTO hospitalDTO = hospitalService.getByCommonName(commonName);
+		String hospitalName = dto.getHospitalName();
+		HospitalDTO hospitalDTO = hospitalService.getByCommonName(hospitalName);
 		String publicKeyPEM = hospitalDTO.getPublicKey();
 
 		if (publicKeyPEM == null) {
-			throw new Exception("Denied: Hospital with common name " + commonName + " not found. Contact a super admin to register this hospital's public key.");
+			throw new Exception("Denied: Hospital with common name " + hospitalName + " not found. Contact a super admin to register this hospital's public key.");
 		}
 
 		// Verify signature

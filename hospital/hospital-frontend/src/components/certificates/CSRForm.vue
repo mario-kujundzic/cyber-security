@@ -126,7 +126,7 @@ export default {
     sendRequest() {
       this.$refs.form.validate();
       if (!this.valid) return;
-
+      this.csr.hospitalName = this.csr.commonName;
       this.axios
         .post("/api/csr/requestCertificate", this.csr)
         .then((response) => {
