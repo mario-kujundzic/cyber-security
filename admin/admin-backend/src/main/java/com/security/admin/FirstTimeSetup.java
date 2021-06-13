@@ -1,18 +1,11 @@
 package com.security.admin;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +15,7 @@ import com.security.admin.dto.CertificateDTO;
 import com.security.admin.pki.certificate.CertificateGenerator;
 import com.security.admin.pki.data.IssuerData;
 import com.security.admin.pki.data.SubjectData;
+import com.security.admin.pki.keystore.CrlKeyStoreManager;
 import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.keystore.TrustStoreManager;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
@@ -33,27 +27,42 @@ public class FirstTimeSetup {
 	private static String keyStoreFolderPath;
 
 	private static String keyStorePath;
+	
+	private static String crlKeyStorePath;
 
 	private static KeyStoreManager keyStoreManager;
+	
+	private static CrlKeyStoreManager crlKeyStoreManager;
 
 	private static TrustStoreManager trustStoreManager;
 
 	private static CertificateService certificateService;
+	
 
 	@Autowired
 	public FirstTimeSetup(@Value("${server.ssl.key-store}") String keyStorePath, KeyStoreManager ksm,
 			CertificateService certService, @Value("${server.ssl.key-store-folder}") String keyStoreFolderPath,
-			TrustStoreManager tsm) {
+			TrustStoreManager tsm, CrlKeyStoreManager crlKeyStoreManager ) {
 		FirstTimeSetup.keyStorePath = keyStorePath;
 		FirstTimeSetup.keyStoreFolderPath = keyStoreFolderPath;
 		FirstTimeSetup.keyStoreManager = ksm;
 		FirstTimeSetup.certificateService = certService;
 		FirstTimeSetup.trustStoreManager = tsm;
+		FirstTimeSetup.crlKeyStoreManager = crlKeyStoreManager;
+		FirstTimeSetup.crlKeyStorePath = "./src/main/resources/keystore/crlKeystore.p12";
 	}
 
 	public static void execute() {
 		File keyStoreFile = new File(keyStorePath);
 		File trustStoreFile = new File(keyStorePath);
+		File crlKeyStoreFile = new File(crlKeyStorePath);
+		
+		if (crlKeyStoreFile.exists()) {
+			crlKeyStoreManager.loadKeyStore();
+		} else {
+			crlKeyStoreManager.createKeyStore();
+			crlKeyStoreManager.saveKeyStore();
+		}
 
 		if (keyStoreFile.exists() && trustStoreFile.exists()) {
 			keyStoreManager.loadKeyStore();

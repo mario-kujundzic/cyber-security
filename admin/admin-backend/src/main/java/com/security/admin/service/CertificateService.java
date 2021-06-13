@@ -6,7 +6,9 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -16,17 +18,23 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.security.admin.dto.CertificateDTO;
+import com.security.admin.dto.CertificateStatusDTO;
+import com.security.admin.enums.CertificateStatus;
 import com.security.admin.model.requests.CertificateSigningRequest;
 import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.pki.certificate.CertificateGenerator;
 import com.security.admin.pki.data.IssuerData;
 import com.security.admin.pki.data.SubjectData;
+import com.security.admin.pki.keystore.CrlKeyStoreManager;
 import com.security.admin.pki.keystore.KeyStoreManager;
 import com.security.admin.pki.keystore.TrustStoreManager;
+import com.security.admin.pki.util.CryptographicUtility;
 import com.security.admin.pki.util.KeyIssuerSubjectGenerator;
+import com.security.admin.pki.util.KeyPairUtility;
 import com.security.admin.pki.util.PEMUtility;
 import com.security.admin.pki.util.RandomUtil;
 import com.security.admin.repository.CertificateRepository;
@@ -35,20 +43,27 @@ import com.security.admin.repository.CertificateRepository;
 public class CertificateService {
 
 	private KeyStoreManager keyStoreManager;
+	
+	private CrlKeyStoreManager crlKeyStoreManager;
 
 	private CertificateRepository certificateRepository;
 
 	private CertificateSigningRequestService certRequestService;
 	
 	private TrustStoreManager trustStoreManager;
+	
+	private String resourceFolderPath;
+	
 
 	@Autowired
-	public CertificateService(KeyStoreManager keyStoreManager, CertificateRepository certificateRepository,
-			CertificateSigningRequestService certRequestService, TrustStoreManager trustStoreManager) {
+	public CertificateService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath, KeyStoreManager keyStoreManager, CertificateRepository certificateRepository,
+			CertificateSigningRequestService certRequestService, TrustStoreManager trustStoreManager, CrlKeyStoreManager crlKeyStoreManager) {
 		this.keyStoreManager = keyStoreManager;
+		this.crlKeyStoreManager = crlKeyStoreManager;
 		this.certificateRepository = certificateRepository;
 		this.certRequestService = certRequestService;
 		this.trustStoreManager = trustStoreManager;
+		this.resourceFolderPath = resourceFolderPath;
 	}
 
 	public List<CertificateDTO> getAll() {
@@ -168,6 +183,11 @@ public class CertificateService {
 
 		// obrisi iz keystora
 		Certificate certificate = keyStoreManager.removeCertificate(serialNumber);
+		
+		// sacuvaj u crl keystore
+		crlKeyStoreManager.write(serialNumber, certificate);
+		crlKeyStoreManager.saveKeyStore();
+		
 		CertificateDTO revokedCert = toDTO(certificate);
 		keyStoreManager.saveKeyStore();
 
@@ -234,5 +254,33 @@ public class CertificateService {
 		modelCert.setValidTo(new Date(dto.getValidTo()));
 
 		certificateRepository.save(modelCert);
+	}
+
+	public CertificateStatusDTO checkCertificateStatus(String serialNumber) throws Exception {
+		Certificate certificate = keyStoreManager.readCertificate(serialNumber);
+		CertificateStatusDTO status = new CertificateStatusDTO(serialNumber);
+		BigInteger sn = new BigInteger(serialNumber);
+		if (certificate != null) {
+			com.security.admin.model.Certificate c = certificateRepository.findOneBySerialNumber(sn);
+			if (c.isRevocationStatus()) {
+				status.setStatus(CertificateStatus.REVOKED);
+			} else if (c.getValidTo().before(new Date(Instant.now().getEpochSecond()))) {
+				revokeCertificate(serialNumber, "Certificate expired");
+				status.setStatus(CertificateStatus.EXPIRED);
+			} else {
+				status.setStatus(CertificateStatus.ACTIVE);
+			}
+		} else {
+			status.setStatus(CertificateStatus.NOT_EXIST);
+		}
+
+		byte[] csrBytes = status.getCSRBytes();
+		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
+		String base64Signature = Base64.getEncoder().encodeToString(signature);
+		status.setSignature(base64Signature); 
+		
+		return status;
+		
 	}
 }

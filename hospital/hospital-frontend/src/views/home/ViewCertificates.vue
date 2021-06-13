@@ -27,10 +27,12 @@
               {{ new Date(item.validTo).toDateString() }}
             </template>
             <template v-slot:[`item.revocationStatus`]="{ item }">
-              {{ item.revocationStatus ? 'Yes' : 'No'}}
+              {{ item.revocationStatus ? "Yes" : "No" }}
             </template>
             <template v-slot:[`item.revocationReason`]="{ item }">
-              {{ item.revocationStatus ? item.revocationReason : 'Not revoked'}}
+              {{
+                item.revocationStatus ? item.revocationReason : "Not revoked"
+              }}
             </template>
             <template v-slot:[`item.revoke`]="{ item }">
               <v-dialog
@@ -51,12 +53,17 @@
                   </v-btn>
                 </template>
                 <revoke-certificate
-                    v-on:remove-certificate="removeCertificate"
-                    v-on:close-revoke-dialog="revokeDialog = false"
-                    v-bind:serialNumber="serialNumber"
-                  >
-                  </revoke-certificate>
+                  v-on:remove-certificate="removeCertificate"
+                  v-on:close-revoke-dialog="revokeDialog = false"
+                  v-bind:serialNumber="serialNumber"
+                >
+                </revoke-certificate>
               </v-dialog>
+            </template>
+            <template v-slot:[`item.status`]="{ item }">
+              <v-btn icon small @click="checkStatus(item)">
+                <v-icon dark>mdi-list-status</v-icon>
+              </v-btn>
             </template>
           </v-data-table>
         </v-card>
@@ -84,7 +91,13 @@ export default {
         { text: "Email", value: "email" },
         { text: "Revoked", value: "revocationStatus" },
         { text: "Revocation reason", value: "revocationReason" },
-        { text: "Revoke", value: "revoke", align: "right"},
+        { text: "Revoke", value: "revoke" },
+        {
+          text: "Status",
+          value: "status",
+          filterable: false,
+          sortable: false,
+        },
       ],
       certificates: [],
       revokeDialog: false,
@@ -117,6 +130,29 @@ export default {
         (f) => f.serialNumber != serialNumber
       );
       this.revokeDialog = false;
+    },
+    checkStatus(item) {
+      this.axios
+        .get(apiURL + "/status/" + item.serialNumber)
+        .then((response) => {
+          this.certificates.forEach(c => {
+            if (c.id === item.id) {
+              c.revocationStatus = response.data.revocationStatus;
+              c.revocationReason = response.data.revocationReason;
+              c.validTo = response.data.validTo;
+            }
+          })
+          if (response.data.revocationStatus) {
+            alert("Certificate is revoked! Revocation reason: " + response.data.revocationReason);
+          } else {
+            alert("Certificate is valid!");
+          }
+          
+        })
+        .catch((error) => {
+          console.log(error.response.data.message);
+          console.log(error);
+        });
     },
   },
 };
