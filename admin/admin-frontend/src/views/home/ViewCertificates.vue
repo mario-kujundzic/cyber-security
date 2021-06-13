@@ -27,7 +27,12 @@
               {{ item.validTo.toDateString() }}
             </template>
             <template v-slot:[`item.details`]="{ item }">
-              <v-dialog v-model="detailsDialog" :retain-focus="false" width="600" height="100%">
+              <v-dialog
+                v-model="detailsDialog"
+                :retain-focus="false"
+                width="600"
+                height="100%"
+              >
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     icon
@@ -63,11 +68,11 @@
                   </v-btn>
                 </template>
                 <revoke-certificate
-                    v-on:remove-certificate="removeCertificate"
-                    v-on:close-revoke-dialog="revokeDialog = false"
-                    v-bind:serialNumber="serialNumber"
-                  >
-                  </revoke-certificate>
+                  v-on:remove-certificate="removeCertificate"
+                  v-on:close-revoke-dialog="revokeDialog = false"
+                  v-bind:serialNumber="serialNumber"
+                >
+                </revoke-certificate>
               </v-dialog>
             </template>
           </v-data-table>
@@ -104,7 +109,12 @@ export default {
           filterable: false,
           sortable: false,
         },
-        { text: "Revoke", value: "revoke", filterable: false, sortable: false },
+        {
+          text: "Revoke",
+          value: "revoke",
+          filterable: false,
+          sortable: false,
+        },
       ],
       certificates: [],
     };

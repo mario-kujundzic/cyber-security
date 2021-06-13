@@ -136,6 +136,6 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				"/api/certificateRequests/request", "/api/modifyUserRequests/request", "/api/addUserRequests/request",
 				"/api/certificates/requestRevoke");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
-				"/**/*.css", "/**/*.js");
+				"/**/*.css", "/**/*.js", "/api/certificates/status/*");
 	}
 }

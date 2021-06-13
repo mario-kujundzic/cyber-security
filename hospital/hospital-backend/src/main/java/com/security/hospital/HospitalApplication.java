@@ -1,6 +1,8 @@
 package com.security.hospital;
 
 import com.google.gson.Gson;
+import com.security.hospital.dto.LogMessageDTO;
+import com.security.hospital.enums.LogMessageType;
 import com.security.hospital.pki.util.KeyIssuerSubjectGenerator;
 import com.security.hospital.pki.util.PEMUtility;
 import com.security.hospital.service.LogService;
@@ -27,6 +29,82 @@ public class HospitalApplication {
 		Security.addProvider(new BouncyCastleProvider());
 		ApplicationContext context = SpringApplication.run(HospitalApplication.class, args);
 		FirstTimeSetup.execute();
+
+//		LogService logService = context.getBean(LogService.class);
+//
+//		logService.logHospitalInfo("Some hospital info");
+//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logHospitalWarning("A hospital warning");
+//		logService.logHospitalError("Some hospital error");
+//		logService.logHospitalInfo("Some hospital info");
+//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logHospitalError("Some hospital error");
+//
+//		logService.logDeviceInfo("d1", "Some device info");
+//		logService.logDeviceInfo("d2", "Some device info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logDeviceInfo("d1", "Some device info");
+//		logService.logDeviceInfo("d2", "Some device info");
+//		logService.logHospitalWarning("A hospital warning");
+//		logService.logHospitalError("Some hospital error");
+//		logService.logHospitalInfo("Some hospital info");
+//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logHospitalWarning("A hospital warning");
+//		logService.logDeviceInfo("d3", "Some device info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logDeviceInfo("d1", "Some device info");
+//		logService.logHospitalError("Some hospital error");
+//		logService.logHospitalInfo("Some hospital info");
+//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logHospitalWarning("A hospital warning");
+//		logService.logDeviceInfo("d2", "Some device info");
+//		logService.logDeviceInfo("d3", "Some device info");
+//		logService.logHospitalInfo("Some hospital info");
+//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logDeviceInfo("d1", "Some device info");
+//
+//		logService.logDeviceInfo("d3", "Some device info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logDeviceInfo("d2", "Some device info");
+//		logService.logDeviceInfo("d3", "Some device info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthError("Some auth error");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logDeviceInfo("d1", "Some device info");
+//		logService.logDeviceInfo("d2", "Some device info");
+//
+//		logService.logHospitalError("Some hospital error");
+//		logService.logHospitalWarning("A hospital warning");
+//		logService.logDeviceInfo("d3", "Some device info");
+//		logService.logDeviceError("d1", "A device error");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthError("Some auth error");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logDeviceInfo("d1", "Some device info");
+//		logService.logDeviceInfo("d2", "Some device info");
+//		logService.logDeviceInfo("d3", "Some device info");
+//
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthError("Some auth error");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthInfo("Some auth info");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthWarning("Some auth warning");
+//		logService.logAuthError("Some auth error");
+
 	}
 
 }

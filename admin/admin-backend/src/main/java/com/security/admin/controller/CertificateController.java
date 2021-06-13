@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.security.admin.dto.CertificateDTO;
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.dto.RevokeCertRequestDTO;
+import com.security.admin.dto.CertificateStatusDTO;
 import com.security.admin.exception.UserException;
 import com.security.admin.service.CertificateService;
 import com.security.admin.util.ValidationUtility;
@@ -47,10 +48,11 @@ public class CertificateController {
 		CertificateDTO created = certService.createCertificate(dto);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
-	
+
 	@PostMapping("/{serialNumber}")
 	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber, @RequestBody String revocationReason) {
+	public ResponseEntity<CertificateDTO> revokeCert(@PathVariable("serialNumber") String serialNumber,
+			@RequestBody String revocationReason) {
 		if (!ValidationUtility.isEnglishText(revocationReason)) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
@@ -64,22 +66,28 @@ public class CertificateController {
 
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/revoked")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<List<CertificateDTO>> getAllRevokedCerts() {
 		List<CertificateDTO> revoked = certService.getRevokedCerts();
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/requestRevoke")
 	public ResponseEntity<Object> requestRevocation(@RequestBody RevokeCertRequestDTO dto) {
 		try {
-			RevokeCertRequestDTO response = certService.processRevocationRequest(dto);			
-			return new ResponseEntity<>(response, HttpStatus.OK);		
-		}
-		catch (Exception e) {
+			RevokeCertRequestDTO response = certService.processRevocationRequest(dto);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	@GetMapping("/status/{serialNumber}")
+	public ResponseEntity<CertificateStatusDTO> checkCertificateStatus(
+			@PathVariable("serialNumber") String serialNumber) throws Exception {
+		CertificateStatusDTO status = certService.checkCertificateStatus(serialNumber);
+		return new ResponseEntity<>(status, HttpStatus.OK);
 	}
 }

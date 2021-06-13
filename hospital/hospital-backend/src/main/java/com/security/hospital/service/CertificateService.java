@@ -16,6 +16,8 @@ import com.security.hospital.dto.CertificateDTO;
 import com.security.hospital.dto.RevokeCertRequestDTO;
 import com.security.hospital.model.Certificate;
 import com.security.hospital.model.requests.RequestStatus;
+import com.security.hospital.dto.CertificateStatusDTO;
+import com.security.hospital.enums.CertificateStatus;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.repository.CertificateRepository;
@@ -86,4 +88,41 @@ public class CertificateService {
 			throw new Exception("Admin didn't sign the certificate! Something went wrong.");
 		return new CertificateDTO(cert);
 	}
+
+	public CertificateDTO checkStatus(String serialNumber) throws Exception {
+		String adminEndpointURI = "https://localhost:9001/api/certificates/status/" + serialNumber;
+
+		CertificateStatusDTO status = this.restTemplate.getForObject(adminEndpointURI,
+				CertificateStatusDTO.class);
+
+		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
+
+		if (rootCAKey == null) {
+			throw new Exception(
+					"Denied: Admin app public key not registered. Contact a super admin to obtain the public key.");
+		}
+
+		// Verify signature
+		byte[] csrBytes = status.getCSRBytes();
+		byte[] signature = Base64.getDecoder().decode(status.getSignature());
+		boolean valid = CryptographicUtility.verify(csrBytes, signature, rootCAKey);
+
+		if (!valid) {
+			throw new Exception("Denied: signature invalid.");
+		}
+		
+		if (status.getStatus() == CertificateStatus.NOT_EXIST) {
+			throw new Exception("Certificate with serial number: " + serialNumber + " doesn't exist.");
+		}
+		
+		if (status.getStatus() == CertificateStatus.EXPIRED) {
+			revokeCertificate(serialNumber, "Certificate expired");
+		}
+		
+		Certificate cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
+		CertificateDTO dto = new CertificateDTO(cert);
+
+		return dto; 
+	}
+	
 }

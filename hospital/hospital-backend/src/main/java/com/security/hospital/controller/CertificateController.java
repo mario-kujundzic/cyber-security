@@ -54,4 +54,12 @@ public class CertificateController {
 
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
+	
+	@GetMapping("/status/{serialNumber}")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<CertificateDTO> checkStatus(@PathVariable("serialNumber") String serialNumber) throws Exception {
+		CertificateDTO dto = service.checkStatus(serialNumber);
+		return new ResponseEntity<>(dto, HttpStatus.OK);
+	}
+	
 }
