@@ -9,13 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
-public class LoggerInterceptor implements HandlerInterceptor {
+public class DoSInterceptor implements HandlerInterceptor {
     @Autowired
     private LogService logService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) {
-        logService.logInfo(request.getMethod() + " " + request.getContextPath() + " from " + request.getRemoteAddr());
+        logService.logHospitalInfo(request.getMethod() + " " + request.getRequestURI() + " from " + request.getRemoteAddr() + request.getRemotePort());
         return true;
     }
 }
