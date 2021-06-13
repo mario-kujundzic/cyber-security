@@ -15,7 +15,7 @@ public class DoSInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) {
-        logService.logHospitalInfo(request.getMethod() + " " + request.getRequestURI() + " from " + request.getRemoteAddr() + request.getRemotePort());
+        //logService.logHospitalInfo(request.getMethod() + " " + request.getRequestURI() + " from " + request.getRemoteAddr() + request.getRemotePort());
         return true;
     }
 }
