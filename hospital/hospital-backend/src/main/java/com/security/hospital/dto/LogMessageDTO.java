@@ -1,31 +1,33 @@
-package com.security.hospital.security.events;
+package com.security.hospital.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.security.hospital.enums.LogMessageType;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 @Data
-public class LogMessageEventDTO {
-    private long unixSecondsTimestamp;
+public class LogMessageDTO {
+    private long unixSeconds;
     private LogMessageType type;
     private String content;
 
-    private SimpleDateFormat sdf;
+    @JsonIgnore
+    private transient SimpleDateFormat sdf;
 
-    public LogMessageEventDTO() {
+    public LogMessageDTO() {
         sdf = new SimpleDateFormat("dd.MM.yy kk:mm");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+        unixSeconds = 0;
+        type = null;
+        content = null;
     }
-    public LogMessageEventDTO(long unixSecondsTimestamp, LogMessageType type, String content) {
+
+    public LogMessageDTO(long unixSeconds, LogMessageType type, String content) {
         this();
-        this.unixSecondsTimestamp = unixSecondsTimestamp;
+        this.unixSeconds = unixSeconds;
         this.type = type;
         this.content = content;
 
@@ -33,7 +35,7 @@ public class LogMessageEventDTO {
 
     @Override
     public String toString() {
-        return sdf.format(new Date(unixSecondsTimestamp * 1000)) + " [" + type.name() + "]: " + content;
+        return sdf.format(new Date(unixSeconds * 1000)) + " [" + type.name() + "]: " + content;
     }
 
     public static boolean lineIsAfterTime(String line, long unixSecondsTimestamp) throws Exception {
@@ -42,22 +44,22 @@ public class LogMessageEventDTO {
             throw new Exception("Can't create LogMessageEventDTO from string: " + line);
         }
 
-        LogMessageEventDTO dto = new LogMessageEventDTO();
+        LogMessageDTO dto = new LogMessageDTO();
         long readSeconds = dto.getSdf().parse(tokens[0]).getTime() / 1000;
 
         return readSeconds > unixSecondsTimestamp;
     }
 
-    public static LogMessageEventDTO fromString(String line) throws Exception {
+    public static LogMessageDTO fromString(String line) throws Exception {
         String[] tokens = line.split("\\[");
         if (tokens.length != 2) {
             throw new Exception("Can't create LogMessageEventDTO from string: " + line);
         }
 
-        LogMessageEventDTO dto = new LogMessageEventDTO();
-        dto.setUnixSecondsTimestamp(dto.getSdf().parse(tokens[0]).getTime() / 1000);
+        LogMessageDTO dto = new LogMessageDTO();
+        dto.setUnixSeconds(dto.getSdf().parse(tokens[0]).getTime() / 1000);
 
-        tokens = tokens[1].split("] ");
+        tokens = tokens[1].split("]: ");
         switch (tokens[0]) {
             case "INFO":
                 dto.setType(LogMessageType.INFO);

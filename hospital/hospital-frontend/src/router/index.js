@@ -16,6 +16,7 @@ import ManageUsers from "../views/ManageUsers";
 import ManageAddUserRequests from "../views/ManageAddUserRequests";
 import ManageDeleteUserRequests from "../views/ManageDeleteUserRequests";
 import ManageModifyUserRequests from "../views/ManageModifyUserRequests";
+import Logs from "../views/Logs";
 
 const routes = [
   {
@@ -86,6 +87,12 @@ const routes = [
         path: "modify-user-requests",
         beforeEnter: guardRouteAdmin
       },
+      {
+        component: Logs,
+        name: "Logs",
+        path: "logs",
+        beforeEnter: guardRouteAdmin
+      }
     ],
   },
   {
