@@ -122,6 +122,6 @@ public class DeviceService {
 		// neka logika za proveru sertifikata
 		String message = dto.getMessage();
 
-		logService.logInfo("Device: " + message);
+		logService.logDeviceInfo("d1", message);
 	}
 }
