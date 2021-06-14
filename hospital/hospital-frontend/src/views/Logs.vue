@@ -4,7 +4,17 @@
       <v-col cols="8">
         <v-card>
           <v-card-title>
-            <v-col> Logs </v-col>
+            <v-col>
+              Logs 
+              <v-btn icon @click="forceRefresh">
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+              <span v-if="refreshing" style="font-size: 0.6em;">Refreshing...</span>
+              <span v-else style="font-size: 0.6em;">Refresh in {{ refreshInSeconds }}s...</span>
+              <span>
+                <v-text-field style="width: 120px;" type="number" min="1" label="Refresh interval (s)" v-model="refreshInterval"></v-text-field>
+              </span>
+            </v-col>
             <v-col>
               <v-text-field
                 v-model="search"
@@ -40,25 +50,46 @@ export default {
     return {
       search: "",
       allLogs: {},
-      sources: []
+      sources: [],
+      refreshInterval: 5,
+      refreshInSeconds: 0,
+      refreshing: false
     };
   },
 
   mounted() {
-    this.getLogs();
+    this.refreshIfTimesUp();
+    setInterval(this.refreshIfTimesUp, 1000);
   },
 
   methods: {
-    getLogs() {
-      this.axios
-        .get(apiURL)
-        .then((response) => {
-          this.allLogs = response.data;
-        })
-        .catch((error) => {
-          alert(error);
-        });
+    async getLogs() {
+      try {
+        let response = await this.axios.get(apiURL);
+        this.allLogs = response.data;
+      } catch (e) {
+        alert(e);
+      }
     },
+
+    async refreshIfTimesUp() {
+      if (this.refreshing) {
+        return;
+      }
+
+      this.refreshInSeconds--;
+      if (this.refreshInSeconds <= 0) {
+        await this.forceRefresh();
+        return;
+      }
+    },
+
+    async forceRefresh() {
+      this.refreshing = true;
+      await this.getLogs();
+      this.refreshInSeconds = this.refreshInterval;
+      this.refreshing = false;
+    }
   },
 
   computed: {

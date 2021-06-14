@@ -93,16 +93,16 @@ public class LogService {
         }
     }
 
-    public void logHospitalInfo(String message) {
-        logMessage("hospital", LogMessageType.INFO, message);
+    public void logGeneralInfo(String message) {
+        logMessage("general", LogMessageType.INFO, message);
     }
 
-    public void logHospitalWarning(String message) {
-        logMessage("hospital", LogMessageType.WARNING, message);
+    public void logGeneralWarning(String message) {
+        logMessage("general", LogMessageType.WARNING, message);
     }
 
-    public void logHospitalError(String message) {
-        logMessage("hospital", LogMessageType.ERROR, message);
+    public void logGeneralError(String message) {
+        logMessage("general", LogMessageType.ERROR, message);
     }
 
     public void logAuthInfo(String message) {
