@@ -10,7 +10,7 @@
         {{ timestamp }} 
       </span>
       <span :style="'color: ' + typeColor">
-        <b>hospital.{{ log.source }}:</b> {{ log.content }}
+        hospital.<b>{{ log.source }}:</b> {{ log.content }}
       </span>
     </div>
   </div>
@@ -58,7 +58,7 @@ export default {
     },
 
     timestamp() {
-      return moment.unix(this.log.unixSeconds).format("DD.MM kk:mm:ss");
+      return moment(this.log.unixMilis).format("DD.MM, kk:mm:ss");
     },
   },
 };
