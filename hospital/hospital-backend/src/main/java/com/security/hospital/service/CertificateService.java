@@ -1,5 +1,6 @@
 package com.security.hospital.service;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -8,11 +9,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.security.hospital.dto.AddCertificateRequestDTO;
 import com.security.hospital.dto.CertificateDTO;
 import com.security.hospital.dto.RevokeCertRequestDTO;
 import com.security.hospital.model.Certificate;
@@ -112,7 +116,7 @@ public class CertificateService {
 			cert = revokeCertificate(serialNumber, "Certificate expired");
 			break;
 		case REVOKED:
-			cert = revokeCertificate(serialNumber, "Revoked by admin");
+			cert = revokeCertificate(serialNumber, status.getRevocationReason());
 			break;
 		case ACTIVE:
 			cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
@@ -131,6 +135,35 @@ public class CertificateService {
 		cert.setRevocationStatus(true);
 		cert.setValidTo(new Date());
 		return repository.save(cert);
+	}
+
+	public void saveCertificateToDb(AddCertificateRequestDTO dto) throws Exception {
+		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
+
+		if (rootCAKey == null) {
+			throw new Exception(
+					"Denied: Admin app public key not registered. Contact a super admin to obtain the public key.");
+		}
+		
+		// Verify signature
+		byte[] csrBytes = dto.getCSRBytes();
+		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
+		boolean valid = CryptographicUtility.verify(csrBytes, signature, rootCAKey);
+
+		if (!valid) {
+			throw new Exception("Denied: signature invalid.");
+		}
+		
+		com.security.hospital.model.Certificate cert = new Certificate();
+		cert.setCommonName(dto.getCommonName());
+		cert.setEmail(dto.getEmail());
+		cert.setRevocationStatus(false);
+		cert.setSerialNumber(dto.getSerialNumber());
+		cert.setValidFrom(new Date(dto.getValidFrom()));
+		cert.setValidTo(new Date(dto.getValidTo()));
+		cert.setCertificateUser(dto.getCertificateUser());
+		
+		repository.save(cert);
 	}
 
 }
