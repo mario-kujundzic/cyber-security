@@ -16,7 +16,7 @@ import ManageDeleteUserRequests from "../views/home/ManageDeleteUserRequests";
 import ManageModifyUserRequests from "../views/home/ManageModifyUserRequests";
 import ForgotPassword from '../views/auth/ForgotPassword';
 import ResetPassword from '../views/auth/ResetPassword';
-
+import ManageUsers from '../views/home/ManageUsers';
 
 const routes = [
   {
@@ -78,6 +78,11 @@ const routes = [
         component: ManageModifyUserRequests,
         name: "ManageModifyUserRequests",
         path: "modify-user-requests",
+      },
+      {
+        component: ManageUsers,
+        name: "ManageUsers",
+        path: "users",
       },
     ],
   },
