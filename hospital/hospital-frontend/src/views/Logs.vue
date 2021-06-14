@@ -94,14 +94,29 @@ export default {
 
   computed: {
     logs() {
+        let self = this;
+        function satisfiesSearch(log) {
+          let searchTerm = self.search.toLowerCase();
+          let contentMatch = log.content.toLowerCase().includes(searchTerm);
+          let typeMatch = log.type.toLowerCase().includes(searchTerm);
+          let sourceMatch = log.source.toLowerCase().includes(searchTerm);
+
+          return contentMatch || typeMatch || sourceMatch;
+        }
+
         let arr = [];
 
         for (let key in this.allLogs) {
             this.allLogs[key].forEach(e => {
-                arr.push({
+                let log = {
                     ...e,
                     source: key
-                });
+                };
+
+                if (this.search === "" || satisfiesSearch(log)) {
+                  arr.push(log);
+                }
+
             })
         }
 
