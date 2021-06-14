@@ -5,14 +5,13 @@
     @mouseenter="mouseIsOver = true"
     @mouseleave="mouseIsOver = false"
   >
-    <div v-if="mouseIsOver">
-      {{ log.source }} -> {{ longDate }} [{{ log.type }}]
-      <span style="font-size: 1.2em">{{ log.content }}</span>
-    </div>
-
-    <div v-else>
-      {{ shortSource }} -> {{ shortDate }}:
-      <span style="font-size: 1.2em">{{ log.content }}</span>
+    <div>
+      <span style="font-size: 0.75em; margin-right: 10px;">
+        {{ timestamp }} 
+      </span>
+      <span :style="'color: ' + typeColor">
+        hospital.<b>{{ log.source }}:</b> {{ log.content }}
+      </span>
     </div>
   </div>
 </template>
@@ -27,57 +26,51 @@ export default {
 
   data() {
     return {
-      mouseIsOver: false,
-      prop: {},
+      mouseIsOver: false
     };
   },
 
   computed: {
     color() {
-      let type = this.log.type;
+      if (!this.mouseIsOver) {
+        return "rgba(0, 0, 0, 0)";
+      }
 
+      return "rgba(0, 0, 0, 0.05)";
+    },
+
+    typeColor() {
+      let type = this.log.type;
+      
       if (type === "WARNING") {
-        if (this.mouseIsOver) {
-          return "rgba(200, 200, 0, 0.8)";
-        }
-        return "rgba(200, 200, 0, 0.5)";
+        return "darkgoldenrod";
       }
 
       if (type === "ERROR") {
-        if (this.mouseIsOver) {
-          return "rgba(255, 0, 0, 0.8)";
-        }
-        return "rgba(255, 0, 0, 0.5)";
+        return "tomato";
       }
 
-      if (this.mouseIsOver) {
-        return "rgba(0, 0, 0, 0.5)";
-      }
-      return "rgba(0, 0, 0, 0.25)";
+      return "black";
     },
 
     shortSource() {
       return this.log.source[0];
     },
 
-    shortDate() {
-      return moment.unix(this.log.unixSeconds).format("DD.MM kk:mm");
-    },
-
-    longDate() {
-      return moment.unix(this.log.unixSeconds).format("DD.MM.YYYY kk:mm:ss");
+    timestamp() {
+      return moment(this.log.unixMilis).format("DD.MM, kk:mm:ss");
     },
   },
 };
 </script>
 
 <style scoped>
+
 .log-message {
   border-radius: 5px;
   width: 100%;
-  min-height: 35px;
   padding: 7px 7px 7px 7px;
-  margin-bottom: 5px;
-  background-color: ;
+  margin-bottom: 3px;
 }
+
 </style>

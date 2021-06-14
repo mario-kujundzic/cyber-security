@@ -29,65 +29,80 @@ import com.security.hospital.service.DeviceService;
 @RequestMapping(value = "/api/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
 
-    @Autowired
-    private DeviceService deviceService;
+	@Autowired
+	private DeviceService deviceService;
 
+	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<DeviceDTO> getOneDevices(@PathVariable long id) {
+		DeviceDTO deviceDTO = deviceService.getOne(id);
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
-    public ResponseEntity<DeviceDTO> getOneDevices(@PathVariable long id) {
-    	DeviceDTO deviceDTO = deviceService.getOne(id);
+		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
-    }
+	@GetMapping
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<List<DeviceDTO>> getAllDevices() {
+		ArrayList<DeviceDTO> deviceDTOs = deviceService.getAll();
 
-    @GetMapping
-    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
-    public ResponseEntity<List<DeviceDTO>> getAllDevices() {
-        ArrayList<DeviceDTO> deviceDTOs = deviceService.getAll();
+		return new ResponseEntity<>(deviceDTOs, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<>(deviceDTOs, HttpStatus.OK);
-    }
+	@PostMapping
+	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
+	public ResponseEntity<DeviceDTO> createDevice(@RequestBody DeviceDTO dto) {
+		DeviceDTO deviceDTO = deviceService.create(dto);
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-    public ResponseEntity<DeviceDTO> createDevice(@RequestBody DeviceDTO dto) {
-    	DeviceDTO deviceDTO = deviceService.create(dto);
+		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
+	}
 
-        return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
-    }
+	@PutMapping
+	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
+	public ResponseEntity<DeviceDTO> updateDevice(@RequestBody DeviceDTO dto) {
+		DeviceDTO deviceDTO = deviceService.update(dto);
 
+		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
+	}
 
-    @PutMapping
-    @PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-    public ResponseEntity<DeviceDTO> updateDevice(@RequestBody DeviceDTO dto) {
-    	DeviceDTO deviceDTO = deviceService.update(dto);
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('DELETE_PRIVILEGE')")
+	public ResponseEntity<GenericMessageDTO> deleteDevice(@PathVariable long id) {
+		deviceService.delete(id);
 
-        return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
-    }
+		return new ResponseEntity<>(new GenericMessageDTO("Device with ID " + id + " successfully deleted."),
+				HttpStatus.OK);
+	}
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('DELETE_PRIVILEGE')")
-    public ResponseEntity<GenericMessageDTO> deleteDevice(@PathVariable long id) {
-    	deviceService.delete(id);
+	@PostMapping("/requestCertificate")
+	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
+	public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto,
+			@AuthenticationPrincipal User admin) {
+		try {
+			GenericMessageDTO mess = deviceService.requestCertificate(dto, admin);
+			return new ResponseEntity<>(mess, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
 
-        return new ResponseEntity<>(new GenericMessageDTO("Device with ID " + id + " successfully deleted."), HttpStatus.OK);
-    }
-    
-    @PostMapping("/requestCertificate")
-    @PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-    public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto, @AuthenticationPrincipal User admin) {
-        try {
-        	GenericMessageDTO mess = deviceService.requestCertificate(dto, admin);
-        	return new ResponseEntity<>(mess, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-    }
+	@PostMapping("/register")
+	public ResponseEntity<GenericMessageDTO> register(@RequestBody DeviceMessageDTO dto) {
+		try {
+			// nekako getuj sertifikat i posalji zahtev za proveru da li je revoked!
+			deviceService.register(dto);
+			return new ResponseEntity<>(new GenericMessageDTO("Successfully registered!"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
 
-    @PostMapping("/data")
-    public ResponseEntity<GenericMessageDTO> recieveData(@RequestBody DeviceMessageDTO dto) {
-    	deviceService.processMessage(dto);
-    	return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);
-    }
+	@PostMapping("/message")
+	public ResponseEntity<GenericMessageDTO> recieveMessage(@RequestBody DeviceMessageDTO dto) {
+		try {
+			deviceService.processMessage(dto);
+			return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

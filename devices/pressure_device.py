@@ -3,6 +3,8 @@ import json
 import ssl
 import os
 import base64
+import random
+import time
 from distutils.command.check import check
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
@@ -10,6 +12,9 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 import cryptography.x509 as crypto_cert
+
+# Device common name
+common_name = 'Pressure device 1'
 
 # Private and public key file names
 private_key_path = 'key.priv'
@@ -23,8 +28,9 @@ certificate_secret = 'sadpotato'
 api_hospital_root = 'localhost:9002'
 
 # Endpoints
-endpoint_request_cert = '/api/devices/request-cert'
-endpoint_send_data = '/api/devices/data'
+endpoint_register = '/api/devices/register'
+endpoint_message = '/api/devices/message'
+
 
 
 def generate_keys():
@@ -84,52 +90,51 @@ def read_keys():
     return private_key, public_key
 
 
-def request_cert(private_key, public_key):
-    # Define the client certificate settings for https connection
-
-    # Create a connection to submit HTTP requests
-    connection = http.client.HTTPConnection(api_hospital_root)
-
-    # Defining parts of the HTTP request
-    request_headers = {
-        'Content-Type': 'application/json'
-    }
-    common_name = 'TestDevice'
-    organization = 'Hospital1'
-    organization_unit = 'Hospital1'
-    locality = 'Novi Sad'
-    state = 'Vojvodina'
-    country = 'RS'
-    email = 'admin1@gmail.com'
-    public_key = bytes.decode(public_key, 'utf-8')
-
-    request_body_dict = {
-        'commonName': common_name,
-        'organization': organization,
-        'organizationUnit': organization_unit,
-        'locality': locality,
-        'state': state,
-        'country': country,
-        'email': email,
-        'publicKey': public_key
-    }
-    private_key = crypto_serialization.load_pem_private_key(private_key, password=None)
-    request_body_dict['signature'] = private_key.sign(
-        data=bytes(common_name + organization + organization_unit + locality + state + country + email, 'utf-8'),
-        padding=padding.PKCS1v15(),
-        algorithm =hashes.SHA1()
-    )
-    request_body_dict['signature'] = base64.b64encode(request_body_dict['signature']).decode('utf-8')
-
-    # Use connection to submit a HTTP POST request
-    connection.request(method="POST", url=endpoint_request_cert, headers=request_headers, body=json.dumps(request_body_dict))
-
-    # Print the HTTP response from the IOT service endpoint
-    response = connection.getresponse()
-    print(response.status, response.reason)
-    data = response.read()
-    print(data)
-
+# def request_cert(private_key, public_key):
+#     # Define the client certificate settings for https connection
+#
+#     # Create a connection to submit HTTP requests
+#     connection = http.client.HTTPConnection(api_hospital_root)
+#
+#     # Defining parts of the HTTP request
+#     request_headers = {
+#         'Content-Type': 'application/json'
+#     }
+#     common_name = 'TestDevice'
+#     organization = 'Hospital1'
+#     organization_unit = 'Hospital1'
+#     locality = 'Novi Sad'
+#     state = 'Vojvodina'
+#     country = 'RS'
+#     email = 'admin1@gmail.com'
+#     public_key = bytes.decode(public_key, 'utf-8')
+#
+#     request_body_dict = {
+#         'commonName': common_name,
+#         'organization': organization,
+#         'organizationUnit': organization_unit,
+#         'locality': locality,
+#         'state': state,
+#         'country': country,
+#         'email': email,
+#         'publicKey': public_key
+#     }
+#     private_key = crypto_serialization.load_pem_private_key(private_key, password=None)
+#     request_body_dict['signature'] = private_key.sign(
+#         data=bytes(common_name + organization + organization_unit + locality + state + country + email, 'utf-8'),
+#         padding=padding.PKCS1v15(),
+#         algorithm =hashes.SHA1()
+#     )
+#     request_body_dict['signature'] = base64.b64encode(request_body_dict['signature']).decode('utf-8')
+#
+#     # Use connection to submit a HTTP POST request
+#     connection.request(method="POST", url=endpoint_request_cert, headers=request_headers, body=json.dumps(request_body_dict))
+#
+#     # Print the HTTP response from the IOT service endpoint
+#     response = connection.getresponse()
+#     print(response.status, response.reason)
+#     data = response.read()
+#     print(data)
 
 def establish_connection():
     file_cert = open(certificate_file_path, 'rb')
@@ -147,18 +152,14 @@ def establish_connection():
     return connection
 
 
-def send_data(connection, private_key):
+def send_data(connection, data, endpoint):
     # Defining parts of the HTTP request
     request_headers = {
         'Content-Type': 'application/json'
     }
 
-    request_body_dict = {
-        'message': 'Hi I am a device and this message is securely transmitted!'
-    }
-
     # Use connection to submit a HTTP POST request
-    connection.request(method="POST", url=endpoint_send_data, headers=request_headers, body=json.dumps(request_body_dict))
+    connection.request(method="POST", url=endpoint, headers=request_headers, body=json.dumps(data))
 
     # Print the HTTP response from the IOT service endpoint
     response = connection.getresponse()
@@ -167,13 +168,55 @@ def send_data(connection, private_key):
     print(data)
 
 
+def register(private_key, public_key):
+    data_types = ['blood_pressure_upper', 'blood_pressure_lower', 'temperature', 'heartrate']
+    data_types.sort()
+    data = {
+        'commonName': common_name,
+        'parameters': { type: '' for type in data_types}
+    }
+    private_key = crypto_serialization.load_pem_private_key(private_key, password=None)
+    data['signature'] = private_key.sign(
+        data=bytes(common_name + ''.join(data_types), 'utf-8'),
+        padding=padding.PKCS1v15(),
+        algorithm =hashes.SHA1()
+    )
+    data['signature'] = base64.b64encode(data['signature']).decode('utf-8')
+    print(data['signature'])
+    connection = establish_connection()
+    send_data(connection, data, endpoint_register)
+    return connection, data['signature']
+
+def update_device(connection, signature):
+    blood_pressure_upper = str(random.randint(100, 160))
+    blood_pressure_lower = str(random.randint(60, 100))
+    heartrate = str(random.randint(40, 120))
+    temperature = str(random.randint(350, 410)/10)
+    data = {
+        'commonName': common_name,
+        'parameters': {
+            'blood_pressure_upper': blood_pressure_upper,
+            'blood_pressure_lower': blood_pressure_lower,
+            'heartrate': heartrate,
+            'temperature': temperature
+        },
+        'signature': signature
+    }
+    try:
+        connection = establish_connection()
+        send_data(connection, data, endpoint_message)
+    except Exception as e:
+        print("Exception occured! " + e)
+
 if __name__ == '__main__':
     if (not os.path.isfile(private_key_path)) or (not os.path.isfile(public_key_path)):
         private_key, public_key = generate_keys()
     else:
         private_key, public_key = read_keys()
     if not os.path.isfile(certificate_file_path):
-        request_cert(private_key, public_key)
+        print("Certificate not found! Check with admin to register a certificate with name " + certificate_file_path + " to enable communication!")
     else:
-        connection = establish_connection()
-        send_data(connection, private_key)
+        connection, signature = register(private_key, public_key)
+        while True:
+            update_device(connection, signature)
+            time.sleep(5)

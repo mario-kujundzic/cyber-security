@@ -32,35 +32,35 @@ public class HospitalApplication {
 
 //		LogService logService = context.getBean(LogService.class);
 //
-//		logService.logHospitalInfo("Some hospital info");
-//		logService.logHospitalInfo("Some more hospital info");
-//		logService.logHospitalWarning("A hospital warning");
-//		logService.logHospitalError("Some hospital error");
-//		logService.logHospitalInfo("Some hospital info");
-//		logService.logHospitalInfo("Some more hospital info");
-//		logService.logHospitalError("Some hospital error");
+//		logService.logGeneralInfo("Some General info");
+//		logService.logGeneralInfo("Some more General info");
+//		logService.logGeneralWarning("A General warning");
+//		logService.logGeneralError("Some General error");
+//		logService.logGeneralInfo("Some General info");
+//		logService.logGeneralInfo("Some more General info");
+//		logService.logGeneralError("Some General error");
 //
 //		logService.logDeviceInfo("d1", "Some device info");
 //		logService.logDeviceInfo("d2", "Some device info");
 //		logService.logDeviceError("d1", "A device error");
 //		logService.logDeviceInfo("d1", "Some device info");
 //		logService.logDeviceInfo("d2", "Some device info");
-//		logService.logHospitalWarning("A hospital warning");
-//		logService.logHospitalError("Some hospital error");
-//		logService.logHospitalInfo("Some hospital info");
-//		logService.logHospitalInfo("Some more hospital info");
-//		logService.logHospitalWarning("A hospital warning");
+//		logService.logGeneralWarning("A General warning");
+//		logService.logGeneralError("Some General error");
+//		logService.logGeneralInfo("Some General info");
+//		logService.logGeneralInfo("Some more General info");
+//		logService.logGeneralWarning("A General warning");
 //		logService.logDeviceInfo("d3", "Some device info");
 //		logService.logDeviceError("d1", "A device error");
 //		logService.logDeviceInfo("d1", "Some device info");
-//		logService.logHospitalError("Some hospital error");
-//		logService.logHospitalInfo("Some hospital info");
-//		logService.logHospitalInfo("Some more hospital info");
-//		logService.logHospitalWarning("A hospital warning");
+//		logService.logGeneralError("Some General error");
+//		logService.logGeneralInfo("Some General info");
+//		logService.logGeneralInfo("Some more General info");
+//		logService.logGeneralWarning("A General warning");
 //		logService.logDeviceInfo("d2", "Some device info");
 //		logService.logDeviceInfo("d3", "Some device info");
-//		logService.logHospitalInfo("Some hospital info");
-//		logService.logHospitalInfo("Some more hospital info");
+//		logService.logGeneralInfo("Some General info");
+//		logService.logGeneralInfo("Some more General info");
 //		logService.logDeviceError("d1", "A device error");
 //		logService.logDeviceInfo("d1", "Some device info");
 //
@@ -81,8 +81,8 @@ public class HospitalApplication {
 //		logService.logDeviceInfo("d1", "Some device info");
 //		logService.logDeviceInfo("d2", "Some device info");
 //
-//		logService.logHospitalError("Some hospital error");
-//		logService.logHospitalWarning("A hospital warning");
+//		logService.logGeneralError("Some General error");
+//		logService.logGeneralWarning("A General warning");
 //		logService.logDeviceInfo("d3", "Some device info");
 //		logService.logDeviceError("d1", "A device error");
 //		logService.logAuthWarning("Some auth warning");

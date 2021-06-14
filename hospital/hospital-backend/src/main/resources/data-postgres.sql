@@ -52,3 +52,14 @@ swIDAQAB-----END PUBLIC KEY-----');
 
 insert into certificates (serial_number, valid_from, valid_to, email, common_name, revocation_status, certificate_user) 
 	values ('672496789128620.00', '2021-06-11 02:00:00', '2022-07-11 02:00:00', 'admin1@gmail.com', 'Hospital1', false, 0);
+
+insert into message_types (param_name, message_data_type) values ('blood_pressure_upper', 0); 
+insert into message_types (param_name, message_data_type) values ('blood_pressure_lower', 0); 
+insert into message_types (param_name, message_data_type) values ('temperature', 1); 
+insert into message_types (param_name, message_data_type) values ('heartrate', 0); 
+
+-- for testing insert directly, otherwise send request from device
+--insert into devices_message_types (device_id, message_types_id) values (1, 1);
+--insert into devices_message_types (device_id, message_types_id) values (1, 2);
+--insert into devices_message_types (device_id, message_types_id) values (1, 3);
+--insert into devices_message_types (device_id, message_types_id) values (1, 4);

@@ -16,8 +16,8 @@ public class LogService {
     private final static String logsFolderPath = "logs/";
 
     private void logMessage(String source, LogMessageType type, String content) {
-        long unixSeconds = (new Date()).getTime() / 1000;
-        LogMessageDTO message = new LogMessageDTO(unixSeconds, type, content);
+        long unixMilis= (new Date()).getTime();
+        LogMessageDTO message = new LogMessageDTO(unixMilis, type, content);
         String logLine = message.toString();
 
         System.out.println(source + " -> " + logLine);
@@ -33,7 +33,6 @@ public class LogService {
             FileUtility.appendLine(logsFolderPath + source + ".log", logLine);
         } catch (IOException e) {
             System.out.println("LogService ERROR: Can't write log line '" + logLine + "' to file '" + filePath + "': " + e.getMessage());
-            return;
         }
     }
 
@@ -54,7 +53,7 @@ public class LogService {
         return sources.toArray(new String[0]);
     }
 
-    public HashMap<String, ArrayList<LogMessageDTO>> loadLogLinesSince(long minUnixSeconds) throws Exception {
+    public HashMap<String, ArrayList<LogMessageDTO>> loadLogLinesSince(long minUnixMilis) throws Exception {
         HashMap<String, ArrayList<LogMessageDTO>> logLinesMap = new HashMap<>();
         tryCreateFolder();
 
@@ -70,7 +69,7 @@ public class LogService {
             String line;
             while ((line = reader.readLine()) != null) {
                 LogMessageDTO logMessage = LogMessageDTO.fromString(line);
-                if (logMessage.getUnixSeconds() >= minUnixSeconds) {
+                if (logMessage.getUnixMilis() > minUnixMilis) {
                     messages.add(logMessage);
                 }
             }
@@ -93,16 +92,16 @@ public class LogService {
         }
     }
 
-    public void logHospitalInfo(String message) {
-        logMessage("hospital", LogMessageType.INFO, message);
+    public void logGeneralInfo(String message) {
+        logMessage("general", LogMessageType.INFO, message);
     }
 
-    public void logHospitalWarning(String message) {
-        logMessage("hospital", LogMessageType.WARNING, message);
+    public void logGeneralWarning(String message) {
+        logMessage("general", LogMessageType.WARNING, message);
     }
 
-    public void logHospitalError(String message) {
-        logMessage("hospital", LogMessageType.ERROR, message);
+    public void logGeneralError(String message) {
+        logMessage("general", LogMessageType.ERROR, message);
     }
 
     public void logAuthInfo(String message) {

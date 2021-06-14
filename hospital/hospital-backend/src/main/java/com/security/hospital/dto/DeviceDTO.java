@@ -2,7 +2,7 @@ package com.security.hospital.dto;
 
 import javax.validation.constraints.NotBlank;
 
-import com.security.hospital.model.Device;
+import com.security.hospital.model.devices.Device;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
