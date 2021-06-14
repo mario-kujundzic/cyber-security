@@ -1,6 +1,17 @@
 package com.security.admin.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Future;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +55,36 @@ public class MailSenderService {
     			"Please follow this link to reset your password:\n" + recoveryLink + "/" + key;
     	return sendEmail(username, username + ", we've made it easy to get back on CyberHeaven application", content);
     			
+    }
+    
+    @Async
+    public void sendCertificate(String commonName, String email, String certPath) throws AddressException, MessagingException, IOException {
+    	String content = "Cao, " + commonName + "!" + "\n\nU prilogu ti se nalazi sertifikat koji si trazio." +
+    					"\n\nU zdravlju da ga koristis!" +
+    					"\n\nPuno te pozdravlja i voli tvoj super admin!";
+    	
+    	String subject = "Knock, knock - your certificate is here!";
+    	
+    	MimeMessage mimeMessage = emailSender.createMimeMessage();
+    	mimeMessage.setSender(new InternetAddress("lotusclinic505@gmail.com"));
+    	mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+    	mimeMessage.setSubject(subject);
+    	    	
+    	MimeBodyPart mimeBodyPart = new MimeBodyPart();
+    	mimeBodyPart.setContent(content, "text/html");
+    	
+    	Multipart multipart = new MimeMultipart();
+    	multipart.addBodyPart(mimeBodyPart);
+    	
+    	MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+    	attachmentBodyPart.attachFile(new File(certPath));
+    	
+    	multipart.addBodyPart(attachmentBodyPart);
+    	
+    	mimeMessage.setContent(multipart);
+    	
+    	emailSender.send(mimeMessage);
+    	
     }
 	
 

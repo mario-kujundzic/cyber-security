@@ -102,7 +102,7 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
 		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/data", "/api/addUserRequests/response",
 				"/api/deleteUserRequests/response", "/api/modifyUserRequests/response",
-				"/api/devices/register", "/api/devices/message");
+				"/api/devices/register", "/api/devices/message", "/api/certificates/add" );
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

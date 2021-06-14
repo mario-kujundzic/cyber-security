@@ -1,5 +1,6 @@
 package com.security.admin.service;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -22,12 +23,15 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.security.admin.dto.AddCertificateRequestDTO;
 import com.security.admin.dto.CertificateDTO;
+import com.security.admin.dto.CertificateStatusDTO;
 import com.security.admin.dto.HospitalDTO;
 import com.security.admin.dto.RevokeCertRequestDTO;
-import com.security.admin.dto.CertificateStatusDTO;
 import com.security.admin.enums.CertificateStatus;
+import com.security.admin.model.CertificateUser;
 import com.security.admin.model.requests.CertificateSigningRequest;
 import com.security.admin.model.requests.RequestStatus;
 import com.security.admin.pki.certificate.CertificateGenerator;
@@ -60,11 +64,16 @@ public class CertificateService {
 
 	private HospitalService hospitalService;
 
+	private MailSenderService mailSenderService;
+	
+	private RestTemplate restTemplate;
+
 	@Autowired
 	public CertificateService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
 			KeyStoreManager keyStoreManager, CertificateRepository certificateRepository,
 			CertificateSigningRequestService certRequestService, TrustStoreManager trustStoreManager,
-			CrlKeyStoreManager crlKeyStoreManager, HospitalService hospitalService) {
+			CrlKeyStoreManager crlKeyStoreManager, HospitalService hospitalService,
+			MailSenderService mailSenderService, RestTemplate restTemplate) {
 		this.keyStoreManager = keyStoreManager;
 		this.crlKeyStoreManager = crlKeyStoreManager;
 		this.certificateRepository = certificateRepository;
@@ -72,6 +81,8 @@ public class CertificateService {
 		this.trustStoreManager = trustStoreManager;
 		this.resourceFolderPath = resourceFolderPath;
 		this.hospitalService = hospitalService;
+		this.mailSenderService = mailSenderService;
+		this.restTemplate = restTemplate;
 	}
 
 	public List<CertificateDTO> getAll() {
@@ -161,16 +172,43 @@ public class CertificateService {
 
 			certRequestService.save(req);
 
+			String certPath = "./cert_" + dto.getCommonName() + ".crt";
 			createCertificateModel(dto, serial, false);
 
-			PEMUtility.writeCertToPEM(certChain, "./cert_" + dto.getCommonName() + ".crt");
+			PEMUtility.writeCertToPEM(certChain, certPath);
 
-			return toDTO(cert);
+			mailSenderService.sendCertificate(dto.getCommonName(), dto.getEmail(),
+					"./cert_" + dto.getCommonName() + ".crt");
+
+			CertificateDTO certDto = toDTO(cert);
+			sendCertificateToHospital(certDto, req.getCertificateUser());
+
+			return certDto;
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	private void sendCertificateToHospital(CertificateDTO dto, CertificateUser certUser) throws IOException {
+		AddCertificateRequestDTO addCertDto = new AddCertificateRequestDTO();
+		addCertDto.setCommonName(dto.getCommonName());
+		addCertDto.setEmail(dto.getEmail());
+		addCertDto.setSerialNumber(dto.getSerialNumber());
+		addCertDto.setValidFrom(dto.getValidFrom());
+		addCertDto.setValidTo(dto.getValidTo());
+		addCertDto.setCertificateUser(certUser);
+		
+		// Add signature
+		byte[] csrBytes = addCertDto.getCSRBytes();
+		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
+		String base64Signature = Base64.getEncoder().encodeToString(signature);
+		addCertDto.setSignature(base64Signature);
+		
+		restTemplate.postForObject("https://localhost:9002/api/certificates/add", addCertDto, AddCertificateRequestDTO.class);
+
 	}
 
 	public CertificateDTO revokeCertificate(String serialNumber, String revocationReason) throws Exception {
@@ -302,13 +340,18 @@ public class CertificateService {
 			if (c.getValidTo().before(new Date(Instant.now().getEpochSecond()))) {
 				revokeCertificate(serialNumber, "Certificate expired");
 				status.setStatus(CertificateStatus.EXPIRED);
+				status.setRevocationReason("Certificate expired");
 			} else {
 				status.setStatus(CertificateStatus.ACTIVE);
 			}
 		} else {
 			Certificate revokedCert = crlKeyStoreManager.readCertificate(serialNumber);
-			if (revokedCert != null)
+			if (revokedCert != null) {
+				com.security.admin.model.Certificate c = certificateRepository.findOneBySerialNumber(sn);
 				status.setStatus(CertificateStatus.REVOKED);
+				status.setRevocationReason(c.getRevocationReason());
+			}
+				
 			else
 				status.setStatus(CertificateStatus.NOT_EXIST);
 		}

@@ -83,7 +83,7 @@
               ></v-row>
               <v-row class="pl-2 pr-2">
                 <v-col>
-                  <v-btn block color="indigo accent-1" @click="sendRequest"
+                  <v-btn block color="indigo accent-1" @click="sendRequest" :loading="loading"
                     >Request a certificate</v-btn
                   >
                 </v-col>
@@ -102,6 +102,7 @@ export default {
   data() {
     return {
       valid: false,
+      loading: false,
       rules: {
         required: (v) => !!v || "Field is required",
         uppercaseLetter: (v) =>
@@ -124,13 +125,18 @@ export default {
 
   methods: {
     sendRequest() {
+      this.loading = true;
       this.$refs.form.validate();
-      if (!this.valid) return;
+      if (!this.valid) {
+        this.loading = false;
+        return;
+      }
       this.csr.hospitalName = this.csr.commonName;
       this.axios
         .post("/api/csr/requestCertificate", this.csr)
         .then((response) => {
           this.$refs.form.reset();
+          this.loading = false;
           alert(response.data.message);
         })
         .catch((error) => {
@@ -138,6 +144,7 @@ export default {
 
           if (!response.errors || !Array.isArray(response.errors)) {
             alert(error.response.data.message);
+            this.loading = false;
             return;
           }
 
@@ -145,7 +152,7 @@ export default {
           response.errors.forEach((err) => {
             errorMessage += err.defaultMessage + "\n";
           });
-
+          this.loading = false;
           alert(errorMessage);
         });
     },
