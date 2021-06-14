@@ -57,12 +57,14 @@ public class CertificateService {
 	private String resourceFolderPath;
 
 	private HospitalService hospitalService;
+	
+	private MailSenderService mailSenderService;
 
 	@Autowired
 	public CertificateService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
 			KeyStoreManager keyStoreManager, CertificateRepository certificateRepository,
 			CertificateSigningRequestService certRequestService, TrustStoreManager trustStoreManager,
-			CrlKeyStoreManager crlKeyStoreManager, HospitalService hospitalService) {
+			CrlKeyStoreManager crlKeyStoreManager, HospitalService hospitalService, MailSenderService mailSenderService) {
 		this.keyStoreManager = keyStoreManager;
 		this.crlKeyStoreManager = crlKeyStoreManager;
 		this.certificateRepository = certificateRepository;
@@ -70,6 +72,7 @@ public class CertificateService {
 		this.trustStoreManager = trustStoreManager;
 		this.resourceFolderPath = resourceFolderPath;
 		this.hospitalService = hospitalService;
+		this.mailSenderService = mailSenderService;
 	}
 
 	public List<CertificateDTO> getAll() {
@@ -142,7 +145,7 @@ public class CertificateService {
 					dto.getCountry(), dto.getEmail(), dto.getValidFrom(), dto.getValidTo());
 
 			IssuerData issuerData = KeyIssuerSubjectGenerator.generateIssuerData(privKey, "LotusClinic");
-
+			
 			Certificate cert = CertificateGenerator.generateCertificate(subjectData, issuerData, dto.getPurpose(),
 					dto.getAlgorithm());
 
@@ -158,11 +161,15 @@ public class CertificateService {
 			req.setStatus(RequestStatus.SIGNED);
 
 			certRequestService.save(req);
-
+			
+			String certPath = "./cert_" + dto.getCommonName() + ".crt";
 			createCertificateModel(dto, serial, false);
 
-			PEMUtility.writeCertToPEM(certChain, "./cert_" + dto.getCommonName() + ".crt");
-
+			PEMUtility.writeCertToPEM(certChain, certPath);
+			
+			// posalji sertifikat na mejl
+			mailSenderService.sendCertificate(dto.getCommonName(), dto.getEmail(), "./cert_" + dto.getCommonName() + ".crt");
+			
 			return toDTO(cert);
 
 		} catch (Exception e) {
