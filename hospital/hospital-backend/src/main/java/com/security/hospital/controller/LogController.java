@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 @RestController
@@ -48,7 +49,7 @@ public class LogController {
             }
 
             ArrayList<LogMessageDTO> temp = new ArrayList<>();
-            temp.add(new LogMessageDTO(0, null,"The source '" + source + "' wasn't found in the hospital's log archive."));
+            temp.add(new LogMessageDTO((new Date()).getTime(), null,"The source '" + source + "' wasn't found in the hospital's log archive."));
             filteredMap.put(source, temp);
         }
 

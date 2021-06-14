@@ -10,7 +10,7 @@ import java.util.TimeZone;
 
 @Data
 public class LogMessageDTO {
-    private long unixSeconds;
+    private long unixMilis;
     private LogMessageType type;
     private String content;
 
@@ -18,16 +18,16 @@ public class LogMessageDTO {
     private transient SimpleDateFormat sdf;
 
     public LogMessageDTO() {
-        sdf = new SimpleDateFormat("dd.MM.yy kk:mm");
+        sdf = new SimpleDateFormat("dd.MM.yy kk:mm:ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT+2"));
-        unixSeconds = 0;
+        unixMilis = 0;
         type = null;
         content = null;
     }
 
-    public LogMessageDTO(long unixSeconds, LogMessageType type, String content) {
+    public LogMessageDTO(long unixMilis, LogMessageType type, String content) {
         this();
-        this.unixSeconds = unixSeconds;
+        this.unixMilis = unixMilis;
         this.type = type;
         this.content = content;
 
@@ -35,7 +35,7 @@ public class LogMessageDTO {
 
     @Override
     public String toString() {
-        return sdf.format(new Date(unixSeconds * 1000)) + " [" + type.name() + "]: " + content;
+        return sdf.format(new Date(unixMilis)) + " [" + type.name() + "]: " + content;
     }
 
     public static boolean lineIsAfterTime(String line, long unixSecondsTimestamp) throws Exception {
@@ -57,7 +57,7 @@ public class LogMessageDTO {
         }
 
         LogMessageDTO dto = new LogMessageDTO();
-        dto.setUnixSeconds(dto.getSdf().parse(tokens[0]).getTime() / 1000);
+        dto.setUnixMilis(dto.getSdf().parse(tokens[0]).getTime());
 
         tokens = tokens[1].split("]: ");
         switch (tokens[0]) {
