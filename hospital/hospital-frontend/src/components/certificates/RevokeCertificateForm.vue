@@ -140,8 +140,9 @@ export default {
       };
       this.axios
         .post(apiURL + "/" + this.serialNumber, this.reason, config)
-        .then(() => {
-          this.$emit("remove-certificate", this.serialNumber);
+        .then((response) => {
+          const cert = response.data;
+          this.$emit("remove-certificate", cert);
         })
         .catch(() => {
           alert("Something went wrong.");

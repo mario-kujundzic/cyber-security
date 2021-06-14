@@ -47,11 +47,19 @@ public class CertificateController {
 
 		CertificateDTO revoked = null;
 		try {
-			revoked = service.revokeCertificate(serialNumber, revocationReason);
+			revoked = service.requestCertificateRevokation(serialNumber, revocationReason);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
 
 		return new ResponseEntity<>(revoked, HttpStatus.OK);
 	}
+	
+	@GetMapping("/status/{serialNumber}")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<CertificateDTO> checkStatus(@PathVariable("serialNumber") String serialNumber) throws Exception {
+		CertificateDTO dto = service.checkStatus(serialNumber);
+		return new ResponseEntity<>(dto, HttpStatus.OK);
+	}
+	
 }
