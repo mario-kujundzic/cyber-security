@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,6 @@ import com.security.hospital.dto.RevokeCertRequestDTO;
 import com.security.hospital.model.Certificate;
 import com.security.hospital.model.requests.RequestStatus;
 import com.security.hospital.dto.CertificateStatusDTO;
-import com.security.hospital.enums.CertificateStatus;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.repository.CertificateRepository;
@@ -46,17 +46,16 @@ public class CertificateService {
 		return new CertificateDTO(c);
 	}
 
-	public CertificateDTO revokeCertificate(String serialNumber, String revocationReason) throws Exception {
-		Certificate cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
-		cert.setRevocationReason(revocationReason);
-		cert.setRevocationStatus(true);
-
+	public CertificateDTO requestCertificateRevokation(String serialNumber, String revocationReason) throws Exception {
+		Certificate check = repository.findOneBySerialNumber(new BigInteger(serialNumber));
+		if (check.isRevocationStatus())
+			throw new Exception("Certificate already revoked!");
 		RevokeCertRequestDTO dto = new RevokeCertRequestDTO();
 		dto.setSerialNumber(serialNumber);
 		dto.setRevocationReason(revocationReason);
 		dto.setStatus(RequestStatus.PENDING);
 		dto.setHospitalName("Hospital1");
-		
+
 		byte[] csrBytes = dto.getCSRBytes();
 		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
 		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
@@ -67,33 +66,30 @@ public class CertificateService {
 
 		RevokeCertRequestDTO response = this.restTemplate.postForObject(adminEndpointURI, dto,
 				RevokeCertRequestDTO.class);
-		
+
 		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
 
 		if (rootCAKey == null) {
-			throw new Exception("Denied: Admin app public key not registered. Contact a super admin to obtain the public key.");
+			throw new Exception(
+					"Denied: Admin app public key not registered. Contact a super admin to obtain the public key.");
 		}
 
 		csrBytes = response.getCSRBytes();
-		signature = Base64.getDecoder().decode(dto.getSignature());
+		signature = Base64.getDecoder().decode(response.getSignature());
 		boolean valid = CryptographicUtility.verify(csrBytes, signature, rootCAKey);
 
 		if (!valid) {
 			throw new Exception("Denied: signature invalid.");
 		}
-		
-		if (response.getStatus().equals(RequestStatus.SIGNED))
-			repository.save(cert);
-		else
-			throw new Exception("Admin didn't sign the certificate! Something went wrong.");
+
+		Certificate cert = revokeCertificate(serialNumber, revocationReason);
 		return new CertificateDTO(cert);
 	}
 
 	public CertificateDTO checkStatus(String serialNumber) throws Exception {
 		String adminEndpointURI = "https://localhost:9001/api/certificates/status/" + serialNumber;
 
-		CertificateStatusDTO status = this.restTemplate.getForObject(adminEndpointURI,
-				CertificateStatusDTO.class);
+		CertificateStatusDTO status = this.restTemplate.getForObject(adminEndpointURI, CertificateStatusDTO.class);
 
 		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
 
@@ -110,19 +106,31 @@ public class CertificateService {
 		if (!valid) {
 			throw new Exception("Denied: signature invalid.");
 		}
-		
-		if (status.getStatus() == CertificateStatus.NOT_EXIST) {
+		Certificate cert = null;
+		switch (status.getStatus()) {
+		case EXPIRED:
+			cert = revokeCertificate(serialNumber, "Certificate expired");
+			break;
+		case REVOKED:
+			cert = revokeCertificate(serialNumber, "Revoked by admin");
+			break;
+		case ACTIVE:
+			cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
+			break;
+		case NOT_EXIST:
 			throw new Exception("Certificate with serial number: " + serialNumber + " doesn't exist.");
 		}
-		
-		if (status.getStatus() == CertificateStatus.EXPIRED) {
-			revokeCertificate(serialNumber, "Certificate expired");
-		}
-		
-		Certificate cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
 		CertificateDTO dto = new CertificateDTO(cert);
 
-		return dto; 
+		return dto;
 	}
-	
+
+	private Certificate revokeCertificate(String serialNumber, String revocationReason) {
+		Certificate cert = repository.findOneBySerialNumber(new BigInteger(serialNumber));
+		cert.setRevocationReason(revocationReason);
+		cert.setRevocationStatus(true);
+		cert.setValidTo(new Date());
+		return repository.save(cert);
+	}
+
 }

@@ -92,7 +92,7 @@ public class CrlKeyStoreManager {
 
 	public Certificate readCertificate(String alias) {
 		try {
-			if (keyStore.isKeyEntry(alias)) {
+			if (keyStore.isCertificateEntry(alias)) {
 				Certificate cert = keyStore.getCertificate(alias);
 				return cert;
 			}

@@ -61,7 +61,7 @@
               </v-dialog>
             </template>
             <template v-slot:[`item.status`]="{ item }">
-              <v-btn icon small @click="checkStatus(item)">
+              <v-btn icon small @click="checkStatus(item)" :disabled="item.revocationStatus">
                 <v-icon dark>mdi-list-status</v-icon>
               </v-btn>
             </template>
@@ -125,33 +125,38 @@ export default {
       this.revokeDialog = true;
       this.serialNumber = item.serialNumber;
     },
-    removeCertificate(serialNumber) {
-      this.certificates = this.certificates.filter(
-        (f) => f.serialNumber != serialNumber
-      );
+    removeCertificate(cert) {
+      this.certificates.forEach((c) => {
+        if (c.id == cert.id) {
+          c.revocationStatus = cert.revocationStatus;
+          c.revocationReason = cert.revocationReason;
+          c.validTo = cert.validTo;
+        }
+      });
       this.revokeDialog = false;
     },
     checkStatus(item) {
       this.axios
         .get(apiURL + "/status/" + item.serialNumber)
         .then((response) => {
-          this.certificates.forEach(c => {
+          this.certificates.forEach((c) => {
             if (c.id === item.id) {
               c.revocationStatus = response.data.revocationStatus;
               c.revocationReason = response.data.revocationReason;
               c.validTo = response.data.validTo;
             }
-          })
+          });
           if (response.data.revocationStatus) {
-            alert("Certificate is revoked! Revocation reason: " + response.data.revocationReason);
+            alert(
+              "Certificate is revoked! Revocation reason: " +
+                response.data.revocationReason
+            );
           } else {
             alert("Certificate is valid!");
           }
-          
         })
         .catch((error) => {
-          console.log(error.response.data.message);
-          console.log(error);
+          alert(error.response.data.message);
         });
     },
   },

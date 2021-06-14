@@ -47,7 +47,7 @@ public class CertificateController {
 
 		CertificateDTO revoked = null;
 		try {
-			revoked = service.revokeCertificate(serialNumber, revocationReason);
+			revoked = service.requestCertificateRevokation(serialNumber, revocationReason);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}

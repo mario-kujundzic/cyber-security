@@ -297,16 +297,18 @@ public class CertificateService {
 		BigInteger sn = new BigInteger(serialNumber);
 		if (certificate != null) {
 			com.security.admin.model.Certificate c = certificateRepository.findOneBySerialNumber(sn);
-			if (c.isRevocationStatus()) {
-				status.setStatus(CertificateStatus.REVOKED);
-			} else if (c.getValidTo().before(new Date(Instant.now().getEpochSecond()))) {
+			if (c.getValidTo().before(new Date(Instant.now().getEpochSecond()))) {
 				revokeCertificate(serialNumber, "Certificate expired");
 				status.setStatus(CertificateStatus.EXPIRED);
 			} else {
 				status.setStatus(CertificateStatus.ACTIVE);
 			}
 		} else {
-			status.setStatus(CertificateStatus.NOT_EXIST);
+			Certificate revokedCert = crlKeyStoreManager.readCertificate(serialNumber);
+			if (revokedCert != null)
+				status.setStatus(CertificateStatus.REVOKED);
+			else
+				status.setStatus(CertificateStatus.NOT_EXIST);
 		}
 
 		byte[] csrBytes = status.getCSRBytes();
