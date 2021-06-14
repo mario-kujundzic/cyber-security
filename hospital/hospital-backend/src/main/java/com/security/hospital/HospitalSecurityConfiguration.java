@@ -1,6 +1,5 @@
 package com.security.hospital;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -96,14 +95,14 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 		// zbog jednostavnosti primera
 		http.csrf().disable();
 	}
-		
-	
+
 	// Generalna bezbednost aplikacije
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
-		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/data",
-				"/api/addUserRequests/response", "/api/deleteUserRequests/response", "/api/modifyUserRequests/response");
+		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/data", "/api/addUserRequests/response",
+				"/api/deleteUserRequests/response", "/api/modifyUserRequests/response",
+				"/api/devices/register", "/api/devices/message");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}
