@@ -82,7 +82,7 @@ public class LogController {
 
 			ArrayList<LogMessageDTO> temp = new ArrayList<>();
 			temp.add(new LogMessageDTO((new Date()).getTime(), null,
-					"The source '" + source + "' wasn't found in the hospital's log archive."));
+					"The source '" + source + "' wasn't found in the hospital's log archive.", null));
 			filteredMap.put(source, temp);
 		}
 
@@ -108,14 +108,13 @@ public class LogController {
 	}
 
 	@PostMapping
-	public ResponseEntity<LogsResponseDTO> requestLogsAdmin(
-			@RequestBody @Valid AdminAuthDTO adminAuth,
+	public ResponseEntity<String> requestLogsAdmin(@RequestBody @Valid AdminAuthDTO adminAuth,
 			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
 			@RequestParam(value = "sources", required = false) String[] sources) throws Exception {
 		authorizeAdminApp(adminAuth);
 		return getLogsSince(sinceUnixSeconds, sources, null);
 	}
-	
+
 	@GetMapping("/sources")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<Object> getLogSources() throws IOException {
@@ -131,7 +130,7 @@ public class LogController {
 		authorizeAdminApp(adminAuth);
 		return getLogSources();
 	}
-	
+
 	private void authorizeAdminApp(AdminAuthDTO adminAuth) throws Exception {
 		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
 
@@ -147,5 +146,21 @@ public class LogController {
 		if (!valid) {
 			throw new Exception("Denied: signature invalid.");
 		}
+	}
+
+	@GetMapping("/report")
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<HashMap<String, ArrayList<LogMessageDTO>>> getLogReport(
+			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
+			@RequestParam(value = "until", required = false) Long untilUnixSeconds) throws Exception {
+		if (sinceUnixSeconds == null) {
+			sinceUnixSeconds = 0L;
+		}
+		if (untilUnixSeconds == null) {
+			untilUnixSeconds = 0L;
+		}
+		HashMap<String, ArrayList<LogMessageDTO>> results = logService.logReportSince(sinceUnixSeconds,
+				untilUnixSeconds);
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 }

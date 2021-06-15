@@ -23,8 +23,13 @@ public class DeviceMessageDTO {
 	@NotBlank(message = "Device common name is required!")
 	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Device common name must be alphanumeric!")
 	private String commonName;
+	
+	@NonNull
+	@NotBlank(message = "Patient full name is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Patient full name must be alphanumeric!")
+	private String patientName;
 
-	private Map<String, String> parameters;	
+	private Map<String, Object> parameters;	
 
 	@NonNull
 	@NotBlank(message = "Signature is required!")
@@ -32,7 +37,7 @@ public class DeviceMessageDTO {
 	private String signature;
 	
     public byte[] getCSRBytes() {
-        String everything = commonName;
+        String everything = commonName + patientName;
         List<String> keys = parameters.keySet().stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList());
         for (String key : keys)
         	everything = everything + key;
