@@ -5,4 +5,8 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Drools Spring kjar</name>
   <packaging>jar</packaging>
+  <properties>
+	     <maven.compiler.source>1.8</maven.compiler.source>
+	     <maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
 </project>

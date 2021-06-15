@@ -1,12 +1,17 @@
 package sbnz.integracija;
 
 import com.security.hospital.model.drools.Test;
+import com.security.hospital.dto.*;
+
+global ArrayList<ActivatedLogAlarmDTO> activatedAlarms;
 
 rule "Test-Hospital"
-	agenda-group "test-hospital"
+	agenda-group "alarms"
 	no-loop
 	when 
-		Test()
+		$logMessage: LogMessageDto($content: content) and
+		$configuredAlarm: LogAlarmDTO( $content.contains(whenContentHas) )
 	then
-		System.out.println("Cao, Stefnuti");
+		System.out.println("ACTIVATED ALARM, LOG: " + $logMessage + ", ALARM: " + $configuredAlarm.getName());
+		activatedAlarms.add(new ActivatedLogAlarmDTO($configuredAlarm.getId(), $configuredAlarm.getName()));
 end

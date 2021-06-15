@@ -9,12 +9,18 @@ import java.util.HashMap;
 
 import javax.validation.Valid;
 
+import com.security.hospital.dto.*;
+import com.security.hospital.model.LogAlarm;
+import com.security.hospital.model.User;
+import com.security.hospital.service.KieSessionService;
+import com.security.hospital.service.LogAlarmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.security.hospital.dto.AdminAuthDTO;
-import com.security.hospital.dto.LogMessageDTO;
-import com.security.hospital.dto.LogSourcesDTO;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.service.LogService;
@@ -40,14 +43,20 @@ public class LogController {
 	private String resourceFolderPath;
 
 	@Autowired
+	private KieSessionService kieSessionService;
+
+	@Autowired
+	LogAlarmService logAlarmService;
+
+	@Autowired
 	public LogController(@Value("${server.ssl.key-store-folder}") String resourceFolderPath) {
 		this.resourceFolderPath = resourceFolderPath;
 	}
 
 	@GetMapping
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
-	public ResponseEntity<String> getLogsSince(@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
-			@RequestParam(value = "sources", required = false) String[] sources) throws Exception {
+	public ResponseEntity<LogsResponseDTO> getLogsSince(@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
+											   @RequestParam(value = "sources", required = false) String[] sources, @AuthenticationPrincipal User user) throws Exception {
 		if (sinceUnixSeconds == null) {
 			sinceUnixSeconds = 0L;
 		}
@@ -58,11 +67,10 @@ public class LogController {
 
 		HashMap<String, ArrayList<LogMessageDTO>> logMap = logService.loadLogLinesSince(sinceUnixSeconds);
 
-		Gson gson = new Gson();
-
-		if (sources.length == 0) {
-			String json = gson.toJson(logMap);
-			return new ResponseEntity<>(json, HttpStatus.OK);
+		ArrayList<ActivatedLogAlarmDTO> activatedAlarms = new ArrayList<>();
+		if (user != null) {
+			ArrayList<LogAlarmDTO> configuredAlarms = logAlarmService.getAllForUser(user.getId());
+			activatedAlarms = kieSessionService.computeActivatedAlarms(logMap, configuredAlarms);
 		}
 
 		HashMap<String, ArrayList<LogMessageDTO>> filteredMap = new HashMap<>();
@@ -78,16 +86,34 @@ public class LogController {
 			filteredMap.put(source, temp);
 		}
 
-		return new ResponseEntity<>(gson.toJson(filteredMap), HttpStatus.OK);
+		if (sources.length > 0) {
+			logMap = filteredMap;
+		}
+		return new ResponseEntity<>(new LogsResponseDTO(logMap, activatedAlarms), HttpStatus.OK);
+	}
+
+	private HashMap<String, ArrayList<LogAlarmDTO>> getConfiguredAlarmsForUser(Long userId) {
+		HashMap<String, ArrayList<LogAlarmDTO>> alarmMap = new HashMap<>();
+		ArrayList<LogAlarmDTO> alarms = logAlarmService.getAllForUser(userId);
+
+		for (LogAlarmDTO alarm : alarms) {
+			if (alarmMap.containsKey(alarm.getWhenSourceIs())) {
+				alarmMap.get(alarm.getWhenSourceIs()).add(alarm);
+				continue;
+			}
+			alarmMap.put(alarm.getWhenSourceIs(), new ArrayList<>());
+		}
+
+		return alarmMap;
 	}
 
 	@PostMapping
-	public ResponseEntity<String> requestLogsAdmin(
+	public ResponseEntity<LogsResponseDTO> requestLogsAdmin(
 			@RequestBody @Valid AdminAuthDTO adminAuth,
 			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
 			@RequestParam(value = "sources", required = false) String[] sources) throws Exception {
 		authorizeAdminApp(adminAuth);
-		return getLogsSince(sinceUnixSeconds, sources);
+		return getLogsSince(sinceUnixSeconds, sources, null);
 	}
 	
 	@GetMapping("/sources")
