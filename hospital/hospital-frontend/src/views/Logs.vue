@@ -4,7 +4,7 @@
     <v-row v-if="activatedAlarms.length > 0" align="start" justify="center">
       <v-col>
         <v-card color="rgba(255, 0, 0, 0.3)">
-          <v-card-title>{{ activatedAlarms.length }} alarms activated!</v-card-title>
+          <v-card-title>{{ activatedAlarms.length }} alarm(s) activated!</v-card-title>
           <v-card-text>
             <div v-for="alarm in activatedAlarms" :key="alarm.id" style="font-size: 1.25em;" class="mb-5">
               <v-icon>mdi-bell-alert</v-icon> {{ alarm.name }}
@@ -95,7 +95,7 @@
 
                 <v-card-text>
                   <h3>Conditions</h3>
-                  <v-select v-model="alarm.source" label="When SOURCE is" :items="messageSources"></v-select>
+                  <v-select v-model="alarm.whenSourceIs" label="When SOURCE is" :items="messageSources"></v-select>
                   <v-text-field v-model="alarm.whenContentHas" label="When CONTENT has"></v-text-field>
                 </v-card-text>
 
@@ -141,34 +141,15 @@ export default {
         "ERROR": true
       },
       activatedAlarms: [
-        {
-          id: 0,
-          name: "Patient 'Fred' has critical heartbeat!"
-        },
-        {
-          id: 1,
-          name: "Bla bla bla!"
-        }
       ],
       configuredAlarms: [
-        {
-          id: 0,
-          name: "Denial of service is happening!",
-          source: "",
-          whenContentHas: "DoS"
-        },
-        {
-          id: 1,
-          name: "A device1 log that has 'Fred' in its content popped up!",
-          source: "",
-          whenContentHas: "Fred"
-        },
       ]
     };
   },
 
   mounted() {
     this.getMessageSources();
+    this.getConfiguredAlarms();
     this.refreshIfTimesUp();
     setInterval(this.refreshIfTimesUp, 1000);
   },
@@ -182,6 +163,15 @@ export default {
         for (let source of this.messageSources) {
           this.isSourceSelected[source] = true;
         }
+      } catch (e) {
+        alert(e);
+      }
+    },
+
+    async getConfiguredAlarms() {
+      try {
+        let response = await this.axios.get("api/logAlarms");
+        this.configuredAlarms = response.data;
       } catch (e) {
         alert(e);
       }
@@ -263,7 +253,7 @@ export default {
       this.configuredAlarms.unshift({
           id: undefined,
           name: "",
-          source: "",
+          whenSourceIs: "",
           whenContentHas: ""
       });
     },
@@ -273,7 +263,7 @@ export default {
       let name = alarm.name;
 
       try {
-        let response = await this.axios.post("api/alarms", alarm);
+        let response = await this.axios.post("api/logAlarms", alarm);
         this.configuredAlarms[alarmIndex] = response.data;
         alert("Saved alarm " + name)
       } catch (e) {
@@ -287,7 +277,7 @@ export default {
 
       try {
         if (alarm.id != undefined) {
-          await this.axios.delete("api/alarms", alarm);
+          await this.axios.delete("api/logAlarms/" + alarm.id, alarm);
         }
         this.configuredAlarms.splice(alarmIndex, 1);
         alert("Deleted alarm " + name)
