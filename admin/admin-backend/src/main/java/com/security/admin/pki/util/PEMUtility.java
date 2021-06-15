@@ -1,6 +1,7 @@
 package com.security.admin.pki.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -9,6 +10,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -44,17 +47,17 @@ public class PEMUtility {
 
     public static String privateKeyToPEM(PrivateKey privateKey) {
         String content = byteArrayToPEM(privateKey.getEncoded());
-        return privateKeyPrefix + content + privateKeySuffix;
+        return privateKeyPrefix + '\n' + content + privateKeySuffix;
     }
 
     public static String publicKeyToPEM(PublicKey publicKey) {
         String content = byteArrayToPEM(publicKey.getEncoded());
-        return publicKeyPrefix + content + publicKeySuffix;
+        return publicKeyPrefix + '\n' + content + publicKeySuffix;
     }
 
     public static PrivateKey PEMToPrivateKey(String PEM) {
-    	String base64Content = PEM.replace(publicKeyPrefix, "");
-    	base64Content = base64Content.replace(publicKeySuffix, "");
+    	String base64Content = PEM.replace(privateKeyPrefix, "");
+    	base64Content = base64Content.replace(privateKeySuffix, "");
         base64Content = base64Content.replace("\n", "");
         base64Content = base64Content.replace("\r", "");
         byte[] byteContent = Base64.getDecoder().decode(base64Content);
@@ -86,11 +89,25 @@ public class PEMUtility {
         return null;
     }
     
-    public static void writeCertToPEM(Certificate cert, String fileName) throws IOException, CertificateEncodingException {
+    public static void writeCertToPEM(Certificate[] certChain, String fileName) throws IOException, CertificateEncodingException {
     	FileWriter fileWriter = new FileWriter(new File(fileName));
     	try (JcaPEMWriter pemWriter = new JcaPEMWriter(fileWriter)) {
-    		pemWriter.writeObject(cert);
-    		pemWriter.flush();
+    		for (Certificate cert : certChain) {
+    			pemWriter.writeObject(cert);
+    			pemWriter.flush();    			
+    		}
     	}
     }
+
+	public static Certificate PEMToCertificate(FileInputStream certStream) {
+        try {
+            CertificateFactory certFactory = CertificateFactory.getInstance("x.509");
+            return certFactory.generateCertificate(certStream);
+        } catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return null;
+	}
 }

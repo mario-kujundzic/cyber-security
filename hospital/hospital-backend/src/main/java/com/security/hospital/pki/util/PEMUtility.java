@@ -41,12 +41,12 @@ public class PEMUtility {
 
     public static String privateKeyToPEM(PrivateKey privateKey) {
         String content = byteArrayToPEM(privateKey.getEncoded());
-        return privateKeyPrefix + content + privateKeySuffix;
+        return privateKeyPrefix + '\n' + content + privateKeySuffix;
     }
 
     public static String publicKeyToPEM(PublicKey publicKey) {
         String content = byteArrayToPEM(publicKey.getEncoded());
-        return publicKeyPrefix + content + publicKeySuffix;
+        return publicKeyPrefix + '\n' + content + publicKeySuffix;
     }
 
     public static PrivateKey PEMToPrivateKey(String PEM) {

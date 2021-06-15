@@ -143,4 +143,8 @@ public class KeyStoreManager {
 		keyStore.deleteEntry(serialNumber);
 		return cert;
 	}
+
+	public KeyStore getKeyStore() {
+		return keyStore;
+	}
 }

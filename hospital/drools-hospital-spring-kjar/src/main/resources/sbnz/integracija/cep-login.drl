@@ -1,0 +1,54 @@
+package sbnz.integracija;
+
+import com.security.hospital.events.InvalidLoginEvent;
+import com.security.hospital.events.StatusLoginEvent;
+import com.security.hospital.events.MaliciousLoginEvent;
+import com.security.hospital.events.StatusMaliciousLoginEvent;
+
+
+rule "StatusLoginEvent check - 3 InvalidLoginEvent in last 10 minutes"
+	salience 100
+    agenda-group "user-login-check"
+    when
+        $loginEvent: StatusLoginEvent($username: username) and
+        $eventCounter: Number(intValue > 5) from accumulate(InvalidLoginEvent(username == $username) over window:time( 10m ), count(1))
+    then
+    	modify($loginEvent) {
+    		setAttack(true)
+    	}
+        delete($loginEvent);
+end
+
+
+rule "StatusMaliciousLoginEvent check - >=30 InvalidLoginEvent in last 24h"
+	salience 100
+    agenda-group "user-login-check"
+    when
+        $loginEvent: StatusMaliciousLoginEvent($ip: IPAddress) and
+        $maliciousCounter: Number(intValue >= 7) from accumulate(MaliciousLoginEvent(IPAddress == $ip) over window:time( 10m ), count(1))     
+    then
+    	modify($loginEvent) {
+	       	setAttack(true)   		
+    	}
+        delete($loginEvent);
+end
+
+
+rule "Cleanup rule - StatusLoginEvent"
+	salience 0
+	agenda-group "user-login-check"
+	when 
+		$sle: StatusLoginEvent()
+	then
+		delete($sle);
+end
+
+
+rule "Cleanup rule - StatusMaliciousLoginEvent"
+	salience 0
+	agenda-group "user-login-check"
+	when 
+		$smle: StatusMaliciousLoginEvent()
+	then
+		delete($smle);
+end

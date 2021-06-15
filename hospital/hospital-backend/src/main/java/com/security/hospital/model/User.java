@@ -8,21 +8,16 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.DiscriminatorOptions;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -35,11 +30,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING, length = 6)
-@DiscriminatorOptions(force = true)
 @Table(name = "users")
-public abstract class User implements UserDetails {
+public class User implements UserDetails {
 	
 	/**
 	 * 
@@ -75,7 +67,7 @@ public abstract class User implements UserDetails {
 	@Column(name="reset_key")
 	private String resetKey;
 
-	@Column(name = "role", insertable = false, updatable = false)
+	@Column(name = "role", unique = false, nullable = false)
 	private String role;
 
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
@@ -185,6 +177,21 @@ public abstract class User implements UserDetails {
 		this.lastPasswordResetDate = lastPasswordResetDate;
 	}
 
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+	
 	public void resetLastLoginDate() {
 		this.lastLoginDate = new Timestamp((new Date()).getTime());
 	}

@@ -108,7 +108,7 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, jwtUserDetailsService),
 						BasicAuthenticationFilter.class)
 //				;
-				.x509().disable();
+				.x509().subjectPrincipalRegex("0.9.2342.19200300.100.1.1=(.*)");
 //				.x509AuthenticationFilter(certAuthFilter);
 		// zbog jednostavnosti primera
 		http.csrf().disable();
@@ -132,9 +132,10 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
-		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/api/certificateRequests",
-				"/api/certificateRequests/request");
+		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/auth/register", "/api/deleteUserRequests/request",
+				"/api/certificateRequests/request", "/api/modifyUserRequests/request", "/api/addUserRequests/request",
+				"/api/certificates/requestRevoke");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
-				"/**/*.css", "/**/*.js");
+				"/**/*.css", "/**/*.js", "/api/certificates/status/*");
 	}
 }

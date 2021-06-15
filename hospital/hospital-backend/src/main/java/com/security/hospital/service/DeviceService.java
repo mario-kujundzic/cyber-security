@@ -4,10 +4,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 
-import com.security.hospital.enums.LogMessageType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,30 +16,34 @@ import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
-import com.security.hospital.model.Device;
+import com.security.hospital.model.User;
+import com.security.hospital.model.devices.Device;
+import com.security.hospital.model.devices.MessageType;
+import com.security.hospital.model.requests.CertificateUser;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.pki.util.PEMUtility;
 import com.security.hospital.repository.DeviceRepository;
+import com.security.hospital.repository.MessageTypeRepository;
 
 @Service
 public class DeviceService {
 	private DeviceRepository deviceRepository;
 	private String resourceFolderPath;
 	private RestTemplate restTemplate;
-
-	@Autowired
-	private SecurityEventService securityEventService;
+	private MessageTypeRepository messageTypeRepository;
 
 	@Autowired
 	private LogService logService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository,
-			@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate) {
+			@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate,
+			MessageTypeRepository messageTypeRepository) {
 		this.deviceRepository = deviceRepository;
 		this.resourceFolderPath = resourceFolderPath;
 		this.restTemplate = restTemplate;
+		this.messageTypeRepository = messageTypeRepository;
 	}
 
 	public DeviceDTO getOne(long id) {
@@ -89,7 +92,7 @@ public class DeviceService {
 		deviceRepository.deleteById(id);
 	}
 
-	public GenericMessageDTO requestCertificate(CertificateRequestDTO dto) throws Exception {
+	public GenericMessageDTO requestCertificate(CertificateRequestDTO dto, User user) throws Exception {
 		// Look up public key of hospital
 		String commonName = dto.getCommonName();
 		Device device = deviceRepository.getByCommonName(commonName);
@@ -100,40 +103,80 @@ public class DeviceService {
 					+ " not found. Contact a hospital admin to register this device's public key.");
 		}
 
-		// Verify signature
-		byte[] csrBytes = dto.getCSRBytes();
-		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
-		PublicKey publicKey = PEMUtility.PEMToPublicKey(publicKeyPEM);
-		boolean valid = CryptographicUtility.verify(csrBytes, signature, publicKey);
-
-		if (!valid) {
-			throw new Exception("Denied: Signature invalid.");
-		}
-
-		String publicKeyHospitalPEM = KeyPairUtility.readPEM(resourceFolderPath + "/key.pub");
 		dto.setPublicKey(publicKeyPEM);
-
-		dto.setCommonName("Hospital1");
+		dto.setEmail(user.getUsername());
+		dto.setHospitalName("Hospital1");
+		dto.setCertificateUser(CertificateUser.DEVICE);
 
 		// Add signature
-		csrBytes = dto.getCSRBytes();
+		byte[] csrBytes = dto.getCSRBytes();
 		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
-		signature = CryptographicUtility.sign(csrBytes, privateKey);
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
 		String base64Signature = Base64.getEncoder().encodeToString(signature);
 		dto.setSignature(base64Signature);
 
 		GenericMessageDTO csrResponse;
 
-		csrResponse = restTemplate.postForObject("http://localhost:9001/api/certificateRequests", dto,
+		csrResponse = restTemplate.postForObject("https://localhost:9001/api/certificateRequests/request", dto,
 				GenericMessageDTO.class);
 
 		return csrResponse;
 	}
 
-	public void processMessage(DeviceMessageDTO dto) {
+	public void register(DeviceMessageDTO dto) throws Exception {
 		// neka logika za proveru sertifikata
-		String message = dto.getMessage();
+		String commonName = dto.getCommonName();
+		Device device = deviceRepository.getByCommonName(commonName);
+		String publicKeyPEM = device.getPublicKey();
 
-		logService.logInfo("Device: " + message);
+		if (publicKeyPEM == null) {
+			logService.logDeviceError(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+				+ " not found in database. Declining registration.");
+			throw new Exception("Denied: Device with common name " + commonName
+					+ " not found. Contact a hospital admin to register this device's public key.");
+		}
+
+		PublicKey publicKey = PEMUtility.PEMToPublicKey(publicKeyPEM);
+		// Verify signature
+		byte[] csrBytes = dto.getCSRBytes();
+		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
+		boolean valid = CryptographicUtility.verify(csrBytes, signature, publicKey);
+
+		if (!valid) {
+			logService.logDeviceError(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+					+ " failed to pass signature check. Declining registration.");
+			throw new Exception("Denied: signature invalid.");
+		}
+		if (dto.getParameters().isEmpty()) {
+			logService.logDeviceWarning(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+					+ " failed to provide parameter info. Declining registration.");			
+			throw new Exception("Denied: no data present!");
+		}
+
+		List<String> paramList = new ArrayList<>();
+		if (device.getMessageTypes().size() == 0) {
+			for (Entry<String, Object> entry : dto.getParameters().entrySet()) {
+				String paramName = entry.getKey();
+				MessageType type = this.messageTypeRepository.getByParamName(paramName);
+				if (type != null) {
+					device.getMessageTypes().add(type);
+					paramList.add(paramName);
+				}
+			}
+		}
+		deviceRepository.save(device);
+		if (paramList.isEmpty())
+			logService.logDeviceInfo(dto.getCommonName(),
+					"Device with common name " + dto.getCommonName() + " already registered for patient "
+							+ dto.getPatientName() + " with params - "
+							+ String.join(", ", dto.getParameters().keySet()));
+		else
+			logService.logDeviceInfo(dto.getCommonName(), "Registered device with common name " + dto.getCommonName()
+					+ " for patient " + dto.getPatientName() + " with params - " + String.join(", ", paramList));
+	}
+
+	public void processMessage(DeviceMessageDTO dto) throws Exception {
+		logService.logDeviceInfo(dto.getCommonName(), "Recieved message from device with common name "
+				+ dto.getCommonName() + " for patient " + dto.getPatientName(), dto.getParameters());
 	}
 }

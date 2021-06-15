@@ -77,6 +77,9 @@
                 <v-col>
                   <v-text-field label="Common name" v-model="tempCommonName" :rules="commonNameRules"></v-text-field>
                 </v-col>
+                <v-col>
+                  <v-text-field label="Hospital URL" v-model="tempHospitalUrl" :rules="commonNameRules"></v-text-field>
+                </v-col>
               </v-row>
 
               <v-row>
@@ -89,7 +92,7 @@
         </v-form>
 
         <v-card-actions class="d-flex justify-end">
-          <v-btn color="success" :disabled="!addFormValid" @click="addHospital({ commonName: tempCommonName, publicKey: tempPublicKey })">Submit</v-btn>
+          <v-btn color="success" :disabled="!addFormValid" @click="addHospital({ commonName: tempCommonName, hospitalUrl: tempHospitalUrl, publicKey: tempPublicKey })">Submit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -108,6 +111,7 @@ export default {
       headers: [
         { text: "ID", value: "id" },
         { text: "Common Name", value: "commonName" },
+        { text: "Hospital URL", value: "hospitalUrl" },
         { text: "Public key", value: "publicKey" },
         { text: "Actions", value: "actions", align: "right"},
       ],
@@ -122,6 +126,7 @@ export default {
       ],
 
       tempCommonName: "",
+      tempHospitalUrl: "",
       tempPublicKey: "",
 
       addFormValid: false

@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.math.BigInteger;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +27,11 @@ public class HospitalDTO {
 	@Pattern(regexp = ValidationUtility.PEMRegex, message = "Public key should be in PEM format!")
 	private String publicKey;
 
+	@NonNull
+	@NotBlank(message = "Hospital URL is required!")
+	@Pattern(regexp = ValidationUtility.alphaNumericRegex, message = "Hospital URL should be in PEM format!")
+	private String hospitalUrl;
+
 	public HospitalDTO(Hospital hospital) {
 		if (hospital == null) {
 			return;
@@ -38,6 +40,7 @@ public class HospitalDTO {
 		id = hospital.getId();
 		commonName = hospital.getCommonName();
 		publicKey = hospital.getPublicKey();
+		hospitalUrl = hospital.getHospitalUrl();
 	}
 
 	public Long getId() {

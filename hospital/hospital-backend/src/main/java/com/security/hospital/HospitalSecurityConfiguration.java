@@ -1,7 +1,5 @@
 package com.security.hospital;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 
 import com.security.hospital.security.TokenUtils;
 import com.security.hospital.security.auth.RestAuthenticationEntryPoint;
@@ -98,13 +95,15 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 		// zbog jednostavnosti primera
 		http.csrf().disable();
 	}
-		
-	
+
 	// Generalna bezbednost aplikacije
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
-		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/request-cert", "/api/devices/data");
+		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/data", "/api/addUserRequests/response",
+				"/api/deleteUserRequests/response", "/api/modifyUserRequests/response", "/api/devices/register",
+				"/api/devices/message", "/api/certificates/add", "/api/users/request",
+				"/api/logs", "/api/logs/sources");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

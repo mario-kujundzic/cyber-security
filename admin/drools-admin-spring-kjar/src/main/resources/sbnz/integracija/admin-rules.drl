@@ -1,0 +1,12 @@
+package sbnz.integracija;
+
+import com.security.admin.model.drools.Test;
+
+rule "Test-Admin"
+	agenda-group "test-admin"
+	no-loop
+	when 
+		Test(test == "nesto")
+	then
+		System.out.println("Cao, Stefnuti");
+end

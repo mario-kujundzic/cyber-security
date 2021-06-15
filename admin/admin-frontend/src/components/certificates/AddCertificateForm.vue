@@ -149,7 +149,7 @@
       </v-row>
       <v-row class="pt-15">
         <v-col>
-          <v-btn color="#8C9EFF" @click="addCert()" block
+          <v-btn color="#8C9EFF" @click="addCert()" block :loading="loading"
             >Create certificate</v-btn
           >
         </v-col>
@@ -168,6 +168,7 @@ export default {
     valid: false,
     menuFrom: false,
     menuTo: false,
+    loading: false,
     certificate: {
       commonName: "",
       organization: "",
@@ -279,8 +280,12 @@ export default {
   },
   methods: {
     addCert: function () {
+      this.loading = true;
       this.$refs.form.validate();
-      if (!this.valid) return;
+      if (!this.valid) {
+        this.loading = false;
+        return;
+      }
       const dto = {
         ...this.certificate,
         validFrom: Date.parse(this.certificate.validFrom),
@@ -291,6 +296,7 @@ export default {
         method: "POST",
         data: dto,
       }).then(() => {
+        this.loading = false;
         this.$router.push({ name: "ViewCertificates" });
       });
     },

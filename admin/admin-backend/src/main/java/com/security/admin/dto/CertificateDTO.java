@@ -3,7 +3,6 @@ package com.security.admin.dto;
 import java.math.BigInteger;
 import java.util.List;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
