@@ -22,7 +22,6 @@ public class AdminApplication {
 		Security.addProvider(new BouncyCastleProvider());
 		ApplicationContext context = SpringApplication.run(AdminApplication.class, args);
 		FirstTimeSetup.execute();
-		SessionInitializer.initializeSession(context);
 //		LogService logService = context.getBean(LogService.class);
 //
 //		logService.logGeneralInfo("Some General info");
@@ -75,14 +74,4 @@ public class AdminApplication {
 //		logService.logAuthError("Some auth error");
 	}
 	
-	@Bean
-	public KieContainer kieContainer() {
-		KieServices ks = KieServices.Factory.get();
-		KieContainer kContainer = ks
-				.newKieContainer(ks.newReleaseId("sbnz.integracija", "security-admin-spring-kjar", "0.0.1-SNAPSHOT"));
-		KieScanner kScanner = ks.newKieScanner(kContainer);
-		kScanner.start(10_000);
-		return kContainer;
-	}
-
 }

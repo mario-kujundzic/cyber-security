@@ -53,6 +53,9 @@ swIDAQAB-----END PUBLIC KEY-----');
 insert into certificates (serial_number, valid_from, valid_to, email, common_name, revocation_status, certificate_user) 
 	values ('672496789128620.00', '2021-06-11 02:00:00', '2022-07-11 02:00:00', 'admin1@gmail.com', 'Hospital1', false, 0);
 
+insert into certificates (serial_number, valid_from, valid_to, email, common_name, revocation_status, certificate_user) 
+	values ('999018678866013.00', '2021-06-15 02:00:00', '2022-07-15 02:00:00', 'admin1@gmail.com', 'patient_device_1', false, 1);
+
 insert into message_types (param_name, message_data_type) values ('blood_pressure_upper', 0); 
 insert into message_types (param_name, message_data_type) values ('blood_pressure_lower', 0); 
 insert into message_types (param_name, message_data_type) values ('temperature', 1); 

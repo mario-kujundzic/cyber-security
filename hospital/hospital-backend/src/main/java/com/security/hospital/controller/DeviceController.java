@@ -3,6 +3,8 @@ package com.security.hospital.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.User;
+import com.security.hospital.service.CertificateService;
 import com.security.hospital.service.DeviceService;
 
 @RestController
@@ -32,6 +35,9 @@ public class DeviceController {
 	@Autowired
 	private DeviceService deviceService;
 
+	@Autowired
+	private CertificateService certService;
+	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<DeviceDTO> getOneDevices(@PathVariable long id) {
@@ -86,23 +92,24 @@ public class DeviceController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<GenericMessageDTO> register(@RequestBody DeviceMessageDTO dto) {
+	public ResponseEntity<Object> register(@RequestBody DeviceMessageDTO dto, HttpServletRequest request) {
 		try {
-			// nekako getuj sertifikat i posalji zahtev za proveru da li je revoked!
 			deviceService.register(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully registered!"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@PostMapping("/message")
-	public ResponseEntity<GenericMessageDTO> recieveMessage(@RequestBody DeviceMessageDTO dto) {
+	public ResponseEntity<Object> recieveMessage(@RequestBody DeviceMessageDTO dto) {
 		try {
 			deviceService.processMessage(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
 }
+

@@ -5,6 +5,9 @@ import os
 import base64
 import random
 import time
+
+import requests
+
 from distutils.command.check import check
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
@@ -22,8 +25,10 @@ private_key_path = 'key.priv'
 public_key_path = 'key.pub'
 
 # Certificate file name
-certificate_file_path = 'device.crt'
-certificate_secret = 'sadpotato'
+certificate_file_path = 'device_999018678866013.crt'
+# certificate_file_path = 'invalid_device.crt'
+
+# certificate_secret = 'sadpotato'
 
 # Host of endpoint
 api_hospital_root = 'localhost:9002'
@@ -49,9 +54,6 @@ def generate_keys():
         crypto_serialization.Encoding.PEM,
         crypto_serialization.PublicFormat.SubjectPublicKeyInfo
     )
-
-    print(private_key)
-    print(public_key)
 
     file_private = open(private_key_path, 'w')
     file_private.write(bytes.decode(private_key, 'utf-8'))
@@ -84,25 +86,43 @@ def read_keys():
         crypto_serialization.PublicFormat.SubjectPublicKeyInfo
     )
 
-    print(private_key)
-    print(public_key)
+    # print(private_key)
+    # print(public_key)
 
     return private_key, public_key
 
 
-def establish_connection():
-    file_cert = open(certificate_file_path, 'rb')
-    cert = crypto_cert.load_pem_x509_certificate(file_cert.read())
+def establish_connection(private_key):
+    # file_cert = open(certificate_file_path, 'rb')
+    # cert = crypto_cert.load_pem_x509_certificate(file_cert.read())
 
     # Define the client certificate settings for https connection
     context = ssl.create_default_context()
-    context.check_hostname = False
-    context.verify_mode = ssl.CERT_NONE
+    context.check_hostname = True
+    context.protocol = ssl.PROTOCOL_TLS
+    context.verify_mode = ssl.CERT_REQUIRED
 
-    context.load_cert_chain(certfile=certificate_file_path, password=certificate_secret, keyfile=private_key_path)
+    context.load_cert_chain(certfile=certificate_file_path, keyfile=private_key_path)
 
     # Create a connection to submit HTTP requests
     connection = http.client.HTTPSConnection(api_hospital_root, context=context)
+
+    data_types = ['blood_pressure_upper', 'blood_pressure_lower', 'temperature', 'heartrate']
+    data_types.sort()
+    data = {
+        'commonName': common_name,
+        'patientName': patient_id,
+        'parameters': { type: '' for type in data_types}
+    }
+    # private_key = crypto_serialization.load_pem_private_key(private_key, password=None)
+    data['signature'] = private_key.sign(
+        data=bytes(common_name + patient_id + ''.join(data_types), 'utf-8'),
+        padding=padding.PKCS1v15(),
+        algorithm =hashes.SHA1()
+    )
+    data['signature'] = base64.b64encode(data['signature']).decode('utf-8')
+
+    resp = requests.post('https://localhost:9002/api/devices/register', data=data, cert=('device_999018678866013.crt', 'key.priv'), verify = "rootCA.crt")
     return connection
 
 
@@ -117,9 +137,10 @@ def send_data(connection, data, endpoint):
 
     # Print the HTTP response from the IOT service endpoint
     response = connection.getresponse()
-    print(response.status, response.reason)
     data = response.read()
-    print(data)
+    data = data.decode('utf-8')
+    if response.status != 200:
+        raise Exception(data)
 
 
 def register(private_key, public_key):
@@ -137,8 +158,8 @@ def register(private_key, public_key):
         algorithm =hashes.SHA1()
     )
     data['signature'] = base64.b64encode(data['signature']).decode('utf-8')
-    print(data['signature'])
-    connection = establish_connection()
+
+    connection = establish_connection(private_key)
     send_data(connection, data, endpoint_register)
     return connection, data['signature']
 
@@ -158,11 +179,8 @@ def update_device(connection, signature):
         'patientName': patient_id,
         'signature': signature
     }
-    try:
-        connection = establish_connection()
-        send_data(connection, data, endpoint_message)
-    except Exception as e:
-        print("Exception occured! " + e)
+    connection = establish_connection()
+    send_data(connection, data, endpoint_message)
 
 if __name__ == '__main__':
     if (not os.path.isfile(private_key_path)) or (not os.path.isfile(public_key_path)):
@@ -172,7 +190,10 @@ if __name__ == '__main__':
     if not os.path.isfile(certificate_file_path):
         print("Certificate not found! Check with admin to register a certificate with name " + certificate_file_path + " to enable communication!")
     else:
-        connection, signature = register(private_key, public_key)
-        while True:
-            update_device(connection, signature)
-            time.sleep(5)
+        try:
+            connection, signature = register(private_key, public_key)
+            while True:
+                update_device(connection, signature)
+                time.sleep(5)
+        except Exception as e:
+            print("Exception occurred! Cause - " + str(e))
