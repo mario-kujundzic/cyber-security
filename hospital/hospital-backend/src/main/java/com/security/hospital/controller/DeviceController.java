@@ -25,6 +25,8 @@ import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.User;
 import com.security.hospital.service.DeviceService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/api/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DeviceController {
@@ -50,7 +52,7 @@ public class DeviceController {
 
 	@PostMapping
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<DeviceDTO> createDevice(@RequestBody DeviceDTO dto) {
+	public ResponseEntity<DeviceDTO> createDevice(@RequestBody @Valid DeviceDTO dto) {
 		DeviceDTO deviceDTO = deviceService.create(dto);
 
 		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
@@ -58,7 +60,7 @@ public class DeviceController {
 
 	@PutMapping
 	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-	public ResponseEntity<DeviceDTO> updateDevice(@RequestBody DeviceDTO dto) {
+	public ResponseEntity<DeviceDTO> updateDevice(@RequestBody @Valid DeviceDTO dto) {
 		DeviceDTO deviceDTO = deviceService.update(dto);
 
 		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
@@ -75,7 +77,7 @@ public class DeviceController {
 
 	@PostMapping("/requestCertificate")
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto,
+	public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody @Valid CertificateRequestDTO dto,
 			@AuthenticationPrincipal User admin) {
 		try {
 			GenericMessageDTO mess = deviceService.requestCertificate(dto, admin);
@@ -86,7 +88,7 @@ public class DeviceController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<GenericMessageDTO> register(@RequestBody DeviceMessageDTO dto) {
+	public ResponseEntity<GenericMessageDTO> register(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
 			// nekako getuj sertifikat i posalji zahtev za proveru da li je revoked!
 			deviceService.register(dto);
@@ -97,7 +99,7 @@ public class DeviceController {
 	}
 
 	@PostMapping("/message")
-	public ResponseEntity<GenericMessageDTO> recieveMessage(@RequestBody DeviceMessageDTO dto) {
+	public ResponseEntity<GenericMessageDTO> recieveMessage(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
 			deviceService.processMessage(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);

@@ -61,7 +61,13 @@ public class LogController {
         ArrayList<HospitalDTO> hospitals = hospitalService.getAll();
         HashMap<String, ArrayList<LogMessageDTO>> hospitalLogMap;
         for (HospitalDTO hospital : hospitals) {
-            hospitalLogMap = getHospitalLogs(hospital.getCommonName(), hospital.getHospitalUrl(), sources);
+            try {
+                hospitalLogMap = getHospitalLogs(hospital.getCommonName(), hospital.getHospitalUrl(), sources);
+            } catch (Exception e) {
+                System.out.println("GET Hospital logs for " + hospital.getHospitalUrl() + " FAILED: " + e.getMessage());
+                continue;
+            }
+
             for (String key : hospitalLogMap.keySet()) {
                 logMap.put(hospital.getCommonName() + "." + key, hospitalLogMap.get(key));
             }

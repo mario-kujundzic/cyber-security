@@ -1,0 +1,12 @@
+package sbnz.integracija;
+
+import com.security.hospital.model.drools.Test;
+
+rule "Test-Hospital"
+	agenda-group "test-hospital"
+	no-loop
+	when 
+		Test()
+	then
+		System.out.println("Cao, Stefnuti");
+end
