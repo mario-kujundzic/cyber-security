@@ -148,7 +148,7 @@ public class DeviceService {
 
 		List<String> paramList = new ArrayList<>();
 		if (device.getMessageTypes().size() == 0) {
-			for (Entry<String, String> entry : dto.getParameters().entrySet()) {
+			for (Entry<String, Object> entry : dto.getParameters().entrySet()) {
 				String paramName = entry.getKey();
 				MessageType type = this.messageTypeRepository.getByParamName(paramName);
 				if (type != null) {
@@ -159,31 +159,17 @@ public class DeviceService {
 		}
 		deviceRepository.save(device);
 		if (paramList.isEmpty())
-			logService.logDeviceInfo(dto.getCommonName(), "Device already registered with params - " + String.join(", ", dto.getParameters().keySet()));
+			logService.logDeviceInfo(dto.getCommonName(),
+					"Device with common name " + dto.getCommonName() + " already registered for patient "
+							+ dto.getPatientName() + " with params - "
+							+ String.join(", ", dto.getParameters().keySet()));
 		else
-			logService.logDeviceInfo(dto.getCommonName(), "Registered device with params - " + String.join(", ", paramList));
+			logService.logDeviceInfo(dto.getCommonName(), "Registered device with common name " + dto.getCommonName()
+					+ " for patient " + dto.getPatientName() + " with params - " + String.join(", ", paramList));
 	}
 
 	public void processMessage(DeviceMessageDTO dto) throws Exception {
-		for (Entry<String, String> entry : dto.getParameters().entrySet()) {
-			String paramName = entry.getKey();
-			MessageType type = this.messageTypeRepository.getByParamName(paramName);
-			if (type != null) {
-				switch(type.getMessageDataType()) {
-				case FLOAT:
-					Float floatVal = Float.parseFloat(entry.getValue());
-					// TODO: do something with value, alarms n stuff potentially?
-					String messageFloat = "Value for param " + type.getParamName() + ": " + entry.getValue();
-					logService.logDeviceInfo(dto.getCommonName(), messageFloat);
-					// TODO: replace with just one log line
-					break;
-				case INTEGER:
-					Integer intVal = Integer.parseInt(entry.getValue());
-					String messageInt = "Value for param " + type.getParamName() + ": " + entry.getValue();
-					logService.logDeviceInfo(dto.getCommonName(), messageInt);
-					break;
-				}
-			}
-		}
+		logService.logDeviceInfo(dto.getCommonName(), "Recieved message from device with common name "
+				+ dto.getCommonName() + " for patient " + dto.getPatientName(), dto.getParameters());
 	}
 }

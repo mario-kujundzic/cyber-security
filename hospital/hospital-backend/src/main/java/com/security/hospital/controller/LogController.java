@@ -74,7 +74,7 @@ public class LogController {
 
 			ArrayList<LogMessageDTO> temp = new ArrayList<>();
 			temp.add(new LogMessageDTO((new Date()).getTime(), null,
-					"The source '" + source + "' wasn't found in the hospital's log archive."));
+					"The source '" + source + "' wasn't found in the hospital's log archive.", null));
 			filteredMap.put(source, temp);
 		}
 

@@ -1,27 +1,57 @@
 package com.security.hospital.service;
 
-import com.security.hospital.enums.LogMessageType;
-import com.security.hospital.dto.LogMessageDTO;
-import com.security.hospital.util.FileUtility;
-import org.springframework.stereotype.Service;
+import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.Id;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
+
+import com.security.hospital.dto.LogMessageDTO;
+import com.security.hospital.enums.LogMessageType;
+import com.security.hospital.model.Log;
+import com.security.hospital.repository.CyberLogRepository;
+import com.security.hospital.util.FileUtility;
 
 @Service
 public class LogService {
+	
+	@Autowired
+	private CyberLogRepository logRepository;
 
     private final static String logsFolderPath = "logs/";
 
     private void logMessage(String source, LogMessageType type, String content) {
-        long unixMilis= (new Date()).getTime();
-        LogMessageDTO message = new LogMessageDTO(unixMilis, type, content);
+        logMessage(source, type, content, null);
+        
+    }
+
+    private void logMessage(String source, LogMessageType type, String content, Map<String, Object> params) {
+    	long unixMilis= (new Date()).getTime();
+        LogMessageDTO message = new LogMessageDTO(unixMilis, type, content, params);
         String logLine = message.toString();
 
         System.out.println(source + " -> " + logLine);
         String filePath = logsFolderPath + source + ".log";
+        
+        Log cyberLog = new Log(message);
+        cyberLog.setId(getNextId());
+        
+        logRepository.save(cyberLog);
 
         try {
             tryCreateFolder();
@@ -118,6 +148,10 @@ public class LogService {
     public void logDeviceInfo(String deviceId, String message) {
         logMessage("device_" + deviceId, LogMessageType.INFO, message);
     }
+    
+    public void logDeviceInfo(String deviceId, String message, Map<String, Object> params) {
+        logMessage("device_" + deviceId, LogMessageType.INFO, message, params);
+    }
 
     public void logDeviceWarning(String deviceId, String message) {
         logMessage("device_" + deviceId, LogMessageType.WARNING, message);
@@ -125,6 +159,29 @@ public class LogService {
 
     public void logDeviceError(String deviceId, String message) {
         logMessage("device_" + deviceId, LogMessageType.ERROR, message);
+    }
+    
+    @Autowired private MongoOperations mongo;
+
+    public int getNextId()
+    {
+        CustomSequences counter = mongo.findAndModify(
+            query(where("_id").is("customSequences")),
+            new Update().inc("seq",1),
+            options().returnNew(true).upsert(true),
+            CustomSequences.class);
+        return counter.getSeq();
+    }
+    
+    @Document(collection = "customSequences")
+    public class CustomSequences {
+        @Id
+        private String id;
+        private int seq;
+
+    	public int getSeq() {
+    		return seq;
+    	}
     }
 
 }

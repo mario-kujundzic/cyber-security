@@ -1,18 +1,25 @@
 package com.security.hospital.dto;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TimeZone;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.security.hospital.enums.LogMessageType;
-import lombok.Data;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import lombok.Data;
 
 @Data
 public class LogMessageDTO {
     private long unixMilis;
     private LogMessageType type;
     private String content;
+    private Map<String, Object> params;
 
     @JsonIgnore
     private transient SimpleDateFormat sdf;
@@ -23,19 +30,31 @@ public class LogMessageDTO {
         unixMilis = 0;
         type = null;
         content = null;
+    	params = new HashMap<>();
     }
 
-    public LogMessageDTO(long unixMilis, LogMessageType type, String content) {
+    public LogMessageDTO(long unixMilis, LogMessageType type, String content, Map<String, Object> params) {
         this();
         this.unixMilis = unixMilis;
         this.type = type;
         this.content = content;
-
+        if (params == null)
+        	this.params = new HashMap<>();
+        else
+        	this.params = params;
     }
 
     @Override
     public String toString() {
-        return sdf.format(new Date(unixMilis)) + " [" + type.name() + "]: " + content;
+    	String temp = sdf.format(new Date(unixMilis)) + " [" + type.name() + "]: " + content;
+    	if (!params.isEmpty()) {
+    		List<String> entries = new ArrayList<String>();
+    		for (Entry<String, Object> en : params.entrySet()) {
+    			entries.add(en.getKey() + ": " + en.getValue().toString());
+    		}    		
+    		temp = temp + " - params: " + String.join(", ", entries);
+    	}
+        return temp;
     }
 
     public static boolean lineIsAfterTime(String line, long unixSecondsTimestamp) throws Exception {
