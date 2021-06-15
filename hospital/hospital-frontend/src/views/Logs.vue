@@ -1,5 +1,19 @@
 <template>
   <v-container fill-height fluid>
+
+    <v-row v-if="activatedAlarms.length > 0" align="start" justify="center">
+      <v-col>
+        <v-card color="rgba(255, 0, 0, 0.3)">
+          <v-card-title>{{ activatedAlarms.length }} alarms activated!</v-card-title>
+          <v-card-text>
+            <div v-for="alarm in activatedAlarms" :key="alarm.id" style="font-size: 1.25em;" class="mb-5">
+              <v-icon>mdi-bell-alert</v-icon> {{ alarm.name }}
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <v-row align="start" justify="center">
       <v-col>
         <v-card>
@@ -29,7 +43,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="8">
+      <v-col cols="10">
         <v-card>
           <v-card-title>
             <v-col>
@@ -60,6 +74,42 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-row align="start" justify="center">
+      <v-col></v-col>
+      <v-col cols="10">
+
+        <v-card>
+          <v-card-title>
+            Configure alarms
+          </v-card-title>
+
+          <v-card-text>
+            <v-btn color="primary" @click="addAlarm" class="mb-5">New alarm</v-btn>
+
+            <v-card class="my-5" v-for="(alarm, index) in configuredAlarms" :key="alarm.id">
+              <v-form>
+                <v-card-title>
+                  <v-icon class="mr-3">mdi-bell-alert</v-icon> <v-text-field v-model="alarm.name" label="Name"></v-text-field>
+                </v-card-title>
+
+                <v-card-text>
+                  <h3>Conditions</h3>
+                  <v-select v-model="alarm.source" label="When SOURCE is" :items="messageSources"></v-select>
+                  <v-text-field v-model="alarm.whenContentHas" label="When CONTENT has"></v-text-field>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-btn color="success" @click="saveAlarm(index)" :ref="'alarm-save-' + alarm.id">Save</v-btn>
+                  <v-btn color="error" @click="deleteAlarm(index)" :ref="'alarm-delete-' + alarm.id">Delete</v-btn>
+                </v-card-actions>
+              </v-form>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 
@@ -79,7 +129,7 @@ export default {
       search: "",
       allLogs: {},
       sources: [],
-      refreshInterval: 5,
+      refreshInterval: 5000,
       refreshInSeconds: 0,
       refreshing: false,
       messageSources: [],
@@ -89,7 +139,31 @@ export default {
         "INFO": true,
         "WARNING": true,
         "ERROR": true
-      }
+      },
+      activatedAlarms: [
+        {
+          id: 0,
+          name: "Patient 'Fred' has critical heartbeat!"
+        },
+        {
+          id: 1,
+          name: "Bla bla bla!"
+        }
+      ],
+      configuredAlarms: [
+        {
+          id: 0,
+          name: "Denial of service is happening!",
+          source: "",
+          whenContentHas: "DoS"
+        },
+        {
+          id: 1,
+          name: "A device1 log that has 'Fred' in its content popped up!",
+          source: "",
+          whenContentHas: "Fred"
+        },
+      ]
     };
   },
 
@@ -184,6 +258,43 @@ export default {
         }
       }
     },
+
+    addAlarm() {
+      this.configuredAlarms.unshift({
+          id: undefined,
+          name: "",
+          source: "",
+          whenContentHas: ""
+      });
+    },
+
+    async saveAlarm(alarmIndex) {
+      let alarm = this.configuredAlarms[alarmIndex];
+      let name = alarm.name;
+
+      try {
+        let response = await this.axios.post("api/alarms", alarm);
+        this.configuredAlarms[alarmIndex] = response.data;
+        alert("Saved alarm " + name)
+      } catch (e) {
+        alert(e);
+      }
+    },
+
+    async deleteAlarm(alarmIndex) {
+      let alarm = this.configuredAlarms[alarmIndex];
+      let name = alarm.name;
+
+      try {
+        if (alarm.id != undefined) {
+          await this.axios.delete("api/alarms", alarm);
+        }
+        this.configuredAlarms.splice(alarmIndex, 1);
+        alert("Deleted alarm " + name)
+      } catch (e) {
+        alert(e);
+      }
+    }
   },
 
   computed: {
