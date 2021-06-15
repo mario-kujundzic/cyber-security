@@ -5,9 +5,6 @@ import os
 import base64
 import random
 import time
-
-import requests
-
 from distutils.command.check import check
 
 from cryptography.hazmat.primitives import serialization as crypto_serialization
@@ -26,7 +23,6 @@ public_key_path = 'key.pub'
 
 # Certificate file name
 certificate_file_path = 'device_999018678866013.crt'
-# certificate_file_path = 'invalid_device.crt'
 
 # certificate_secret = 'sadpotato'
 
@@ -86,17 +82,10 @@ def read_keys():
         crypto_serialization.PublicFormat.SubjectPublicKeyInfo
     )
 
-    # print(private_key)
-    # print(public_key)
-
     return private_key, public_key
 
 
-def establish_connection(private_key):
-    # file_cert = open(certificate_file_path, 'rb')
-    # cert = crypto_cert.load_pem_x509_certificate(file_cert.read())
-
-    # Define the client certificate settings for https connection
+def establish_connection():
     context = ssl.create_default_context()
     context.check_hostname = True
     context.protocol = ssl.PROTOCOL_TLS
@@ -106,36 +95,16 @@ def establish_connection(private_key):
 
     # Create a connection to submit HTTP requests
     connection = http.client.HTTPSConnection(api_hospital_root, context=context)
-
-    data_types = ['blood_pressure_upper', 'blood_pressure_lower', 'temperature', 'heartrate']
-    data_types.sort()
-    data = {
-        'commonName': common_name,
-        'patientName': patient_id,
-        'parameters': { type: '' for type in data_types}
-    }
-    # private_key = crypto_serialization.load_pem_private_key(private_key, password=None)
-    data['signature'] = private_key.sign(
-        data=bytes(common_name + patient_id + ''.join(data_types), 'utf-8'),
-        padding=padding.PKCS1v15(),
-        algorithm =hashes.SHA1()
-    )
-    data['signature'] = base64.b64encode(data['signature']).decode('utf-8')
-
-    resp = requests.post('https://localhost:9002/api/devices/register', data=data, cert=('device_999018678866013.crt', 'key.priv'), verify = "rootCA.crt")
     return connection
 
 
 def send_data(connection, data, endpoint):
-    # Defining parts of the HTTP request
     request_headers = {
         'Content-Type': 'application/json'
     }
 
-    # Use connection to submit a HTTP POST request
     connection.request(method="POST", url=endpoint, headers=request_headers, body=json.dumps(data))
 
-    # Print the HTTP response from the IOT service endpoint
     response = connection.getresponse()
     data = response.read()
     data = data.decode('utf-8')
@@ -159,7 +128,7 @@ def register(private_key, public_key):
     )
     data['signature'] = base64.b64encode(data['signature']).decode('utf-8')
 
-    connection = establish_connection(private_key)
+    connection = establish_connection()
     send_data(connection, data, endpoint_register)
     return connection, data['signature']
 
@@ -180,6 +149,8 @@ def update_device(connection, signature):
         'signature': signature
     }
     connection = establish_connection()
+    print("Sent data for patient " + str(patient_id) + " - blood pressure upper: " + str(blood_pressure_upper) + ", blood pressure lower: "
+          + str(blood_pressure_lower) + ", heartrate: " + str(heartrate) + ", temperature: " + str(temperature))
     send_data(connection, data, endpoint_message)
 
 if __name__ == '__main__':

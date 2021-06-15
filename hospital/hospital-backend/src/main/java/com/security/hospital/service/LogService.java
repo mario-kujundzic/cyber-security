@@ -97,34 +97,15 @@ public class LogService {
         		logLinesMap.put(l.getSourceName(), newList);
         	}        			
         }
-        
-//        tryCreateFolder();        
-//
-//        File directory = new File(logsFolderPath);
-//        for (File file : directory.listFiles()) {
-//            if (!file.getName().endsWith(".log")) {
-//                continue;
-//            }
-//
-//            ArrayList<LogMessageDTO> messages = new ArrayList<>();
-//
-//            BufferedReader reader = new BufferedReader(new FileReader(file));
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                LogMessageDTO logMessage = LogMessageDTO.fromString(line);
-//                if (logMessage.getUnixMilis() > minUnixMilis) {
-//                    messages.add(logMessage);
-//                }
-//            }
-//
-//            int trimTo = file.getName().lastIndexOf(".log");
-//            String sourceName = file.getName().substring(0, trimTo);
-//
-//            logLinesMap.put(sourceName, messages);
-//        }
-
         return logLinesMap;
     }
+    
+
+
+	public HashMap<String, ArrayList<Object>> logReportSince(Long sinceUnixSeconds) {
+		
+		return null;
+	}
 
     private void tryCreateFolder() throws IOException {
         if (!FileUtility.folderExists(logsFolderPath)) {
@@ -194,5 +175,4 @@ public class LogService {
     		return seq;
     	}
     }
-
 }

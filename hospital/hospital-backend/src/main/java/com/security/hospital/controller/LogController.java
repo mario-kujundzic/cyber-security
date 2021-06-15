@@ -122,4 +122,15 @@ public class LogController {
 			throw new Exception("Denied: signature invalid.");
 		}
 	}
+	
+
+	@GetMapping
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<HashMap<String, ArrayList<Object>>> getLogReport(@RequestParam(value = "since", required = false) Long sinceUnixSeconds) throws Exception {
+		if (sinceUnixSeconds == null) {
+			sinceUnixSeconds = 0L;
+		}
+		HashMap<String, ArrayList<Object>> results = logService.logReportSince(sinceUnixSeconds);
+		return new ResponseEntity<>(results, HttpStatus.OK);
+	}
 }
