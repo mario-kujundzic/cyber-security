@@ -2,14 +2,16 @@ package com.security.admin.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.security.admin.dto.AdminAuthDTO;
 import com.security.admin.dto.HospitalDTO;
 import com.security.admin.dto.LogSourcesDTO;
-import com.security.admin.dto.UserTokenStateDTO;
-import com.security.admin.security.auth.JwtAuthenticationRequest;
+import com.security.admin.pki.util.CryptographicUtility;
+import com.security.admin.pki.util.KeyPairUtility;
 import com.security.admin.service.HospitalService;
 import com.security.admin.service.LogService;
 import com.security.admin.dto.LogMessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.security.PrivateKey;
 import java.util.*;
 
 @RestController
@@ -34,6 +37,13 @@ public class LogController {
     @Autowired
     private RestTemplate restTemplate;
 
+    private String resourceFolderPath;
+    
+    @Autowired
+    public LogController(@Value("${server.ssl.key-store-folder}") String resourceFolderPath) {
+    	this.resourceFolderPath = resourceFolderPath;
+    }
+    
     @GetMapping
     public ResponseEntity<String> getLogsSince(@RequestParam(value = "since", required = false) Long sinceUnixSeconds, @RequestParam(value = "sources", required = false) String[] sources) throws Exception {
         if (sinceUnixSeconds == null) {
@@ -79,18 +89,11 @@ public class LogController {
         return new ResponseEntity<>(gson.toJson(filteredMap), HttpStatus.OK);
     }
 
-    private String authAtHospital(String hospitalUrl) {
-        JwtAuthenticationRequest authRequest = new JwtAuthenticationRequest("admin1@gmail.com", "admin1");
-        UserTokenStateDTO response = this.restTemplate.postForObject(hospitalUrl + "/auth/login", authRequest, UserTokenStateDTO.class);
-
-        return response.getAccessToken();
-    }
-
-    private HashMap<String, ArrayList<LogMessageDTO>> getHospitalLogs(String hospitalName, String hospitalUrl, String[] sources) {
+    private HashMap<String, ArrayList<LogMessageDTO>> getHospitalLogs(String hospitalName, String hospitalUrl, String[] sources) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        String accessToken = authAtHospital(hospitalUrl);
-        headers.set("Authorization", "Bearer " + accessToken);
+        
+        AdminAuthDTO dto = getAuthDTO();
 
         String queryParams = "?sources=";
         if (sources.length > 0) {
@@ -108,8 +111,8 @@ public class LogController {
             queryParams = queryParams.substring(0, queryParams.length()-1);
         }
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        String response = this.restTemplate.exchange(hospitalUrl + "/api/logs" + queryParams, HttpMethod.GET, entity, String.class).getBody();
+        HttpEntity<AdminAuthDTO> entity = new HttpEntity<>(dto, headers);
+        String response = this.restTemplate.exchange(hospitalUrl + "/api/logs" + queryParams, HttpMethod.POST, entity, String.class).getBody();
         Gson gson = new Gson();
         Type type = new TypeToken<HashMap<String, ArrayList<LogMessageDTO>>>(){}.getType();
         return gson.fromJson(response, type);
@@ -146,16 +149,22 @@ public class LogController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
-    private LogSourcesDTO getHospitalSources(String hospitalUrl) {
-        JwtAuthenticationRequest authRequest = new JwtAuthenticationRequest("admin1@gmail.com", "admin1");
-        UserTokenStateDTO response = this.restTemplate.postForObject(hospitalUrl + "/auth/login", authRequest, UserTokenStateDTO.class);
-
+    private LogSourcesDTO getHospitalSources(String hospitalUrl) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Authorization", "Bearer " + response.getAccessToken());
+        AdminAuthDTO dto = getAuthDTO();
+        HttpEntity<AdminAuthDTO> entity = new HttpEntity<>(dto, headers);
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        return this.restTemplate.exchange(hospitalUrl + "/api/logs/sources", HttpMethod.GET, entity, LogSourcesDTO.class).getBody();
+        return this.restTemplate.exchange(hospitalUrl + "/api/logs/sources", HttpMethod.POST, entity, LogSourcesDTO.class).getBody();
+    }
+    
+    private AdminAuthDTO getAuthDTO() throws IOException {
+    	AdminAuthDTO dto = new AdminAuthDTO();
+		byte[] csrBytes = dto.getCSRBytes();
+		PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
+		byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
+		String base64Signature = Base64.getEncoder().encodeToString(signature);
+		dto.setSignature(base64Signature);
+		return dto;
     }
 }

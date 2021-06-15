@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserListDTO;
-import com.security.hospital.dto.UserListRequestDTO;
+import com.security.hospital.dto.AdminAuthDTO;
 import com.security.hospital.model.User;
 import com.security.hospital.service.AddUserRequestService;
 import com.security.hospital.service.DeleteUserRequestService;
@@ -54,7 +54,7 @@ public class UserController {
 	}
 
 	@PostMapping("/request")
-	public ResponseEntity<Object> requestUsers(@RequestBody UserListRequestDTO dto) throws Exception {
+	public ResponseEntity<Object> requestUsers(@RequestBody AdminAuthDTO dto) throws Exception {
 		UserListDTO users = userService.getAllRequest(dto);
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}

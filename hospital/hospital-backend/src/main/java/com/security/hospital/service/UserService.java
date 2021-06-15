@@ -32,7 +32,7 @@ import com.security.hospital.dto.DeleteUserRequestDTO;
 import com.security.hospital.dto.ModifyUserRequestDTO;
 import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserListDTO;
-import com.security.hospital.dto.UserListRequestDTO;
+import com.security.hospital.dto.AdminAuthDTO;
 import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
@@ -279,7 +279,7 @@ public class UserService implements UserDetailsService {
 		userRepository.save(user);
 	}
 
-	public UserListDTO getAllRequest(UserListRequestDTO dto) throws Exception {
+	public UserListDTO getAllRequest(AdminAuthDTO dto) throws Exception {
 		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
 
 		if (rootCAKey == null) {
