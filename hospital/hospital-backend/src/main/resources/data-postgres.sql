@@ -40,7 +40,7 @@ insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight
 insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight, blood_type, blood_pressure, illness, vaccination) values ('Mini', 'Maus', '3007991816434', 'Female', '1998-05-31', '162', '59', 'B', '140/90', 'Ilness 1, Ilness 2', 'Vaccine1, Vaccine2');
 insert into patients (name, surname, jmbg, gender, date_of_birth, height, weight, blood_type, blood_pressure, illness, vaccination) values ('Vuk', 'Karadzic', '3107981816038', 'Male', '1994-07-12', '171', '60', 'A', '140/90', 'Ilness 1, Ilness 2', 'Vaccine1, Vaccine2');
 
-insert into devices (common_name, public_key) values ('Pressure device 1', 
+insert into devices (common_name, public_key) values ('patient_device_1', 
 '-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxvV8MQJSwNDWoH9Ykymz
 IpqxazITBo7S8zw4VvwNPO8dreznEBbJsz2H2TjRougDEUGPuSE+doYOOndUtWPI

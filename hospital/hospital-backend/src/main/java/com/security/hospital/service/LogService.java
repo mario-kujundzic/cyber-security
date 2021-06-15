@@ -4,13 +4,12 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Id;
@@ -37,7 +36,6 @@ public class LogService {
 
     private void logMessage(String source, LogMessageType type, String content) {
         logMessage(source, type, content, null);
-        
     }
 
     private void logMessage(String source, LogMessageType type, String content, Map<String, Object> params) {
@@ -50,6 +48,7 @@ public class LogService {
         
         Log cyberLog = new Log(message);
         cyberLog.setId(getNextId());
+        cyberLog.setSourceName(source);
         
         logRepository.save(cyberLog);
 
@@ -87,30 +86,42 @@ public class LogService {
 
     public HashMap<String, ArrayList<LogMessageDTO>> loadLogLinesSince(long minUnixMilis) throws Exception {
         HashMap<String, ArrayList<LogMessageDTO>> logLinesMap = new HashMap<>();
-        tryCreateFolder();
-
-        File directory = new File(logsFolderPath);
-        for (File file : directory.listFiles()) {
-            if (!file.getName().endsWith(".log")) {
-                continue;
-            }
-
-            ArrayList<LogMessageDTO> messages = new ArrayList<>();
-
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                LogMessageDTO logMessage = LogMessageDTO.fromString(line);
-                if (logMessage.getUnixMilis() > minUnixMilis) {
-                    messages.add(logMessage);
-                }
-            }
-
-            int trimTo = file.getName().lastIndexOf(".log");
-            String sourceName = file.getName().substring(0, trimTo);
-
-            logLinesMap.put(sourceName, messages);
+        
+        List<Log> logList = logRepository.findAllByTimestampBetween(new Date(minUnixMilis), new Date());
+        for (Log l : logList) {
+        	if (logLinesMap.containsKey(l.getSourceName())) {
+        		logLinesMap.get(l.getSourceName()).add(new LogMessageDTO(l));        		
+        	} else {
+        		ArrayList<LogMessageDTO> newList = new ArrayList<LogMessageDTO>();
+        		newList.add(new LogMessageDTO(l));
+        		logLinesMap.put(l.getSourceName(), newList);
+        	}        			
         }
+        
+//        tryCreateFolder();        
+//
+//        File directory = new File(logsFolderPath);
+//        for (File file : directory.listFiles()) {
+//            if (!file.getName().endsWith(".log")) {
+//                continue;
+//            }
+//
+//            ArrayList<LogMessageDTO> messages = new ArrayList<>();
+//
+//            BufferedReader reader = new BufferedReader(new FileReader(file));
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                LogMessageDTO logMessage = LogMessageDTO.fromString(line);
+//                if (logMessage.getUnixMilis() > minUnixMilis) {
+//                    messages.add(logMessage);
+//                }
+//            }
+//
+//            int trimTo = file.getName().lastIndexOf(".log");
+//            String sourceName = file.getName().substring(0, trimTo);
+//
+//            logLinesMap.put(sourceName, messages);
+//        }
 
         return logLinesMap;
     }

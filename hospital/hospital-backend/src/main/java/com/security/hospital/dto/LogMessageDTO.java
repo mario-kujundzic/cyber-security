@@ -11,6 +11,7 @@ import java.util.TimeZone;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.security.hospital.enums.LogMessageType;
+import com.security.hospital.model.Log;
 
 import lombok.Data;
 
@@ -44,7 +45,14 @@ public class LogMessageDTO {
         	this.params = params;
     }
 
-    @Override
+    public LogMessageDTO(Log l) {
+		this.content = l.getContent();
+		this.type = l.getType();
+		this.unixMilis = l.getTimestamp().getTime();
+		this.params = l.getParams();
+	}
+
+	@Override
     public String toString() {
     	String temp = sdf.format(new Date(unixMilis)) + " [" + type.name() + "]: " + content;
     	if (!params.isEmpty()) {

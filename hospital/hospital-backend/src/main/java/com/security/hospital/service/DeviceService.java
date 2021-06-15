@@ -130,6 +130,8 @@ public class DeviceService {
 		String publicKeyPEM = device.getPublicKey();
 
 		if (publicKeyPEM == null) {
+			logService.logDeviceError(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+				+ " not found in database. Declining registration.");
 			throw new Exception("Denied: Device with common name " + commonName
 					+ " not found. Contact a hospital admin to register this device's public key.");
 		}
@@ -141,10 +143,15 @@ public class DeviceService {
 		boolean valid = CryptographicUtility.verify(csrBytes, signature, publicKey);
 
 		if (!valid) {
+			logService.logDeviceError(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+					+ " failed to pass signature check. Declining registration.");
 			throw new Exception("Denied: signature invalid.");
 		}
-		if (dto.getParameters().isEmpty())
+		if (dto.getParameters().isEmpty()) {
+			logService.logDeviceWarning(dto.getCommonName(), "Device with common name " + dto.getCommonName()
+					+ " failed to provide parameter info. Declining registration.");			
 			throw new Exception("Denied: no data present!");
+		}
 
 		List<String> paramList = new ArrayList<>();
 		if (device.getMessageTypes().size() == 0) {

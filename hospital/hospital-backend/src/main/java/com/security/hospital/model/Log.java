@@ -31,6 +31,9 @@ public class Log {
 
 	@Column(name = "content")
 	private String content;	
+
+	@Column(name = "sourceName")
+	private String sourceName;	
 	
 	@Column(name = "type")
 	private LogMessageType type;
@@ -40,9 +43,9 @@ public class Log {
 
 	public Log(LogMessageDTO message) {
 		this.timestamp = message.getSdf().getCalendar().getTime();
-		this.content = message.getContent();
 		this.type = message.getType();
 		this.params = message.getParams();
+		this.content = message.getContent();
 	}
 
 }

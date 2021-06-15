@@ -14,7 +14,7 @@ from cryptography.hazmat.backends import default_backend as crypto_default_backe
 import cryptography.x509 as crypto_cert
 
 # Device common name
-common_name = 'Pressure device 1'
+common_name = 'patient_device_1'
 patient_id = 'Rafaelo Rafaelic'
 
 # Private and public key file names
