@@ -197,7 +197,8 @@ export default {
 
       try {
         let response = await this.axios.get(apiURL + queryParams);
-        this.allLogs = response.data;
+        this.allLogs = response.data.logs;
+        this.activatedAlarms = response.data.activatedAlarms;
         // TODO: Part of the nice to have feature stated earlier in this function
         // APPEND the difference to the current list
         // let newLogs = response.data;

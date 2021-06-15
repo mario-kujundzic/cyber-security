@@ -17,6 +17,7 @@ import lombok.Data;
 
 @Data
 public class LogMessageDTO {
+    private long id;
     private long unixMilis;
     private LogMessageType type;
     private String content;
@@ -46,6 +47,8 @@ public class LogMessageDTO {
     }
 
     public LogMessageDTO(Log l) {
+        this();
+        this.id = l.getId();
 		this.content = l.getContent();
 		this.type = l.getType();
 		this.unixMilis = l.getTimestamp().getTime();

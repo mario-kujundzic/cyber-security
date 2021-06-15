@@ -108,7 +108,7 @@ public class LogController {
 	}
 
 	@PostMapping
-	public ResponseEntity<String> requestLogsAdmin(@RequestBody @Valid AdminAuthDTO adminAuth,
+	public ResponseEntity<LogsResponseDTO> requestLogsAdmin(@RequestBody @Valid AdminAuthDTO adminAuth,
 			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
 			@RequestParam(value = "sources", required = false) String[] sources) throws Exception {
 		authorizeAdminApp(adminAuth);

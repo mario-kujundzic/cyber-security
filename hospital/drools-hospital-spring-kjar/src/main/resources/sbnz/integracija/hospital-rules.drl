@@ -2,6 +2,7 @@ package sbnz.integracija;
 
 import com.security.hospital.model.drools.Test;
 import com.security.hospital.dto.*;
+import java.util.ArrayList;
 
 global ArrayList<ActivatedLogAlarmDTO> activatedAlarms;
 
@@ -9,7 +10,7 @@ rule "Test-Hospital"
 	agenda-group "alarms"
 	no-loop
 	when 
-		$logMessage: LogMessageDto($content: content) and
+		$logMessage: LogMessageDTO($content: content) and
 		$configuredAlarm: LogAlarmDTO( $content.contains(whenContentHas) )
 	then
 		System.out.println("ACTIVATED ALARM, LOG: " + $logMessage + ", ALARM: " + $configuredAlarm.getName());
