@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 
 @RestController
@@ -26,7 +27,7 @@ public class LogAlarmController {
     }
 
     @PostMapping
-    public ResponseEntity<LogAlarmDTO> save(@RequestBody LogAlarmDTO dto, @AuthenticationPrincipal User user) {
+    public ResponseEntity<LogAlarmDTO> save(@RequestBody@ Valid LogAlarmDTO dto, @AuthenticationPrincipal User user) {
         dto.setUserId(user.getId());
         return new ResponseEntity<>(logAlarmService.createUpdate(dto), HttpStatus.OK);
     }
