@@ -3,7 +3,9 @@ package com.security.hospital.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -11,8 +13,8 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import java.util.stream.Stream;
 
-import com.security.hospital.security.events.LoginAttemptResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -29,12 +31,16 @@ import com.security.hospital.dto.AddUserRequestDTO;
 import com.security.hospital.dto.DeleteUserRequestDTO;
 import com.security.hospital.dto.ModifyUserRequestDTO;
 import com.security.hospital.dto.UserDTO;
+import com.security.hospital.dto.UserListDTO;
+import com.security.hospital.dto.UserListRequestDTO;
 import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
 import com.security.hospital.model.Role;
 import com.security.hospital.model.User;
+import com.security.hospital.pki.util.CryptographicUtility;
+import com.security.hospital.pki.util.KeyPairUtility;
 import com.security.hospital.repository.RoleRepository;
 import com.security.hospital.repository.UserRepository;
 import com.security.hospital.security.TokenUtils;
@@ -60,23 +66,27 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private LogService logService;
 
+	private String resourceFolderPath;
+
 	@Autowired
-	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
-			MailSenderService mailSenderService, RoleRepository roleRepository) {
+	public UserService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
+			UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager,
+			PasswordEncoder passwordEncoder, MailSenderService mailSenderService, RoleRepository roleRepository) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
 		this.roleRepository = roleRepository;
 		this.mailSenderService = mailSenderService;
+		this.resourceFolderPath = resourceFolderPath;
 	}
 
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
 
-	public UserTokenStateDTO login(String username, String password, String IPAddress) throws DisabledException, UserException {
+	public UserTokenStateDTO login(String username, String password, String IPAddress)
+			throws DisabledException, UserException {
 		User existUser = null;
 		try {
 			existUser = getOne(username);
@@ -108,9 +118,8 @@ public class UserService implements UserDetailsService {
 	public UserTokenStateDTO generateToken(String username, String password) throws BadCredentialsException {
 		Authentication authentication = null;
 
-		authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(username, password)
-		);
+		authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		// create token
@@ -268,5 +277,29 @@ public class UserService implements UserDetailsService {
 		System.out.println("Reset key - " + key);
 		mailSenderService.resetPassword(dto.getUsername(), key);
 		userRepository.save(user);
+	}
+
+	public UserListDTO getAllRequest(UserListRequestDTO dto) throws Exception {
+		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
+
+		if (rootCAKey == null) {
+			throw new Exception(
+					"Denied: Admin app public key not registered. Contact a super admin to obtain the public key.");
+		}
+
+		// Verify signature
+		byte[] csrBytes = dto.getCSRBytes();
+		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
+		boolean valid = CryptographicUtility.verify(csrBytes, signature, rootCAKey);
+
+		if (!valid) {
+			throw new Exception("Denied: signature invalid.");
+		}
+
+		List<User> users = userRepository.findAll();
+		List<UserDTO> userList = users.stream().map(this::toDTO).collect(Collectors.toList());
+		UserListDTO response = new UserListDTO();
+		response.setUsers(userList);
+		return response;
 	}
 }

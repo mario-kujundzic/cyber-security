@@ -212,18 +212,7 @@ export default {
           alert(response.data.message);
         })
         .catch((error) => {
-          let response = error.response.data;
-
-          if (!response.errors || !Array.isArray(response.errors)) {
-            alert(error.response.data.message);
-            return;
-          }
-
-          let errorMessage = "";
-          response.errors.forEach((err) => {
-            errorMessage += err.defaultMessage + "\n";
-          });
-
+          let errorMessage = error.response.data.message;
           alert(errorMessage);
         });
     }

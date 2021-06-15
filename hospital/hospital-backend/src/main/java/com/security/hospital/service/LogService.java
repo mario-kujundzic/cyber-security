@@ -47,7 +47,9 @@ public class LogService {
                 continue;
             }
 
-            sources.add(file.getName().split("\\.")[0]);
+            int trimTo = file.getName().lastIndexOf(".log");
+            String sourceName = file.getName().substring(0, trimTo);
+            sources.add(sourceName);
         }
 
         return sources.toArray(new String[0]);
@@ -74,13 +76,10 @@ public class LogService {
                 }
             }
 
-            String[] tokens = file.getName().split("\\.");
-            String source = "";
-            for (int i = 0; i < tokens.length - 1; i++) {
-                source += tokens[i];
-            }
+            int trimTo = file.getName().lastIndexOf(".log");
+            String sourceName = file.getName().substring(0, trimTo);
 
-            logLinesMap.put(source, messages);
+            logLinesMap.put(sourceName, messages);
         }
 
         return logLinesMap;

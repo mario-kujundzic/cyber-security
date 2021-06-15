@@ -101,8 +101,8 @@ public class HospitalSecurityConfiguration extends WebSecurityConfigurerAdapter 
 	public void configure(WebSecurity web) throws Exception {
 		// TokenAuthenticationFilter ce ignorisati sve ispod navedene putanje
 		web.ignoring().antMatchers(HttpMethod.POST, "/auth/login", "/api/devices/data", "/api/addUserRequests/response",
-				"/api/deleteUserRequests/response", "/api/modifyUserRequests/response",
-				"/api/devices/register", "/api/devices/message", "/api/certificates/add" );
+				"/api/deleteUserRequests/response", "/api/modifyUserRequests/response", "/api/devices/register",
+				"/api/devices/message", "/api/certificates/add", "/api/users/request");
 		web.ignoring().antMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "/favicon.ico", "/**/*.html",
 				"/**/*.css", "/**/*.js");
 	}

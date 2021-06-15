@@ -13,6 +13,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -361,6 +363,25 @@ public class CertificateService {
 		status.setSignature(base64Signature);
 
 		return status;
-
+	}
+	
+	public void checkCertificateFromRequest(HttpServletRequest request) throws Exception {
+		Certificate[] certs = (Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		if (certs == null)
+			throw new Exception("Certificate not with request!");
+		Certificate cert = certs[0];
+		JcaX509CertificateHolder holder = new JcaX509CertificateHolder((X509Certificate) cert);
+		String serial = holder.getSerialNumber().toString();
+		CertificateStatusDTO check = checkCertificateStatus(serial.toString());
+		switch (check.getStatus()) {
+		case EXPIRED: 
+			throw new Exception("Certificate with id " + serial + " expired!");
+		case NOT_EXIST:
+			throw new Exception("Certificate with id " + serial + " doesn't exist!");
+		case REVOKED:
+			throw new Exception("Certificate with id " + serial + " has been revoked!");
+		case ACTIVE:
+			return;
+		}
 	}
 }

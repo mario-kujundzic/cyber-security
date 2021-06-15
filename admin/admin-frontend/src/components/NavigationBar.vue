@@ -77,6 +77,17 @@
           </v-list-item>
         </router-link>
         <v-divider></v-divider>
+        <router-link :to="{ name: 'ManageUsers' }" v-slot="{ navigate }">
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-account</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>Users</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
         <router-link :to="{ name: 'ManageAddUserRequests' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
             <v-list-item-icon>
@@ -88,7 +99,10 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
-        <router-link :to="{ name: 'ManageDeleteUserRequests' }" v-slot="{ navigate }">
+        <router-link
+          :to="{ name: 'ManageDeleteUserRequests' }"
+          v-slot="{ navigate }"
+        >
           <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-account-remove</v-icon>
@@ -99,7 +113,10 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
-        <router-link :to="{ name: 'ManageModifyUserRequests' }" v-slot="{ navigate }">
+        <router-link
+          :to="{ name: 'ManageModifyUserRequests' }"
+          v-slot="{ navigate }"
+        >
           <v-list-item @click="navigate">
             <v-list-item-icon>
               <v-icon>mdi-account-convert</v-icon>
@@ -107,6 +124,17 @@
 
             <v-list-item-content>
               <v-list-item-title>Modify User Requests</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+        <router-link :to="{ name: 'Logs' }" v-slot="{ navigate }">
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-post-outline</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>Logs</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
