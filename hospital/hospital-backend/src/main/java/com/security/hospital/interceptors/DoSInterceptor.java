@@ -37,7 +37,7 @@ public class DoSInterceptor implements HandlerInterceptor {
     	session.fireAllRules();
     	if (des.isAttack()) {
     		session.removeDosEvents(ip);
-    		logService.logGeneralError("DoS suspected from IP: " + ip);
+    		logService.logGeneralError("DOS suspected from IP: " + ip);
     		MaliciousIPHandler.ips.add(ip);
     		MaliciousIPHandler.writeIP();
     		return false;
