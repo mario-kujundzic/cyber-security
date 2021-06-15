@@ -102,9 +102,22 @@ public class LogService {
     
 
 
-	public HashMap<String, ArrayList<Object>> logReportSince(Long sinceUnixSeconds) {
+	public HashMap<String, ArrayList<LogMessageDTO>> logReportSince(Long sinceUnixSeconds, Long untilUnixSeconds) {
+        HashMap<String, ArrayList<LogMessageDTO>> logLinesMap = new HashMap<>();
+        
+        List<Log> logList = logRepository.findAllByTimestampBetween(new Date(sinceUnixSeconds), new Date(untilUnixSeconds));
+
+        for (Log l : logList) {
+        	if (logLinesMap.containsKey(l.getType().toString())) {
+        		logLinesMap.get(l.getType().toString()).add(new LogMessageDTO(l));        		
+        	} else {
+        		ArrayList<LogMessageDTO> newList = new ArrayList<LogMessageDTO>();
+        		newList.add(new LogMessageDTO(l));
+        		logLinesMap.put(l.getType().toString(), newList);
+        	}        			
+        }
 		
-		return null;
+		return logLinesMap;
 	}
 
     private void tryCreateFolder() throws IOException {
