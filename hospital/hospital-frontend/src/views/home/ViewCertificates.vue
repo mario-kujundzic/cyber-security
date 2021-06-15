@@ -44,10 +44,10 @@
                   <v-btn
                     icon
                     small
-                    :disabled="item.rootAuthority"
                     v-bind="attrs"
                     v-on="on"
                     @click="revokeCertificate(item)"
+                    :disabled="item.revocationStatus"
                   >
                     <v-icon dark>mdi-close-thick</v-icon>
                   </v-btn>

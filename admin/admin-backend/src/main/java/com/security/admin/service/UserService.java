@@ -3,15 +3,16 @@ package com.security.admin.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -19,18 +20,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.security.admin.dto.HospitalDTO;
 import com.security.admin.dto.ResetPasswordDTO;
+import com.security.admin.dto.UserDTO;
+import com.security.admin.dto.UserListDTO;
+import com.security.admin.dto.UserListRequestDTO;
 import com.security.admin.dto.UserTokenStateDTO;
 import com.security.admin.exception.OftenUsedPasswordException;
 import com.security.admin.exception.UserException;
 import com.security.admin.model.User;
+import com.security.admin.pki.util.CryptographicUtility;
+import com.security.admin.pki.util.KeyPairUtility;
 import com.security.admin.repository.UserRepository;
 import com.security.admin.security.CustomUserDetailsService;
 import com.security.admin.security.TokenUtils;
 import com.security.admin.util.RandomUtility;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -40,16 +46,24 @@ public class UserService {
 	private AuthenticationManager authenticationManager;
 	private MailSenderService mailSenderService;
 	private CustomUserDetailsService userDetailsService;
+	private HospitalService hospitalService;
+	private String resourceFolderPath;
+
+	private RestTemplate restTemplate;
 
 	@Autowired
-	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
-			AuthenticationManager authenticationManager, MailSenderService mailSenderService,
-			CustomUserDetailsService userDetailsService) {
+	public UserService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
+			UserRepository userRepository, TokenUtils tokenUtils, AuthenticationManager authenticationManager,
+			MailSenderService mailSenderService, CustomUserDetailsService userDetailsService,
+			HospitalService hospitalService, RestTemplate restTemplate) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
 		this.mailSenderService = mailSenderService;
 		this.userDetailsService = userDetailsService;
+		this.hospitalService = hospitalService;
+		this.resourceFolderPath = resourceFolderPath;
+		this.restTemplate = restTemplate;
 	}
 
 	public User findByUsername(String username) {
@@ -152,20 +166,20 @@ public class UserService {
 		UserTokenStateDTO token = generateToken(user.getUsername(), newPassword);
 		return token;
 	}
-	
+
 	private boolean oftenUsedPassword(String password) {
 		List<String> oftenUsedPasswords = new ArrayList<>();
-	    try (Stream<String> lines = Files.lines(Paths.get("./src/main/resources/common-passwords.txt"))) {
-	    	oftenUsedPasswords = lines.collect(Collectors.toList());
-	    } catch (IOException e) {
+		try (Stream<String> lines = Files.lines(Paths.get("./src/main/resources/common-passwords.txt"))) {
+			oftenUsedPasswords = lines.collect(Collectors.toList());
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	    
-	    if (oftenUsedPasswords.contains(password.toLowerCase()))
-	    	return true;
-	    return false;
+
+		if (oftenUsedPasswords.contains(password.toLowerCase()))
+			return true;
+		return false;
 	}
-	
+
 	private boolean passwordContainsUserData(String password, User user) {
 		String lowerPass = password.toLowerCase();
 		if (lowerPass.contains(user.getName().toLowerCase()))
@@ -175,5 +189,32 @@ public class UserService {
 		if (lowerPass.contains(user.getUsername().split("@")[0].toLowerCase()))
 			return true;
 		return false;
+	}
+
+	public List<UserDTO> getAllUsers() {
+		List<HospitalDTO> hospitals = hospitalService.getAll();
+		List<UserDTO> users = new ArrayList<>();
+		for (HospitalDTO h : hospitals) {
+			try {
+				String url = h.getHospitalUrl() + "/api/users/request";
+				
+				UserListRequestDTO dto = new UserListRequestDTO();
+				byte[] csrBytes = dto.getCSRBytes();
+				PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
+				byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
+				String base64Signature = Base64.getEncoder().encodeToString(signature);
+				dto.setSignature(base64Signature);
+				
+				UserListDTO response = this.restTemplate.postForObject(url, dto,
+						UserListDTO.class);
+				for (UserDTO u : response.getUsers()) {
+					u.setHospital(h.getCommonName());
+					users.add(u);
+				}
+			} catch (Exception e) {
+				System.out.println("Skipping hospital due to error.");
+			}
+		}
+		return users;
 	}
 }

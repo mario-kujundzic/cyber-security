@@ -15,11 +15,12 @@ public class CertificateStatusDTO {
 	@NonNull
 	private String serialNumber;
 	private CertificateStatus status;
+	private String revocationReason;
 	private String signature;
 	
 	
 	public byte[] getCSRBytes() {
-		String everything = String.join("", serialNumber, status.toString());
+		String everything = String.join("", serialNumber, status.toString(), revocationReason);
 		return everything.getBytes();
 	}
 	

@@ -108,7 +108,7 @@ public class AdminSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.addFilterBefore(new TokenAuthenticationFilter(tokenUtils, jwtUserDetailsService),
 						BasicAuthenticationFilter.class)
 //				;
-				.x509();
+				.x509().subjectPrincipalRegex("0.9.2342.19200300.100.1.1=(.*)");
 //				.x509AuthenticationFilter(certAuthFilter);
 		// zbog jednostavnosti primera
 		http.csrf().disable();

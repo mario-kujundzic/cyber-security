@@ -3,6 +3,7 @@ package com.security.admin.controller;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.dto.ModifyUserRequestDTO;
+import com.security.admin.service.CertificateService;
 import com.security.admin.service.ModifyUserRequestService;
 
 @RestController
@@ -27,17 +29,21 @@ public class ModifyUserRequestController {
 
 	private ModifyUserRequestService service;
 
+	private CertificateService certService;
 	@Autowired
-	public ModifyUserRequestController(ModifyUserRequestService service) {
+	public ModifyUserRequestController(ModifyUserRequestService service, CertificateService certService) {
 		this.service = service;
+		this.certService = certService;
 	}
 
 	@PostMapping("/request")
-	public ResponseEntity<GenericMessageDTO> requestNewCertificate(@RequestBody @Valid ModifyUserRequestDTO dto) {
+	public ResponseEntity<Object> requestNewCertificate(@RequestBody @Valid ModifyUserRequestDTO dto,
+			HttpServletRequest request) {
 		try {
+			certService.checkCertificateFromRequest(request);
 			service.addRequest(dto);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 
 		return new ResponseEntity<>(

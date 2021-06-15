@@ -2,6 +2,8 @@ package com.security.hospital.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.security.hospital.dto.AddCertificateRequestDTO;
 import com.security.hospital.dto.CertificateDTO;
 import com.security.hospital.service.CertificateService;
 import com.security.hospital.util.ValidationUtility;
@@ -60,6 +63,12 @@ public class CertificateController {
 	public ResponseEntity<CertificateDTO> checkStatus(@PathVariable("serialNumber") String serialNumber) throws Exception {
 		CertificateDTO dto = service.checkStatus(serialNumber);
 		return new ResponseEntity<>(dto, HttpStatus.OK);
+	}
+	
+	@PostMapping("/add")
+	public ResponseEntity<Object> addCertificate(@RequestBody @Valid AddCertificateRequestDTO dto) throws Exception {
+		service.saveCertificateToDb(dto);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 }

@@ -1,9 +1,11 @@
 package com.security.hospital.service;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,28 +16,34 @@ import com.security.hospital.dto.CertificateRequestDTO;
 import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
-import com.security.hospital.model.Device;
 import com.security.hospital.model.User;
+import com.security.hospital.model.devices.Device;
+import com.security.hospital.model.devices.MessageType;
 import com.security.hospital.model.requests.CertificateUser;
 import com.security.hospital.pki.util.CryptographicUtility;
 import com.security.hospital.pki.util.KeyPairUtility;
+import com.security.hospital.pki.util.PEMUtility;
 import com.security.hospital.repository.DeviceRepository;
+import com.security.hospital.repository.MessageTypeRepository;
 
 @Service
 public class DeviceService {
 	private DeviceRepository deviceRepository;
 	private String resourceFolderPath;
 	private RestTemplate restTemplate;
+	private MessageTypeRepository messageTypeRepository;
 
 	@Autowired
 	private LogService logService;
 
 	@Autowired
 	public DeviceService(DeviceRepository deviceRepository,
-			@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate) {
+			@Value("${server.ssl.key-store-folder}") String resourceFolderPath, RestTemplate restTemplate,
+			MessageTypeRepository messageTypeRepository) {
 		this.deviceRepository = deviceRepository;
 		this.resourceFolderPath = resourceFolderPath;
 		this.restTemplate = restTemplate;
+		this.messageTypeRepository = messageTypeRepository;
 	}
 
 	public DeviceDTO getOne(long id) {
@@ -115,10 +123,67 @@ public class DeviceService {
 		return csrResponse;
 	}
 
-	public void processMessage(DeviceMessageDTO dto) {
+	public void register(DeviceMessageDTO dto) throws Exception {
 		// neka logika za proveru sertifikata
-		String message = dto.getMessage();
+		String commonName = dto.getCommonName();
+		Device device = deviceRepository.getByCommonName(commonName);
+		String publicKeyPEM = device.getPublicKey();
 
-		logService.logDeviceInfo("d1", message);
+		if (publicKeyPEM == null) {
+			throw new Exception("Denied: Device with common name " + commonName
+					+ " not found. Contact a hospital admin to register this device's public key.");
+		}
+
+		PublicKey publicKey = PEMUtility.PEMToPublicKey(publicKeyPEM);
+		// Verify signature
+		byte[] csrBytes = dto.getCSRBytes();
+		byte[] signature = Base64.getDecoder().decode(dto.getSignature());
+		boolean valid = CryptographicUtility.verify(csrBytes, signature, publicKey);
+
+		if (!valid) {
+			throw new Exception("Denied: signature invalid.");
+		}
+		if (dto.getParameters().isEmpty())
+			throw new Exception("Denied: no data present!");
+
+		List<String> paramList = new ArrayList<>();
+		if (device.getMessageTypes().size() == 0) {
+			for (Entry<String, String> entry : dto.getParameters().entrySet()) {
+				String paramName = entry.getKey();
+				MessageType type = this.messageTypeRepository.getByParamName(paramName);
+				if (type != null) {
+					device.getMessageTypes().add(type);
+					paramList.add(paramName);
+				}
+			}
+		}
+		deviceRepository.save(device);
+		if (paramList.isEmpty())
+			logService.logDeviceInfo(dto.getCommonName(), "Device already registered with params - " + String.join(", ", dto.getParameters().keySet()));
+		else
+			logService.logDeviceInfo(dto.getCommonName(), "Registered device with params - " + String.join(", ", paramList));
+	}
+
+	public void processMessage(DeviceMessageDTO dto) throws Exception {
+		for (Entry<String, String> entry : dto.getParameters().entrySet()) {
+			String paramName = entry.getKey();
+			MessageType type = this.messageTypeRepository.getByParamName(paramName);
+			if (type != null) {
+				switch(type.getMessageDataType()) {
+				case FLOAT:
+					Float floatVal = Float.parseFloat(entry.getValue());
+					// TODO: do something with value, alarms n stuff potentially?
+					String messageFloat = "Value for param " + type.getParamName() + ": " + entry.getValue();
+					logService.logDeviceInfo(dto.getCommonName(), messageFloat);
+					// TODO: replace with just one log line
+					break;
+				case INTEGER:
+					Integer intVal = Integer.parseInt(entry.getValue());
+					String messageInt = "Value for param " + type.getParamName() + ": " + entry.getValue();
+					logService.logDeviceInfo(dto.getCommonName(), messageInt);
+					break;
+				}
+			}
+		}
 	}
 }

@@ -3,6 +3,7 @@ package com.security.admin.controller;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,23 +21,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.security.admin.dto.AddUserRequestDTO;
 import com.security.admin.dto.GenericMessageDTO;
 import com.security.admin.service.AddUserRequestService;
+import com.security.admin.service.CertificateService;
 
 @RestController
 @RequestMapping(value = "/api/addUserRequests", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AddUserRequestController {
 	private AddUserRequestService service;
+	private CertificateService certService;
 
 	@Autowired
-	public AddUserRequestController (AddUserRequestService service) {
+	public AddUserRequestController (AddUserRequestService service, CertificateService certService) {
 		this.service = service;
+		this.certService = certService;
 	}
 
 	@PostMapping("/request")
-	public ResponseEntity<GenericMessageDTO> requestUserAdd(@RequestBody @Valid AddUserRequestDTO dto) {
+	public ResponseEntity<Object> requestUserAdd(@RequestBody @Valid AddUserRequestDTO dto, HttpServletRequest request) {
 		try {
+			certService.checkCertificateFromRequest(request);
 			service.addRequest(dto);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 
 		return new ResponseEntity<>(
@@ -55,7 +60,7 @@ public class AddUserRequestController {
 
 	@GetMapping()
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
-	public ResponseEntity<Object> getAllRequests() {
+	public ResponseEntity<Object> getAllRequests(HttpServletRequest httpServletRequest) {
 		List<AddUserRequestDTO> dtos = service.getAllRequestsDTO();
 
 		return new ResponseEntity<>(dtos, HttpStatus.OK);

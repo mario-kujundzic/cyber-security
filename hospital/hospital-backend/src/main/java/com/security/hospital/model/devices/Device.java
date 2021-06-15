@@ -1,10 +1,14 @@
-package com.security.hospital.model;
+package com.security.hospital.model.devices;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.security.hospital.dto.DeviceDTO;
@@ -27,6 +31,9 @@ public class Device {
 
 	@Column(name = "public_key", columnDefinition = "TEXT")
 	private String publicKey;
+	
+	@ManyToMany
+	private List<MessageType> messageTypes = new ArrayList<>();
 
 	public Device(DeviceDTO dto) {
 		id = dto.getId();

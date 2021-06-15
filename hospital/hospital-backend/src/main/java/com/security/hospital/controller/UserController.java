@@ -3,6 +3,8 @@ package com.security.hospital.controller;
 import java.io.IOException;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.dto.UserDTO;
+import com.security.hospital.dto.UserListDTO;
+import com.security.hospital.dto.UserListRequestDTO;
 import com.security.hospital.model.User;
 import com.security.hospital.service.AddUserRequestService;
 import com.security.hospital.service.DeleteUserRequestService;
@@ -49,9 +53,15 @@ public class UserController {
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 
+	@PostMapping("/request")
+	public ResponseEntity<Object> requestUsers(@RequestBody UserListRequestDTO dto) throws Exception {
+		UserListDTO users = userService.getAllRequest(dto);
+		return new ResponseEntity<>(users, HttpStatus.OK);
+	}
+
 	@PostMapping()
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<Object> addUser(@RequestBody UserDTO dto, @AuthenticationPrincipal User admin) throws IOException {
+	public ResponseEntity<Object> addUser(@RequestBody @Valid UserDTO dto, @AuthenticationPrincipal User admin) throws IOException {
 		GenericMessageDTO message = addUserRequestService.create(dto, admin);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
