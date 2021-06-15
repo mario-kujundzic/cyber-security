@@ -23,7 +23,7 @@ public class MaliciousIPHandler {
 		}       
 	}
 	
-	public static void writeIP(String IP) {
+	public static void writeIP() {
 		Path out = Paths.get("./src/main/resources/malicious-ip.txt");
 		try {
 			Files.write(out, ips, Charset.defaultCharset());

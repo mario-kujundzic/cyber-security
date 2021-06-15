@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.security.hospital.events.InvalidLoginEvent;
+import com.security.hospital.events.MaliciousLoginEvent;
 
 
 @Service
@@ -64,6 +65,23 @@ public class KieSessionService {
 				if (object.getClass().equals(InvalidLoginEvent.class)) {
 					InvalidLoginEvent event = (InvalidLoginEvent) object;
 					return event.getUsername().equals(username);
+				}
+				return false;
+			}
+		};
+		Collection<FactHandle> events = this.kieSession.getFactHandles(filter);
+		for (FactHandle handle : events) {
+			this.kieSession.delete(handle);			
+		}
+	}
+	
+	public void removeMaliciousLoginEvents(String IPAddress) {
+		ObjectFilter filter = new ObjectFilter() {
+			@Override
+			public boolean accept(Object object) {
+				if (object.getClass().equals(MaliciousLoginEvent.class)) {
+					MaliciousLoginEvent event = (MaliciousLoginEvent) object;
+					return event.getIPAddress().equals(IPAddress);
 				}
 				return false;
 			}

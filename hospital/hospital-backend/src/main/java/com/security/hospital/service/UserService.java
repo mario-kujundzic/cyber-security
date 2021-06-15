@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PublicKey;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
@@ -41,7 +39,9 @@ import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserListDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
 import com.security.hospital.events.InvalidLoginEvent;
+import com.security.hospital.events.MaliciousLoginEvent;
 import com.security.hospital.events.StatusLoginEvent;
+import com.security.hospital.events.StatusMaliciousLoginEvent;
 import com.security.hospital.exceptions.MaliciousIPAddressException;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
@@ -121,18 +121,28 @@ public class UserService implements UserDetailsService {
 		try {
 			token = generateToken(username, password);
 		} catch (BadCredentialsException e) {
-			logService.logAuthError("Login failed, wrong password for account '" + username + "'. IP: " + IPAddress);
+			logService.logAuthWarning("Login failed, wrong password for account '" + username + "'. IP: " + IPAddress);
 			StatusLoginEvent statusLoginEvent = new StatusLoginEvent(username);
+			StatusMaliciousLoginEvent statusMaliciousLoginEvent = new StatusMaliciousLoginEvent(IPAddress);
 			InvalidLoginEvent event = new InvalidLoginEvent(username);
-			session.insert(statusLoginEvent);
+			MaliciousLoginEvent mEvent = new MaliciousLoginEvent(IPAddress);
 			session.insert(event);
+			session.insert(statusLoginEvent);
+			session.insert(mEvent);
+			session.insert(statusMaliciousLoginEvent);
 			session.setAgendaFocus("user-login-check");
 			session.fireAllRules();
 			if (statusLoginEvent.isAttack()) {
 				session.removeLoginEvents(username);
 				logService.logAuthError("Attack happened - Login failed, wrong password for account '" + username + " ' 3 times. IP: " + IPAddress);
 			}
-			throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
+			if (statusMaliciousLoginEvent.isAttack()) {
+				session.removeMaliciousLoginEvents(IPAddress);
+				MaliciousIPHandler.ips.add(IPAddress);
+				MaliciousIPHandler.writeIP();
+				logService.logAuthError("Detected more than 30 failed login attempts in the last 24h. Malicious IP: " + IPAddress);
+			}
+			throw new UserException("Invalid username or password!", "password", "Incorrect password.");
 		}
 		
 		Date lastLogin = new Date(existUser.getLastLoginDate().getTime());
