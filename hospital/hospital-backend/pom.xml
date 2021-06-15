@@ -155,7 +155,7 @@
 		
 		<dependency>
 	  		<groupId>sbnz.integracija</groupId>
-	  		<artifactId>security-spring-kjar</artifactId>
+	  		<artifactId>security-hospital-spring-kjar</artifactId>
 	  		<type>jar</type>
 	  		<version>0.0.1-SNAPSHOT</version>
   		</dependency>

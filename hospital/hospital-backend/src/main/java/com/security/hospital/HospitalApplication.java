@@ -18,7 +18,7 @@ public class HospitalApplication {
 		Security.addProvider(new BouncyCastleProvider());
 		ApplicationContext context = SpringApplication.run(HospitalApplication.class, args);
 		FirstTimeSetup.execute();
-
+		SessionInitializer.initializeSession(context);
 //		LogService logService = context.getBean(LogService.class);
 //
 //		logService.logGeneralInfo("Some General info");
@@ -100,7 +100,7 @@ public class HospitalApplication {
 	public KieContainer kieContainer() {
 		KieServices ks = KieServices.Factory.get();
 		KieContainer kContainer = ks
-				.newKieContainer(ks.newReleaseId("sbnz.integracija", "security-spring-kjar", "0.0.1-SNAPSHOT"));
+				.newKieContainer(ks.newReleaseId("sbnz.integracija", "security-hospital-spring-kjar", "0.0.1-SNAPSHOT"));
 		KieScanner kScanner = ks.newKieScanner(kContainer);
 		kScanner.start(10_000);
 		return kContainer;
