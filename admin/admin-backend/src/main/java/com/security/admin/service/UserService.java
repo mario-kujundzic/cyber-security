@@ -11,7 +11,6 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.security.admin.security.events.LoginAttemptResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,18 +40,16 @@ public class UserService {
 	private AuthenticationManager authenticationManager;
 	private MailSenderService mailSenderService;
 	private CustomUserDetailsService userDetailsService;
-	private SecurityEventService securityEventService;
 
 	@Autowired
 	public UserService(UserRepository userRepository, TokenUtils tokenUtils,
 			AuthenticationManager authenticationManager, MailSenderService mailSenderService,
-			CustomUserDetailsService userDetailsService, SecurityEventService securityEventService) {
+			CustomUserDetailsService userDetailsService) {
 		this.userRepository = userRepository;
 		this.tokenUtils = tokenUtils;
 		this.authenticationManager = authenticationManager;
 		this.mailSenderService = mailSenderService;
 		this.userDetailsService = userDetailsService;
-		this.securityEventService = securityEventService;
 	}
 
 	public User findByUsername(String username) {
@@ -80,12 +77,10 @@ public class UserService {
         try {
             existUser = getOne(username);
         } catch (NoSuchElementException e) {
-            securityEventService.invokeLoginAttempt(username, LoginAttemptResult.USER_DOESNT_EXIST, IPAddress, -1);
             throw new UserException("No such element!", "username", "User with this username doesn't exist.");
         }
 
         if (!existUser.isEnabled()) {
-            securityEventService.invokeLoginAttempt(username, LoginAttemptResult.ACCOUNT_INACTIVE, IPAddress, -1);
             throw new DisabledException("Your account hasn't been activated yet. Please check your email!");
         }
 
@@ -93,15 +88,11 @@ public class UserService {
         try {
             token = generateToken(username, password);
         } catch (BadCredentialsException e) {
-            securityEventService.invokeLoginAttempt(username, LoginAttemptResult.PASSWORD_INCORRECT, IPAddress,
-                    existUser.getLastLoginDate().getTime() / 1000);
             throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
         }
 
         existUser.resetLastLoginDate();
         userRepository.save(existUser);
-        securityEventService.invokeLoginAttempt(username, LoginAttemptResult.SUCCESS, IPAddress,
-                existUser.getLastLoginDate().getTime() / 1000);
         return token;
 
     }
