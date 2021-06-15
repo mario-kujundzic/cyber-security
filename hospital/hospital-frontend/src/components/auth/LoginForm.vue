@@ -135,10 +135,10 @@ export default {
             this.$router.push({ name: "ViewPatients" });
           }
         })
-        .catch(() => {
+        .catch((error) => {
           //TODO sredi ovo na snackbarove u nekom trenutku
           this.loading = false;
-          alert("Incorrect username or password!");
+          alert(error.response.data.message);
         });
     },
   },

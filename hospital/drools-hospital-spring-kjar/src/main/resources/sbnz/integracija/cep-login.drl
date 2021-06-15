@@ -1,0 +1,16 @@
+package sbnz.integracija;
+
+import com.security.hospital.events.InvalidLoginEvent;
+import com.security.hospital.events.StatusLoginEvent;
+
+
+rule "UserLoginStatusEvent check - 3 InvalidLoginEvent in last 30 minutes"
+    agenda-group "user-login-check"
+    when
+        $loginEvent: StatusLoginEvent($username: username) and
+        $eventCounter: Number(intValue > 5) from accumulate(InvalidLoginEvent(username == $username) over window:time( 10min ), count(1))
+    then
+        System.out.println("User with username " + $username + " failed login! New InvalidLoginEvent added.");
+        $loginEvent.setAttack(true);
+        delete($loginEvent);
+end

@@ -18,6 +18,12 @@ public class ExceptionHandlers {
 		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(MaliciousIPAddressException.class)
+	public ResponseEntity<ErrorMessage> maliciousIPHandler(MaliciousIPAddressException ex, WebRequest request) {
+		ErrorMessage message = new ErrorMessage(ex.getMessage());
+		return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(OftenUsedPasswordException.class)
 	public ResponseEntity<ErrorMessage> OftenUsedPasswordExceptionHandler(OftenUsedPasswordException ex, WebRequest request) {
 		ErrorMessage message = new ErrorMessage(ex.getMessage());

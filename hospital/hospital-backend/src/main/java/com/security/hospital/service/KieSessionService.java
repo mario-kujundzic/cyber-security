@@ -5,8 +5,11 @@ import java.util.Collection;
 import org.drools.core.ObjectFilter;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.security.hospital.events.InvalidLoginEvent;
 
 
 @Service
@@ -54,23 +57,21 @@ public class KieSessionService {
 		return results;
 	}
 	
-	
-	// primer sklanjanja eventova iz sesije
-//	public void removeLoginEvents(Long userId) {
-//		ObjectFilter filter = new ObjectFilter() {
-//			@Override
-//			public boolean accept(Object object) {
-//				if (object.getClass().equals(InvalidLoginEvent.class)) {
-//					InvalidLoginEvent event = (InvalidLoginEvent) object;
-//					return event.getJobSeekerId().equals(userId);
-//				}
-//				return false;
-//			}
-//		};
-//		Collection<FactHandle> events = this.kieSession.getFactHandles(filter);
-//		for (FactHandle handle : events) {
-//			this.kieSession.delete(handle);			
-//		}
-//	}
+	public void removeLoginEvents(String username) {
+		ObjectFilter filter = new ObjectFilter() {
+			@Override
+			public boolean accept(Object object) {
+				if (object.getClass().equals(InvalidLoginEvent.class)) {
+					InvalidLoginEvent event = (InvalidLoginEvent) object;
+					return event.getUsername().equals(username);
+				}
+				return false;
+			}
+		};
+		Collection<FactHandle> events = this.kieSession.getFactHandles(filter);
+		for (FactHandle handle : events) {
+			this.kieSession.delete(handle);			
+		}
+	}
 
 }
