@@ -74,7 +74,7 @@ public class LogController {
 
 			ArrayList<LogMessageDTO> temp = new ArrayList<>();
 			temp.add(new LogMessageDTO((new Date()).getTime(), null,
-					"The source '" + source + "' wasn't found in the hospital's log archive."));
+					"The source '" + source + "' wasn't found in the hospital's log archive.", null));
 			filteredMap.put(source, temp);
 		}
 
@@ -121,5 +121,16 @@ public class LogController {
 		if (!valid) {
 			throw new Exception("Denied: signature invalid.");
 		}
+	}
+	
+
+	@GetMapping
+	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
+	public ResponseEntity<HashMap<String, ArrayList<Object>>> getLogReport(@RequestParam(value = "since", required = false) Long sinceUnixSeconds) throws Exception {
+		if (sinceUnixSeconds == null) {
+			sinceUnixSeconds = 0L;
+		}
+		HashMap<String, ArrayList<Object>> results = logService.logReportSince(sinceUnixSeconds);
+		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 }

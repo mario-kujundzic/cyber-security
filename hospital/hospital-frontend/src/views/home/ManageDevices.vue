@@ -208,7 +208,6 @@ export default {
       this.axios
         .post("/api/devices/requestCertificate", csr)
         .then((response) => {
-          this.$refs.form.reset();
           alert(response.data.message);
         })
         .catch((error) => {

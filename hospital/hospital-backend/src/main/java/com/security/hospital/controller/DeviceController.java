@@ -88,23 +88,24 @@ public class DeviceController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<GenericMessageDTO> register(@RequestBody @Valid DeviceMessageDTO dto) {
+	public ResponseEntity<Object> register(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
-			// nekako getuj sertifikat i posalji zahtev za proveru da li je revoked!
 			deviceService.register(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully registered!"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@PostMapping("/message")
-	public ResponseEntity<GenericMessageDTO> recieveMessage(@RequestBody @Valid DeviceMessageDTO dto) {
+	public ResponseEntity<Object> recieveMessage(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
 			deviceService.processMessage(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(new GenericMessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
 }
+

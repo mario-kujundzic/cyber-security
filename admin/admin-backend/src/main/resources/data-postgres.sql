@@ -22,6 +22,8 @@ insert into user_roles (user_id, role_id) values (1, 1);
 insert into certificates (common_name, email, revocation_status, root_authority, serial_number, valid_from, valid_to) values ('LotusClinic', 'lotusclinic505@gmail.com', 'false', 'true', '139095100165847.00', '2021-05-04 00:00:00', '2022-05-04 00:00:00');
 -- generated cert for hospital1
 insert into certificates (common_name, email, revocation_status, root_authority, serial_number, valid_from, valid_to) values ('Hospital1', 'admin1@gmail.com', 'false', 'false', '672496789128620.00', '2021-06-11 02:00:00', '2022-07-11 02:00:00');
+-- generated cert for device1
+insert into certificates (common_name, email, revocation_status, root_authority, serial_number, valid_from, valid_to) values ('patient_device_1', 'admin1@gmail.com', 'false', 'false', '999018678866013.00', '2021-06-15 02:00:00', '2022-07-15 02:00:00');
 
 insert into hospitals (common_name, hospital_url, public_key) values ('Hospital1', 'https://localhost:9002',
 '-----BEGIN PUBLIC KEY-----
@@ -34,7 +36,7 @@ CZbUxz3U2naGbbYBFlbr8Ua6+YfxkQqTt2nWuCOT9GU5AkV6ftLSxBnxLtFpa9uI
 UwIDAQAB-----END PUBLIC KEY-----');
 
 
-insert into requests_csr (common_name, country, email, locality, organization, organization_unit, public_key, state, hospital_name, status, certificate_user) values ('Hospital1', 'RS', 'admin1@gmail.com', 'Novi Sad', 'Lotus Clinic Organization', 'Cyber Security Administrative Center', 
+insert into requests_csr (common_name, country, email, locality, organization, organization_unit, public_key, state, hospital_name, status, certificate_user) values ('Hospital1', 'RS', 'admin1@gmail.com', 'Novi Sad', 'Cyber Security Hospital Center', 'Cyber Security Administrative Center', 
 '-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8ujeqk0wBwrZrT/DTG4S
 /nhs9qnqTjuwavcrf3scARCD6yB+k+4DsiPjtvt0eBWwCjcIGcEhJSuXP9Dapek4
@@ -44,3 +46,14 @@ OqA+OomtD9NO0PFgkMWT11RRK/H2fypZ6NqZJyrw8H4K4cilXVf9sp3vefSd9AWv
 CZbUxz3U2naGbbYBFlbr8Ua6+YfxkQqTt2nWuCOT9GU5AkV6ftLSxBnxLtFpa9uI
 UwIDAQAB-----END PUBLIC KEY-----', 
 'Vojvodina', 'Hospital1', 1, 0);
+
+insert into requests_csr (common_name, country, email, locality, organization, organization_unit, public_key, state, hospital_name, status, certificate_user) values ('patient_device_1', 'RS', 'admin1@gmail.com', 'Novi Sad', 'Cyber Security Hospital Center', 'Cyber Security Administrative Center', 
+'-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxvV8MQJSwNDWoH9Ykymz
+IpqxazITBo7S8zw4VvwNPO8dreznEBbJsz2H2TjRougDEUGPuSE+doYOOndUtWPI
+8AH92Ra3JY/gM846J5QfsUADOSLH+FomV6+56dR3drhCv/isu1L7Y/zZlmBBsSVm
+8SSp3MafSrh2gWzAR/2GTHB/HWwpBs++r6dedqLpZbuIoGHj49XNboLh1OL2EIIf
+q+aPNB3KysQTtIuwa4KaZlH4qS4B5s6+jeENGeb5kB/XjsmVAD8gF7jijZ7rlHBz
+YPM18z8V4M7jwiEmv84mcYTAKO375WiPgcXQJ4cnk5tKrS3mjEUpkt9ZHAgNR5Yv
+swIDAQAB-----END PUBLIC KEY-----', 
+'Vojvodina', 'Hospital1', 1, 1);

@@ -1,16 +1,17 @@
 package com.security.hospital.service;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
 
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -165,5 +166,5 @@ public class CertificateService {
 		
 		repository.save(cert);
 	}
-
+	
 }

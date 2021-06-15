@@ -128,14 +128,6 @@
 			<artifactId>drools-compiler</artifactId>
 			<version>6.5.0.Final</version>
 		</dependency>
-		
-		<dependency>
-	  		<groupId>sbnz.integracija</groupId>
-	  		<artifactId>security-admin-spring-kjar</artifactId>
-	  		<type>jar</type>
-	  		<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-
 	</dependencies>
 
 	<build>
