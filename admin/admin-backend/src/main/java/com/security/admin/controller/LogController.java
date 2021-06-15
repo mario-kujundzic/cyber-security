@@ -147,12 +147,11 @@ public class LogController {
     }
 
     private LogSourcesDTO getHospitalSources(String hospitalUrl) {
-        JwtAuthenticationRequest authRequest = new JwtAuthenticationRequest("admin1@gmail.com", "admin1");
-        UserTokenStateDTO response = this.restTemplate.postForObject(hospitalUrl + "/auth/login", authRequest, UserTokenStateDTO.class);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Authorization", "Bearer " + response.getAccessToken());
+        String accessToken = authAtHospital(hospitalUrl);
+        headers.set("Authorization", "Bearer " + accessToken);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
