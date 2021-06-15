@@ -82,14 +82,13 @@ public class LogController {
 	}
 
 	@PostMapping
-	public ResponseEntity<String> requestLogsAdmin(
-			@RequestBody @Valid AdminAuthDTO adminAuth,
+	public ResponseEntity<String> requestLogsAdmin(@RequestBody @Valid AdminAuthDTO adminAuth,
 			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
 			@RequestParam(value = "sources", required = false) String[] sources) throws Exception {
 		authorizeAdminApp(adminAuth);
 		return getLogsSince(sinceUnixSeconds, sources);
 	}
-	
+
 	@GetMapping("/sources")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<Object> getLogSources() throws IOException {
@@ -105,7 +104,7 @@ public class LogController {
 		authorizeAdminApp(adminAuth);
 		return getLogSources();
 	}
-	
+
 	private void authorizeAdminApp(AdminAuthDTO adminAuth) throws Exception {
 		PublicKey rootCAKey = KeyPairUtility.readPublicKey(resourceFolderPath + "/rootCA.pub");
 
@@ -122,15 +121,20 @@ public class LogController {
 			throw new Exception("Denied: signature invalid.");
 		}
 	}
-	
 
-	@GetMapping
+	@GetMapping("/report")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
-	public ResponseEntity<HashMap<String, ArrayList<Object>>> getLogReport(@RequestParam(value = "since", required = false) Long sinceUnixSeconds) throws Exception {
+	public ResponseEntity<HashMap<String, ArrayList<LogMessageDTO>>> getLogReport(
+			@RequestParam(value = "since", required = false) Long sinceUnixSeconds,
+			@RequestParam(value = "until", required = false) Long untilUnixSeconds) throws Exception {
 		if (sinceUnixSeconds == null) {
 			sinceUnixSeconds = 0L;
 		}
-		HashMap<String, ArrayList<Object>> results = logService.logReportSince(sinceUnixSeconds);
+		if (untilUnixSeconds == null) {
+			untilUnixSeconds = 0L;
+		}
+		HashMap<String, ArrayList<LogMessageDTO>> results = logService.logReportSince(sinceUnixSeconds,
+				untilUnixSeconds);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 }

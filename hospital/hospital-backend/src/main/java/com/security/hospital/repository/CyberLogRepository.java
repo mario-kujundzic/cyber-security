@@ -10,5 +10,5 @@ import com.security.hospital.model.Log;
 
 public interface CyberLogRepository extends MongoRepository<Log, Long>{
 	List<Log> findAllByTimestampBetween(Date timestampStart, Date timestampEnd);
-	List<Log> findAllByType(LogMessageType type);
+	List<Log> findAllByTimestampBetweenAndType(Date timestampStart, Date timestampEnd, LogMessageType type);
 }
