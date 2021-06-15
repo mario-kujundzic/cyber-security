@@ -36,7 +36,7 @@ public class FirstTimeSetup {
 		File privateKeyFile = new File(keyStoreFolderPath + "/key.priv");
 		File publicKeyFile = new File(keyStoreFolderPath + "/key.pub");
 		File certFile = new File(keyStoreFolderPath + "/hospitalBack.crt");
-
+		
 		if (keyStoreFile.exists() && privateKeyFile.exists() && publicKeyFile.exists()) {
 			System.out.println("FirstTimeSetup: KeyStore, private key and public key found at specified path.");
 			keyStoreManager.loadKeyStore();

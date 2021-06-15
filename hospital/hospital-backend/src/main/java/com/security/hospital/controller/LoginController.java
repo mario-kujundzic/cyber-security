@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
+import com.security.hospital.exceptions.MaliciousIPAddressException;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
 import com.security.hospital.security.auth.JwtAuthenticationRequest;
@@ -37,7 +38,7 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<UserTokenStateDTO> login(
             @RequestBody JwtAuthenticationRequest authenticationRequest,
-            HttpServletRequest request, HttpServletResponse response) throws DisabledException, UserException {
+            HttpServletRequest request, HttpServletResponse response) throws DisabledException, UserException, MaliciousIPAddressException {
 
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();

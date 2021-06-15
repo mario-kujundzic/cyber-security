@@ -1,0 +1,27 @@
+package sbnz.integracija;
+
+import com.security.hospital.events.DosEventStatus;
+import com.security.hospital.events.DosEvent;
+
+rule "DosEvent check - more than 50 in 60s"
+	salience 100
+    agenda-group "dos-agenda"
+    when
+        $loginEvent: DosEventStatus($ip: IPAddress) and
+        $eventCounter: Number(intValue > 50) from accumulate(DosEvent(IPAddress == $ip) over window:time( 1m ), count(1))
+    then
+    	modify($loginEvent) {
+    		setAttack(true)
+    	}
+        delete($loginEvent);
+end
+
+
+rule "Cleanup rule - DosEventStatus"
+	salience 0
+	agenda-group "dos-agenda"
+	when 
+		$des: DosEventStatus()
+	then
+		delete($des);
+end

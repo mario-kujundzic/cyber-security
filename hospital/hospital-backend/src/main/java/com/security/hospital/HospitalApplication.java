@@ -18,6 +18,7 @@ public class HospitalApplication {
 		Security.addProvider(new BouncyCastleProvider());
 		ApplicationContext context = SpringApplication.run(HospitalApplication.class, args);
 		FirstTimeSetup.execute();
+		MaliciousIPHandler.loadIP();
 		SessionInitializer.initializeSession(context);
 //		LogService logService = context.getBean(LogService.class);
 //

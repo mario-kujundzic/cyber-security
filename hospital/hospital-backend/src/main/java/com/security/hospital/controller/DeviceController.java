@@ -3,8 +3,6 @@ package com.security.hospital.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,8 +23,9 @@ import com.security.hospital.dto.DeviceDTO;
 import com.security.hospital.dto.DeviceMessageDTO;
 import com.security.hospital.dto.GenericMessageDTO;
 import com.security.hospital.model.User;
-import com.security.hospital.service.CertificateService;
 import com.security.hospital.service.DeviceService;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/devices", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,9 +34,6 @@ public class DeviceController {
 	@Autowired
 	private DeviceService deviceService;
 
-	@Autowired
-	private CertificateService certService;
-	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 	public ResponseEntity<DeviceDTO> getOneDevices(@PathVariable long id) {
@@ -56,7 +52,7 @@ public class DeviceController {
 
 	@PostMapping
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<DeviceDTO> createDevice(@RequestBody DeviceDTO dto) {
+	public ResponseEntity<DeviceDTO> createDevice(@RequestBody @Valid DeviceDTO dto) {
 		DeviceDTO deviceDTO = deviceService.create(dto);
 
 		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
@@ -64,7 +60,7 @@ public class DeviceController {
 
 	@PutMapping
 	@PreAuthorize("hasAuthority('UPDATE_PRIVILEGE')")
-	public ResponseEntity<DeviceDTO> updateDevice(@RequestBody DeviceDTO dto) {
+	public ResponseEntity<DeviceDTO> updateDevice(@RequestBody @Valid DeviceDTO dto) {
 		DeviceDTO deviceDTO = deviceService.update(dto);
 
 		return new ResponseEntity<DeviceDTO>(deviceDTO, HttpStatus.OK);
@@ -81,7 +77,7 @@ public class DeviceController {
 
 	@PostMapping("/requestCertificate")
 	@PreAuthorize("hasAuthority('CREATE_PRIVILEGE')")
-	public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody CertificateRequestDTO dto,
+	public ResponseEntity<GenericMessageDTO> requestCertificate(@RequestBody @Valid CertificateRequestDTO dto,
 			@AuthenticationPrincipal User admin) {
 		try {
 			GenericMessageDTO mess = deviceService.requestCertificate(dto, admin);
@@ -92,7 +88,7 @@ public class DeviceController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<Object> register(@RequestBody DeviceMessageDTO dto, HttpServletRequest request) {
+	public ResponseEntity<Object> register(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
 			deviceService.register(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully registered!"), HttpStatus.OK);
@@ -102,7 +98,7 @@ public class DeviceController {
 	}
 
 	@PostMapping("/message")
-	public ResponseEntity<Object> recieveMessage(@RequestBody DeviceMessageDTO dto) {
+	public ResponseEntity<Object> recieveMessage(@RequestBody @Valid DeviceMessageDTO dto) {
 		try {
 			deviceService.processMessage(dto);
 			return new ResponseEntity<>(new GenericMessageDTO("Successfully delivered secure message!"), HttpStatus.OK);

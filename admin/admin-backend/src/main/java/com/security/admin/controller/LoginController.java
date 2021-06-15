@@ -34,7 +34,7 @@ public class LoginController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<UserTokenStateDTO> login(@RequestBody JwtAuthenticationRequest authenticationRequest,
+	public ResponseEntity<UserTokenStateDTO> login(@RequestBody @Valid JwtAuthenticationRequest authenticationRequest,
 			HttpServletRequest request,
 			HttpServletResponse response) throws UserException {
 		String username = authenticationRequest.getUsername();

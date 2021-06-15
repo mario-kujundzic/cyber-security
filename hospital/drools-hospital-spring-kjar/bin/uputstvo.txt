@@ -1,0 +1,24 @@
+2.	U eclipsu instalirati JBoss tools:
+	a.	U eclipsu: Help -> Eclipse Marketplace..
+	b.	U search ukucati JBoss Tools, nakon pronalaska alata kliknuti na install.
+	c.	Čekirati sve opcije i instalirati
+	
+3.	Sa sajta www.drools.org skinuti „Drools and jBPM tools“ i raspakovati arhivu
+
+4.	U eclipsu instalirati „Drools and jBPM tools“:
+	a.	Help -> Install new software
+	b.	U okviru Work with: kliknuti na Add… dugme
+	c.	U novootvorenom dijalogu u polje name uneti „drools local update site“
+	d.	Kliknuti na dugme Local…
+	e.	Pozicionirati se na org.drools.updatesite folder koji se nalazi u binaries folderu raspakovane arhive
+	f.	Čekirati sve opcije i instalirati
+	
+5.	Nakon instalacije sa sajta www.drools.org skinuti drools distribution (Drools Engine) i raspakovati arhivu
+
+6.	U eclipsu dodati drools runtime:
+	a.	Window -> Preferences
+	b.	Drools -> Installed Drools Runtimes
+	c.	Kliknuti na dugme ADD
+	d.	U dijalogu kliknuti na dugme Browse i pronaći binares folder u okviru drools distribution
+	
+Nakon zavrsene instalacije drools-a instalirati drools-spring-kjar preko maven install da se napravi jar

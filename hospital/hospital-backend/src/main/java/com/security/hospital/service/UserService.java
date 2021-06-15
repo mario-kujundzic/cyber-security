@@ -6,12 +6,14 @@ import java.nio.file.Paths;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Valid;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +29,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.security.hospital.MaliciousIPHandler;
 import com.security.hospital.dto.AddUserRequestDTO;
+import com.security.hospital.dto.AdminAuthDTO;
 import com.security.hospital.dto.DeleteUserRequestDTO;
 import com.security.hospital.dto.ModifyUserRequestDTO;
+import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserDTO;
 import com.security.hospital.dto.UserListDTO;
-import com.security.hospital.dto.AdminAuthDTO;
-import com.security.hospital.dto.ResetPasswordDTO;
 import com.security.hospital.dto.UserTokenStateDTO;
+import com.security.hospital.events.InvalidLoginEvent;
+import com.security.hospital.events.MaliciousLoginEvent;
+import com.security.hospital.events.StatusLoginEvent;
+import com.security.hospital.events.StatusMaliciousLoginEvent;
+import com.security.hospital.exceptions.MaliciousIPAddressException;
 import com.security.hospital.exceptions.OftenUsedPasswordException;
 import com.security.hospital.exceptions.UserException;
 import com.security.hospital.model.Role;
@@ -67,6 +75,9 @@ public class UserService implements UserDetailsService {
 	private LogService logService;
 
 	private String resourceFolderPath;
+	
+	@Autowired
+	private KieSessionService session;
 
 	@Autowired
 	public UserService(@Value("${server.ssl.key-store-folder}") String resourceFolderPath,
@@ -86,7 +97,13 @@ public class UserService implements UserDetailsService {
 	}
 
 	public UserTokenStateDTO login(String username, String password, String IPAddress)
-			throws DisabledException, UserException {
+			throws DisabledException, UserException, MaliciousIPAddressException {
+		
+		if(MaliciousIPHandler.ips.contains(IPAddress)) {
+			logService.logAuthError("Login failed! Malicious IP address: " + IPAddress);
+			throw new MaliciousIPAddressException("Login failed! Your IP address has been blacklisted.");
+		}
+		
 		User existUser = null;
 		try {
 			existUser = getOne(username);
@@ -104,8 +121,39 @@ public class UserService implements UserDetailsService {
 		try {
 			token = generateToken(username, password);
 		} catch (BadCredentialsException e) {
-			logService.logAuthError("Login failed, wrong password for account '" + username + "'. IP: " + IPAddress);
-			throw new UserException("Bad credentials exception!", "password", "Incorrect password.");
+			logService.logAuthWarning("Login failed, wrong password for account '" + username + "'. IP: " + IPAddress);
+			StatusLoginEvent statusLoginEvent = new StatusLoginEvent(username);
+			StatusMaliciousLoginEvent statusMaliciousLoginEvent = new StatusMaliciousLoginEvent(IPAddress);
+			InvalidLoginEvent event = new InvalidLoginEvent(username);
+			MaliciousLoginEvent mEvent = new MaliciousLoginEvent(IPAddress);
+			session.insert(event);
+			session.insert(statusLoginEvent);
+			session.insert(mEvent);
+			session.insert(statusMaliciousLoginEvent);
+			session.setAgendaFocus("user-login-check");
+			session.fireAllRules();
+			if (statusLoginEvent.isAttack()) {
+				session.removeLoginEvents(username);
+				logService.logAuthError("Attack happened - Login failed, wrong password for account '" + username + " ' 3 times. IP: " + IPAddress);
+			}
+			if (statusMaliciousLoginEvent.isAttack()) {
+				session.removeMaliciousLoginEvents(IPAddress);
+				MaliciousIPHandler.ips.add(IPAddress);
+				MaliciousIPHandler.writeIP();
+				logService.logAuthError("Detected more than 30 failed login attempts in the last 24h. Malicious IP: " + IPAddress);
+			}
+			throw new UserException("Invalid username or password!", "password", "Incorrect password.");
+		}
+		
+		Date lastLogin = new Date(existUser.getLastLoginDate().getTime());
+		Date now = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(now);
+		cal.add(Calendar.DATE, -90);
+		Date dateBefore90Days = cal.getTime();
+		
+		if (lastLogin.before(dateBefore90Days)) {
+			logService.logAuthError("Login detected for '" + username + " ' Account was unused for 90 days. IP: " + IPAddress);
 		}
 
 		existUser.resetLastLoginDate();
