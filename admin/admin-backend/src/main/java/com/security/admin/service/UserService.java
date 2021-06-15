@@ -26,7 +26,7 @@ import com.security.admin.dto.HospitalDTO;
 import com.security.admin.dto.ResetPasswordDTO;
 import com.security.admin.dto.UserDTO;
 import com.security.admin.dto.UserListDTO;
-import com.security.admin.dto.UserListRequestDTO;
+import com.security.admin.dto.AdminAuthDTO;
 import com.security.admin.dto.UserTokenStateDTO;
 import com.security.admin.exception.OftenUsedPasswordException;
 import com.security.admin.exception.UserException;
@@ -198,7 +198,7 @@ public class UserService {
 			try {
 				String url = h.getHospitalUrl() + "/api/users/request";
 				
-				UserListRequestDTO dto = new UserListRequestDTO();
+				AdminAuthDTO dto = new AdminAuthDTO();
 				byte[] csrBytes = dto.getCSRBytes();
 				PrivateKey privateKey = KeyPairUtility.readPrivateKey(resourceFolderPath + "/key.priv");
 				byte[] signature = CryptographicUtility.sign(csrBytes, privateKey);
