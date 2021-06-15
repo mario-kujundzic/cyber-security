@@ -18,6 +18,7 @@ import ManageDeleteUserRequests from "../views/ManageDeleteUserRequests";
 import ManageModifyUserRequests from "../views/ManageModifyUserRequests";
 import Logs from "../views/Logs";
 import ViewCertificates from "../views/home/ViewCertificates";
+import AdminReport from "../views/AdminReport";
 
 const routes = [
   {
@@ -98,6 +99,12 @@ const routes = [
         component: Logs,
         name: "Logs",
         path: "logs",
+        beforeEnter: guardRouteAdmin
+      },
+      {
+        component: AdminReport,
+        name: "AdminReport",
+        path: "adminReport",
         beforeEnter: guardRouteAdmin
       }
     ],

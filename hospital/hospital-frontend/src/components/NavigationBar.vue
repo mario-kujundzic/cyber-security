@@ -33,6 +33,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link :to="{ name: 'PublicKeyViewer' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
             <v-list-item-icon>
@@ -43,7 +44,9 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+        
         <v-divider></v-divider>
+
         <router-link :to="{ name: 'ViewCertificates' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
             <v-list-item-icon>
@@ -54,6 +57,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link :to="{ name: 'ManageDevices' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
             <v-list-item-icon>
@@ -64,7 +68,9 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <v-divider></v-divider>
+
         <router-link :to="{ name: 'ManageUsers' }" v-slot="{ navigate }">
           <v-list-item @click="navigate">
             <v-list-item-icon>
@@ -75,6 +81,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link
           :to="{ name: 'ManageAddUserRequests' }"
           v-slot="{ navigate }"
@@ -89,6 +96,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link
           :to="{ name: 'ManageDeleteUserRequests' }"
           v-slot="{ navigate }"
@@ -103,6 +111,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link
           :to="{ name: 'ManageModifyUserRequests' }"
           v-slot="{ navigate }"
@@ -117,6 +126,7 @@
             </v-list-item-content>
           </v-list-item>
         </router-link>
+
         <router-link
           :to="{ name: 'Logs' }"
           v-slot="{ navigate }"
@@ -128,6 +138,21 @@
 
             <v-list-item-content>
               <v-list-item-title>Logs</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
+        <router-link
+          :to="{ name: 'AdminReport' }"
+          v-slot="{ navigate }"
+        >
+          <v-list-item @click="navigate">
+            <v-list-item-icon>
+              <v-icon>mdi-file-chart</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>Admin Report</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </router-link>
