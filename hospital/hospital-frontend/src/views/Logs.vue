@@ -229,6 +229,7 @@ export default {
     async forceRefresh() {
       this.refreshing = true;
       await this.getLogs();
+      await this.getMessageSources();
       this.refreshInSeconds = this.refreshInterval;
       this.refreshing = false;
     },
